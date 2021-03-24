@@ -123,7 +123,23 @@ constant symbol der_π2 :
   Π(p A : Term), Π(B : Term → Term),
   der p (tsum A B) → der (π2 A B p) (B (π1 A B p));
 // Equality terms
-// TODO
+constant symbol der_refl :
+  Π(s : Sort), Π(u A : Term),
+  der A (tsort s) → der u A → der (trefl A u) (teq A u u);
+constant symbol der_uip :
+  Π(e1 e2 u v A : Term),
+  der e1 (teq A u v) → der e2 (teq A u v) → der (uip A u v e1 e2) (teq (teq A u v) e1 e2);
+constant symbol der_J :
+  Π(s s' : Sort), Π(A u v p w : Term), Π(P : Term → Term → Term),
+  der A (tsort s) → der u A → der v A
+  → der (P (VAR A) (VAR (teq A u (VAR A)))) (tsort s')
+  → der p (teq A u v) → der w (P u (trefl A u))
+  → der (J A u P w v p) (P v p);
+constant symbol der_funext :
+  Π(f g A e : Term), Π(B : Term → Term),
+  der f (tfun A B) → der g (tfun A B)
+  → der e (tfun A (λ u, teq (B u) (tapp A B f u) (tapp A B g u)))
+  → der (funext A B f g e) (teq (tfun A B) f g);
 // Computation
 // TODO
 // Conversion
