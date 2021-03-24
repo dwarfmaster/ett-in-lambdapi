@@ -141,6 +141,29 @@ constant symbol der_funext :
   → der e (tfun A (λ u, teq (B u) (tapp A B f u) (tapp A B g u)))
   → der (funext A B f g e) (teq (tfun A B) f g);
 // Computation
-// TODO
+constant symbol der_eq_beta :
+  Π(s s' : Sort), Π(u A : Term), Π(t B : Term → Term),
+  der A (tsort s) → der (B (VAR A)) (tsort s') → der (t (VAR A)) (B (VAR A)) → der u A
+  → der_eq (B u) (tapp A B (tabs A B t) u) (t u);
+constant symbol der_eq_J :
+  Π(s s' : Sort), Π(u A w : Term), Π(P : Term → Term → Term),
+  der A (tsort s) → der u A → der (P (VAR A) (VAR (teq A u (VAR A)))) (tsort s')
+  → der w (P u (trefl A u))
+  → der_eq (P u (trefl A u)) (J A u P w u (trefl A u)) w;
+constant symbol der_eq_π1 :
+  Π(s s' : Sort), Π(u A v : Term), Π(B : Term → Term),
+  der A (tsort s) → der u A → der (B (VAR A)) (tsort s') → der v (B u)
+  → der_eq A (π1 A B (tpair A B u v)) u;
+constant symbol der_eq_π2 :
+  Π(s s' : Sort), Π(u A v : Term), Π(B : Term → Term),
+  der A (tsort s) → der u A → der (B (VAR A)) (tsort s') → der v (B u)
+  → der_eq (B u) (π2 A B (tpair A B u v)) v;
 // Conversion
-// TODO
+constant symbol der_eq_conversion :
+  Π(s : Sort), Π(t1 t2 T1 T2 : Term),
+  der T1 (tsort s) → der T2 (tsort s)
+  → der_eq T1 t1 t2 → der_eq (tsort s) T1 T2
+  → der_eq T2 t1 t2;
+constant symbol der_eq_lift :
+  Π(e u v A : Term),
+  der e (teq A u v) → der_eq A u v;
