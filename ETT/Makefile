@@ -1,5 +1,5 @@
 .POSIX:
-SRC = main.lp rr.lp itt.lp
+SRC = main.lp rr.lp itt.lp der_ind.lp
 OBJ = $(SRC:.lp=.lpo)
 .SUFFIXES:
 
