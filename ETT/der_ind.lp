@@ -75,6 +75,60 @@ symbol der_ind :
     Π(d1 : der e1 (teq A u v)), Π(d2 : der e2 (teq A u v)),
     Π(H1 : ε S (P _ _ d1)), Π(H2 : ε S (P _ _ d2)), ε S (P _ _ (der_uip e1 e2 u v A d1 d2)))
   // J
-  // TODO
+  → (Π(s s' : Sort), Π(A u v p w : Term), Π(E : Term → Term → Term),
+    Π(dA : der A (tsort s)), Π(du : der u A), Π(dv : der v A),
+    Π(dE : Π(v1 v2 : Var), der (E (VAR v1 A) (VAR v2 (teq A u (VAR v1 A)))) (tsort s')),
+    Π(dp : der p (teq A u v)), Π(dw : der w (E u (trefl A u))),
+    Π(HA : ε S (P _ _ dA)), Π(Hu : ε S (P _ _ du)), Π(Hv : ε S (P _ _ dv)),
+    Π(HE : Π(v1 v2 : Var), ε S (P _ _ (dE v1 v2))),
+    Π(Hp : ε S (P _ _ dp)), Π(Hw : ε S (P _ _ dw)),
+    ε S (P _ _ (der_J s s' A u v p w E dA du dv dE dp dw)))
+  // Function extensionality
+  → (Π(f g A e : Term), Π(B : Term → Term),
+    Π(df : der f (tfun A B)), Π(dg : der g (tfun A B)),
+    Π(de : der e (tfun A (λ u, teq (B u) (tapp A B f u) (tapp A B g u)))),
+    Π(Hf : ε S (P _ _ df)), Π(Hg : ε S (P _ _ dg)), Π(He : ε S (P _ _ de)),
+    ε S (P _ _ (der_funext f g A e B df dg de)))
+
+  // Computation
+  // β-reduction
+  → (Π(s s' : Sort), Π(u A : Term), Π(t B : Term → Term),
+    Π(dA : der A (tsort s)), Π(dB : Π(v : Var), der (B (VAR v A)) (tsort s')),
+    Π(dt : Π(v : Var), der (t (VAR v A)) (B (VAR v A))), Π(du : der u A),
+    Π(HA : ε S (P _ _ dA)), Π(HB : Π(v : Var), ε S (P _ _ (dB v))),
+    Π(Ht : Π(v : Var), ε S (P _ _ (dt v))), Π(Hu : ε S (P _ _ du)),
+    ε S (Peq _ _ _ (der_eq_beta s s' u A t B dA dB dt du)))
+  // J
+  → (Π(s s' : Sort), Π(u A w : Term), Π(E : Term → Term → Term),
+    Π(dA : der A (tsort s)), Π(du : der u A),
+    Π(dE : Π(v1 v2 : Var), der (E (VAR v1 A) (VAR v2 (teq A u (VAR v1 A)))) (tsort s')),
+    Π(dw : der w (E u (trefl A u))),
+    Π(HA : ε S (P _ _ dA)), Π(Hu : ε S (P _ _ du)),
+    Π(HE : Π(v1 v2 : Var), ε S (P _ _ (dE v1 v2))), Π(Hw : ε S (P _ _ dw)),
+    ε S (Peq _ _ _ (der_eq_J s s' u A w E dA du dE dw)))
+  // π1
+  → (Π(s s' : Sort), Π(u A v : Term), Π(B : Term → Term),
+    Π(dA : der A (tsort s)), Π(du : der u A),
+    Π(dB : Π(v : Var), der (B (VAR v A)) (tsort s')), Π(dv : der v (B u)),
+    Π(HA : ε S (P _ _ dA)), Π(Hu : ε S (P _ _ du)),
+    Π(HB : Π(v : Var), ε S (P _ _ (dB v))), Π(Hv : ε S (P _ _ dv)),
+    ε S (Peq _ _ _ (der_eq_π1 s s' u A v B dA du dB dv)))
+  // π2
+  → (Π(s s' : Sort), Π(u A v : Term), Π(B : Term → Term),
+    Π(dA : der A (tsort s)), Π(du : der u A),
+    Π(dB : Π(v : Var), der (B (VAR v A)) (tsort s')), Π(dv : der v (B u)),
+    Π(HA : ε S (P _ _ dA)), Π(Hu : ε S (P _ _ du)),
+    Π(HB : Π(v : Var), ε S (P _ _ (dB v))), Π(Hv : ε S (P _ _ dv)),
+    ε S (Peq _ _ _ (der_eq_π2 s s' u A v B dA du dB dv)))
+  // Conversion
+  → (Π(s : Sort), Π(t1 t2 T1 T2 : Term),
+    Π(dT1 : der T1 (tsort s)), Π(dT2 : der T2 (tsort s)),
+    Π(deqt : der_eq T1 t1 t2), Π(deqT : der_eq (tsort s) T1 T2),
+    Π(HT1 : ε S (P _ _ dT1)), Π(HT2 : ε S (P _ _ dT2)),
+    Π(Heqt : ε S (Peq _ _ _ deqt)), Π(HeqT : ε S (Peq _ _ _ deqT)),
+    ε S (Peq _ _ _ (der_eq_conversion s t1 t2 T1 T2 dT1 dT2 deqt deqT)))
+  // Lifting
+  → (Π(e u v A : Term), Π(de : der e (teq A u v)),
+    Π(He : ε S (P _ _ de)), ε S (Peq _ _ _ (der_eq_lift e u v A de)))
 
   → Π(t T : Term), Π(d : der t T), ε S (P t T d); //
