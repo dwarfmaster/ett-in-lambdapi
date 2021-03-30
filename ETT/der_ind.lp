@@ -4,7 +4,19 @@ require ETT.itt as ITT;
 
 symbol ε ≔ ITT.ε;
 
-symbol der_ind :
+constant symbol der_ind_T :
+  Π(S : ITT.Sort),
+  Π(_ : Π(t T : Term), der t T → ITT.U S),
+  Π(_ : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S),
+  TYPE;
+symbol get_der_ind {S : ITT.Sort} {P : Π(t T : Term), der t T → ITT.U S}
+                   {Peq : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S} :
+  der_ind_T S P Peq → Π(t T : Term), Π(d : der t T), ε S (P t T d);
+symbol get_der_eq_ind {S : ITT.Sort} {P : Π(t T : Term), der t T → ITT.U S}
+                   {Peq : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S} :
+  der_ind_T S P Peq → Π(t1 t2 T : Term), Π(d : der_eq t1 t2 T), ε S (Peq t1 t2 T d);
+
+symbol der_ind' :
   Π(S : ITT.Sort),
   Π(P : Π(t T : Term), der t T → ITT.U S),
   Π(Peq : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S),
@@ -131,4 +143,17 @@ symbol der_ind :
   → (Π(e u v A : Term), Π(de : der e (teq A u v)),
     Π(He : ε S (P _ _ de)), ε S (Peq _ _ _ (der_eq_lift e u v A de)))
 
-  → Π(t T : Term), Π(d : der t T), ε S (P t T d); //
+  → der_ind_T S P Peq;
+
+symbol der_ind S P Peq csort cprod csigma ctypeeq cvar cconv
+               cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
+               cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift
+               ≔ get_der_ind (der_ind' S P Peq csort cprod csigma ctypeeq cvar cconv
+                                       cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
+                                       cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift);
+symbol der_eq_ind S P Peq csort cprod csigma ctypeeq cvar cconv
+                  cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
+                  cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift
+                  ≔ get_der_eq_ind (der_ind' S P Peq csort cprod csigma ctypeeq cvar cconv
+                                             cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
+                                             cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift);
