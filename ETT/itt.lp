@@ -4,9 +4,9 @@ constant symbol Sort : TYPE;
 constant symbol s0 : Sort;
 constant symbol snext : Sort → Sort;
 symbol smax : Sort → Sort → Sort;
-rule smax s0 $s ↪ $s;
-rule smax $s s0 ↪ $s;
-rule smax (snext $s1) (snext $s2) ↪ snext (smax $s1 $s2);
+rule smax s0 $s ↪ $s
+with smax $s s0 ↪ $s
+with smax (snext $s1) (snext $s2) ↪ snext (smax $s1 $s2);
 
 // Interpretation of sorts
 constant symbol U : Sort → TYPE;

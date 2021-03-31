@@ -4,9 +4,9 @@ symbol Sort : TYPE;
 constant symbol s0 : Sort;
 constant symbol snext : Sort → Sort;
 symbol smax : Sort → Sort → Sort;
-rule smax s0 $n ↪ $n;
-rule smax $n s0 ↪ $n;
-rule smax (snext $n) (snext $m) ↪ snext (smax $n $m);
+rule smax s0 $n ↪ $n
+with smax $n s0 ↪ $n
+with smax (snext $n) (snext $m) ↪ snext (smax $n $m);
 
 /* Terms */
 /* HOAS style, in order to avoid having to bother with De Brujin indices and α
