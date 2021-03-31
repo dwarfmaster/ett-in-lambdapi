@@ -45,7 +45,7 @@ symbol der_ind' :
   → (Π(A : Term), Π(v : Var), ε S (P _ _ (der_var A v)))
   // Conversion
   → (Π(u A B : Term), Π(s : Sort),
-    Π(du : der u A), Π(deq : der_eq A B (tsort s)),
+    Π(du : der u A), Π(deq : der_eq (tsort s) A B),
     Π(Hu : ε S (P _ _ du)), Π(Heq : ε S (Peq _ _ _ deq)),
     ε S (P _ _ (der_type_conv u A B s du deq)))
 

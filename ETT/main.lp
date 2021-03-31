@@ -102,7 +102,7 @@ constant symbol der_prop_type_eq :
 constant symbol der_var : Π(A : Term), Π(v : Var), der (VAR v A) A;
 constant symbol der_type_conv :
   Π (u A B : Term), Π(s : Sort),
-  der u A → der_eq A B (tsort s) → der u B;
+  der u A → der_eq (tsort s) A B → der u B;
 
 // λ-calculus terms
 constant symbol der_abs :

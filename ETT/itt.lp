@@ -40,3 +40,11 @@ constant symbol uip (s : Sort) (A : U s) (u v : ε s A) (e1 e2 : ε s (eq s A u 
 constant symbol funext (s s' : Sort) (A : U s) (B : ε s A → U s') (f g : ε (smax s s') (P s s' A B))
                        (_ : Π(x : ε s A), ε s' (eq s' (B x) (f x) (g x)))
               : ε (smax s s') (eq (smax s s') (P s s' A B) f g);
+
+// True
+constant symbol ⊤ (s : Sort) : U s;
+constant symbol I (s : Sort) : ε s (⊤ s);
+
+// False
+constant symbol ⊥ (s : Sort) : U s;
+constant symbol ⊥_elim (s1 s2 : Sort) (A : U s2) : ε _ (P s1 s2 (⊥ s1) (λ _, A));
