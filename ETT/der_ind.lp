@@ -9,11 +9,11 @@ constant symbol der_ind_T :
   Π(_ : Π(t T : Term), der t T → ITT.U S),
   Π(_ : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S),
   TYPE;
-symbol get_der_ind {S : ITT.Sort} {P : Π(t T : Term), der t T → ITT.U S}
-                   {Peq : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S} :
+symbol get_der_ind (S : ITT.Sort) (P : Π(t T : Term), der t T → ITT.U S)
+                   (Peq : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S) :
   der_ind_T S P Peq → Π(t T : Term), Π(d : der t T), ε S (P t T d);
-symbol get_der_eq_ind {S : ITT.Sort} {P : Π(t T : Term), der t T → ITT.U S}
-                   {Peq : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S} :
+symbol get_der_eq_ind (S : ITT.Sort) (P : Π(t T : Term), der t T → ITT.U S)
+                   (Peq : Π(t1 t2 T : Term), der_eq t1 t2 T → ITT.U S) :
   der_ind_T S P Peq → Π(t1 t2 T : Term), Π(d : der_eq t1 t2 T), ε S (Peq t1 t2 T d);
 
 symbol der_ind' :
@@ -145,15 +145,287 @@ symbol der_ind' :
 
   → der_ind_T S P Peq;
 
+// Helpers
 symbol der_ind S P Peq csort cprod csigma ctypeeq cvar cconv
                cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
                cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift
-               ≔ get_der_ind (der_ind' S P Peq csort cprod csigma ctypeeq cvar cconv
+               ≔ get_der_ind S P Peq
+                             (der_ind' S P Peq csort cprod csigma ctypeeq cvar cconv
                                        cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
                                        cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift);
 symbol der_eq_ind S P Peq csort cprod csigma ctypeeq cvar cconv
                   cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
                   cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift
-                  ≔ get_der_eq_ind (der_ind' S P Peq csort cprod csigma ctypeeq cvar cconv
+                  ≔ get_der_eq_ind S P Peq
+                                   (der_ind' S P Peq csort cprod csigma ctypeeq cvar cconv
                                              cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
                                              cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift);
+
+// Computation rules
+rule get_der_ind _ _ _ (der_ind' _ _ _ $csort _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _) _ _ (der_sort $s)
+  ↪ $csort $s;
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_prod $s $s' $A $B $dA $dB)
+  ↪ $cprod $s $s' $A $B $dA $dB
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dB);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_sigma $s $s' $A $B $dA $dB)
+  ↪ $csigma $s $s' $A $B $dA $dB
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dB);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_prop_type_eq $s $A $u $v $dA $du $dv)
+  ↪ $ctypeeq $s $A $u $v $dA $du $dv
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dv);
+rule get_der_ind _ _ _ (der_ind' _ _ _ _ _ _ _ $cvar _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _) _ _ (der_var $A $v)
+  ↪ $cvar $A $v;
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_type_conv $u $A $B $s $du $deq)
+  ↪ $cconv $u $A $B $s $du $deq
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du)
+        (der_eq_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ _ $deq);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_abs $s $s' $A $t $B $dA $dB $dt)
+  ↪ $cabs $s $s' $A $t $B $dA $dB $dt
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (λ v, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                      $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                      $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dB v))
+        (λ v, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                      $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                      $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dt v));
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_app $s $s' $A $t $u $B $dA $dB $dt $du)
+  ↪ $capp $s $s' $A $t $u $B $dA $dB $dt $du
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (λ v, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                      $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                      $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dB v))
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dt)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_pair $s $s' $u $A $v $B $dA $du $dB $dv)
+  ↪ $cpair $s $s' $u $A $v $B $dA $du $dB $dv
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du)
+        (λ v, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                      $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                      $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dB v))
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dv);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_π1 $p $A $B $dp)
+  ↪ $cπ1 $p $A $B $dp
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dp);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_π2 $p $A $B $dp)
+  ↪ $cπ2 $p $A $B $dp
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dp);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_refl $s $u $A $dA $du)
+  ↪ $crefl $s $u $A $dA $du
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_uip $e1 $e2 $u $v $A $de1 $de2)
+  ↪ $cuip $e1 $e2 $u $v $A $de1 $de2
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $de1)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $de2);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_J $s $s' $A $u $v $p $w $E $dA $du $dv $dE $dp $dw)
+  ↪ $cJ $s $s' $A $u $v $p $w $E $dA $du $dv $dE $dp $dw
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dv)
+        (λ v1 v2, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                          $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                          $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dE v1 v2))
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dp)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dw);
+rule get_der_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _
+                 (der_funext $f $g $A $e $B $df $dg $de)
+  ↪ $cfunext $f $g $A $e $B $df $dg $de
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $df)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dg)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $de);
+rule get_der_eq_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _ _
+                 (der_eq_beta $s $s' $u $A $t $B $dA $dB $dt $du)
+  ↪ $cbeta $s $s' $u $A $t $B $dA $dB $dt $du
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (λ v, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                      $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                      $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dB v))
+        (λ v, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                      $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                      $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dt v))
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du);
+rule get_der_eq_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _ _
+                 (der_eq_J $s $s' $u $A $w $E $dA $du $dE $dw)
+  ↪ $ceqJ $s $s' $u $A $w $E $dA $du $dE $dw
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du)
+        (λ v1 v2, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                          $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                          $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dE v1 v2))
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dw);
+rule get_der_eq_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _ _
+                 (der_eq_π1 $s $s' $u $A $v $B $dA $du $dB $dv)
+  ↪ $ceqπ1 $s $s' $u $A $v $B $dA $du $dB $dv
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du)
+        (λ v, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                      $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                      $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dB v))
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dv);
+rule get_der_eq_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _ _
+                 (der_eq_π2 $s $s' $u $A $v $B $dA $du $dB $dv)
+  ↪ $ceqπ2 $s $s' $u $A $v $B $dA $du $dB $dv
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dA)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $du)
+        (λ v, der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                      $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                      $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ ($dB v))
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dv);
+rule get_der_eq_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _ _
+                 (der_eq_conversion $s $t1 $t2 $T1 $T2 $dT1 $dT2 $deqt $deqT)
+  ↪ $ceqconv $s $t1 $t2 $T1 $T2 $dT1 $dT2 $deqt $deqT
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dT1)
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $dT2)
+        (der_eq_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ _ $deqt)
+        (der_eq_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ _ $deqT);
+rule get_der_eq_ind _ _ _ (der_ind' $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                                    $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                                    $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift) _ _ _
+                 (der_eq_lift $e $u $v $A $de)
+  ↪ $ceqlift $e $u $v $A $de
+        (der_ind $S $P $Peq $csort $cprod $csigma $ctypeeq $cvar $cconv
+                 $cabs $capp $cpair $cπ1 $cπ2 $crefl $cuip $cJ $cfunext
+                 $cbeta $ceqJ $ceqπ1 $ceqπ2 $ceqconv $ceqlift _ _ $de);
