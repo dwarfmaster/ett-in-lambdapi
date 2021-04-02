@@ -1,6 +1,7 @@
 
 require ETT.main as ETT;
 require ETT.itt as ITT;
+require ETT.inversions as I;
 
 // Helper definitions
 symbol ε ≔ ITT.ε;
@@ -20,20 +21,15 @@ symbol τ_s : ETT.Sort → ITT.Sort;
 rule τ_s ETT.s0 ↪ ITT.s0
 with τ_s (ETT.snext $s) ↪ ITT.snext (τ_s $s);
 
-// Inversion lemma for eq
-symbol Term ≔ ETT.Term;
-symbol inv_eq_1 (s : ETT.Sort) (t1 t2 T : Term) (d : ETT.der_eq T t1 t2) : ETT.der t1 T;
-symbol inv_eq_2 (s : ETT.Sort) (t1 t2 T : Term) (d : ETT.der_eq T t1 t2) : ETT.der t2 T;
-symbol inv_sort (s : ETT.Sort) (t T : ETT.Term) (d : ETT.der t T) : ETT.der T (ETT.tsort s);
-
-// Translation
-// TODO add sort information to der
-// symbol τ_T (T : Term) (s : ETT.Sort) : ETT.der T (ETT.tsort s) → univ (τ_s s);
-// symbol τ (t T : Term) (s : ETT.Sort) (d : ETT.der t T) : ε (τ_s s) (τ_T t T s (inv_sort s t T d));
-
-// symbol τ_eq (t1 t2 T : Term) (s : ETT.Sort) (d : ETT.der_eq T t1 t2) :
-//   heterogeneous_eq' (τ_s s)
-//                   (τ_T t1 T s (inv_eq_1 s t1 t2 T d))
-//                   (τ_T t2 T s (inv_eq_2 s t1 t2 T d))
-//                   (τ t1 T s (inv_eq_1 s t1 t2 T d))
-//                   (τ t2 T s (inv_eq_2 s t1 t2 T d));
+// Translation declaration
+symbol τ_T (T : ETT.Term) (s : ETT.Sort) : ETT.der T (ETT.tsort s) → univ (τ_s s);
+symbol τ (t T : ETT.Term) (d : ETT.der t T) :
+  ε (τ_s (I.inv_get_sort t T d)) (τ_T T (I.inv_get_sort t T d) (I.inv_sort t T d));
+symbol τ_eq (T t1 t2 : ETT.Term) (d : ETT.der_eq T t1 t2) :
+  let s ≔ I.inv_eq_get_sort T t1 t2 d in
+  let d1 ≔ I.inv_eq_t1 T t1 t2 d in
+  let d2 ≔ I.inv_eq_t2 T t1 t2 d in
+  heterogeneous_eq (τ_s s)
+    (τ_T T s (I.inv_sort t1 T d1))
+    (τ_T T s (I.inv_sort t2 T d2))
+    (τ t1 T d1) (τ t2 T d2);
