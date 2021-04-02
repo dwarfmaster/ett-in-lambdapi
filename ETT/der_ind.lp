@@ -141,89 +141,25 @@ symbol der_ind' :
   → (Π(e u v A : Term), Π(de : der e (teq A u v)),
     Π(He : ITT.ε S (P _ _ de)), ITT.ε S (Peq _ _ _ (der_eq_lift e u v A de)))
 
-  // Computation context
-  // CTX Abstraction
-  → (Π(s s' : Sort), Π(A A' : Term), Π(B B' t t' : Term → Term),
-    Π(dA : der_eq (tsort s) A A'),
-    Π(dB : Π(v : Var), der_eq (tsort s') (B (VAR v A)) (B' (VAR v A))),
-    Π(dt : Π(v : Var), der_eq (B (VAR v A)) (t (VAR v A)) (t' (VAR v A))),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(HB : Π(v : Var), ITT.ε S (Peq _ _ _ (dB v))),
-    Π(Ht : Π(v : Var), ITT.ε S (Peq _ _ _ (dt v))),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_abs s s' A A' B B' t t' dA dB dt)))
-  // CTX Application
-  → (Π(s s' : Sort), Π(A A' f f' u u' : Term), Π(B B' : Term → Term),
-    Π(dA : der_eq (tsort s) A A'), Π(df : der_eq (tfun A B) f f'),
-    Π(du : der_eq A u u'), Π(dB : Π(v : Var), der_eq (tsort s') (B (VAR v A)) (B' (VAR v A))),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(Hf : ITT.ε S (Peq _ _ _ df)),
-    Π(Hu : ITT.ε S (Peq _ _ _ du)), Π(HB : Π(v : Var), ITT.ε S (Peq _ _ _ (dB v))),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_app s s' A A' f f' u u' B B' dA df du dB)))
-  // CTX Product
-  → (Π(s s' : Sort), Π(A A' : Term), Π(B B' : Term → Term),
-    Π(dA : der_eq (tsort s) A A'), Π(dB : Π(v : Var), der_eq (tsort s') (B (VAR v A)) (B' (VAR v A))),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(HB : Π(v : Var), ITT.ε S (Peq _ _ _ (dB v))),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_prod s s' A A' B B' dA dB)))
-  // CTX Pair
-  → (Π(s s' : Sort), Π(u u' A A' v v' : Term), Π(B B' : Term → Term),
-    Π(du : der_eq A u u'), Π(dA : der_eq (tsort s) A A'), Π(dv : der_eq (B u) v v'),
-    Π(dB : Π(v : Var), der_eq (tsort s') (B (VAR v A)) (B' (VAR v A))),
-    Π(Hu : ITT.ε S (Peq _ _ _ du)), Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(Hv : ITT.ε S (Peq _ _ _ dv)),
-    Π(HB : Π(v : Var), ITT.ε S (Peq _ _ _ (dB v))),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_pair s s' u u' A A' v v' B B' du dA dv dB)))
-  // CTX π1
-  → (Π(s s' : Sort), Π(p p' A A' : Term), Π(B B' : Term → Term),
-    Π(dA : der_eq (tsort s) A A'), Π(dB : Π(v : Var), der_eq (tsort s') (B (VAR v A)) (B' (VAR v A))),
-    Π(dp : der_eq (tsum A B) p p'),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(HB : Π(v : Var), ITT.ε S (Peq _ _ _ (dB v))),
-    Π(Hp : ITT.ε S (Peq _ _ _ dp)),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_π1 s s' p p' A A' B B' dA dB dp)))
-  // CTX π2
-  → (Π(s s' : Sort), Π(p p' A A' : Term), Π(B B' : Term → Term),
-    Π(dA : der_eq (tsort s) A A'), Π(dB : Π(v : Var), der_eq (tsort s') (B (VAR v A)) (B' (VAR v A))),
-    Π(dp : der_eq (tsum A B) p p'),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(HB : Π(v : Var), ITT.ε S (Peq _ _ _ (dB v))),
-    Π(Hp : ITT.ε S (Peq _ _ _ dp)),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_π2 s s' p p' A A' B B' dA dB dp)))
-  // CTX sum
-  → (Π(s s' : Sort), Π(A A' : Term), Π(B B' : Term → Term),
-    Π(dA : der_eq (tsort s) A A'), Π(dB : Π(v : Var), der_eq (tsort s') (B (VAR v A)) (B' (VAR v A))),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(HB : Π(v : Var), ITT.ε S (Peq _ _ _ (dB v))),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_sum s s' A A' B B' dA dB)))
-  // CTX refl
-  → (Π(s : Sort), Π(A A' u u' : Term),
-    Π(dA : der_eq (tsort s) A A'), Π(du : der_eq A u u'),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(Hu : ITT.ε S (Peq _ _ _ du)),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_refl s A A' u u' dA du)))
-  // CTX J
-  → (Π(s s' : Sort), Π(A A' u u' v v' w w' p p' : Term), Π(E E' : Term → Term → Term),
-    Π(dA : der_eq (tsort s) A A'), Π(du : der_eq A u u'), Π(dv : der_eq A v v'),
-    Π(dE : Π(v1 v2 : Var), der_eq (tsort s') (E  (VAR v1 A) (VAR v2 (teq A u (VAR v1 A))))
-                                             (E' (VAR v1 A) (VAR v2 (teq A u (VAR v1 A))))),
-    Π(dp : der_eq (teq A u v) p p'), Π(dw : der_eq (E u (trefl A u)) w w'),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(Hu : ITT.ε S (Peq _ _ _ du)), Π(Hv : ITT.ε S (Peq _ _ _ dv)),
-    Π(HE : Π(v1 v2 : Var), ITT.ε S (Peq _ _ _ (dE v1 v2))),
-    Π(Hp : ITT.ε S (Peq _ _ _ dp)), Π(Hw : ITT.ε S (Peq _ _ _ dw)),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_J s s' A A' u u' v v' w w' p p' E E' dA du dv dE dp dw)))
-  // CTX equality
-  → (Π(s : Sort), Π(A A' u u' v v' : Term),
-    Π(dA : der_eq (tsort s) A A'), Π(du : der_eq A u u'), Π(dv : der_eq A v v'),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(Hu : ITT.ε S (Peq _ _ _ du)), Π(Hv : ITT.ε S (Peq _ _ _ dv)),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_teq s A A' u u' v v' dA du dv)))
-  // CTX function extensionality
-  → (Π(s s' : Sort), Π(f f' g g' A A' e e' : Term), Π(B B' : Term → Term),
-    Π(dA : der_eq (tsort s) A A'), Π(dB : Π(v : Var), der_eq (tsort s') (B (VAR v A)) (B' (VAR v A))),
-    Π(df : der_eq (tfun A B) f f'), Π(dg : der_eq (tfun A B) g g'),
-    Π(de : der_eq (tfun A (λ u, teq (B u) (tapp A B f u) (tapp A B g u))) e e'),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(HB : Π(v : Var), ITT.ε S (Peq _ _ _ (dB v))),
-    Π(Hf : ITT.ε S (Peq _ _ _ df)), Π(Hg : ITT.ε S (Peq _ _ _ dg)),
-    Π(He : ITT.ε S (Peq _ _ _ de)),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_funext s s' f f' g g' A A' e e' B B' dA dB df dg de)))
-  // CTX UIP
-  → (Π(s : Sort), Π(e1 e1' e2 e2' u u' v v' A A' : Term),
-    Π(dA : der_eq (tsort s) A A'), Π(du : der_eq A u u'), Π(dv : der_eq A v v'),
-    Π(de1 : der_eq (teq A u v) e1 e1'), Π(de2 : der_eq (teq A u v) e2 e2'),
-    Π(HA : ITT.ε S (Peq _ _ _ dA)), Π(Hu : ITT.ε S (Peq _ _ _ du)), Π(Hv : ITT.ε S (Peq _ _ _ dv)),
-    Π(He1 : ITT.ε S (Peq _ _ _ de1)), Π(He2 : ITT.ε S (Peq _ _ _ de2)),
-    ITT.ε S (Peq _ _ _ (der_eq_ctx_uip s e1 e1' e2 e2' u u' v v' A A' dA du dv de1 de2)))
+  // Congruence
+  // Reflexivity
+  → (Π(u A : Term), Π(dA : der u A), Π(HA : ITT.ε S (P _ _ dA)),
+    ITT.ε S (Peq _ _ _ (der_eq_refl u A dA)))
+  // Transitivity
+  → (Π(u v w A : Term), Π(du : der_eq A u v), Π(dv : der_eq A v w),
+    Π(Hu : ITT.ε S (Peq _ _ _ du)), Π(Hv : ITT.ε S (Peq _ _ _ dv)),
+    ITT.ε S (Peq _ _ _ (der_eq_trans u v w A du dv)))
+  // Symmetry
+  → (Π(u v A : Term), Π(d : der_eq A u v),
+    Π(H : ITT.ε S (Peq _ _ _ d)), ITT.ε S (Peq _ _ _ (der_eq_symm u v A d)))
+  // Context
+  → (Π(s : Sort), Π(u u' A B : Term), Π(C C' : Term → Term),
+    Π(du : der_eq A u u'), Π(dB : der B (tsort s)),
+    Π(dC : Π(v : Var), der_eq B (C (VAR v A)) (C' (VAR v A))),
+    Π(Hu : ITT.ε S (Peq _ _ _ du)), Π(HB : ITT.ε S (P _ _ dB)),
+    Π(HC : Π(v : Var), ITT.ε S (Peq _ _ _ (dC v))),
+    ITT.ε S (Peq _ _ _ (der_eq_context s u u' A B C C' du dB dC)))
+
 
   → der_ind_T S P Peq;
 
@@ -231,25 +167,21 @@ symbol der_ind' :
 symbol der_ind S P Peq csort cprod csigma ctypeeq cvar cconv
                cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
                cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift
-               ctxabs ctxapp ctxprod ctxpair ctxπ1 ctxπ2 ctxsum
-               ctxrefl ctxJ ctxteq ctxfunext ctxuip
+               cstrrefl cstrtrans cstrsymm cstrctx
                ≔ get_der_ind S P Peq
                              (der_ind' S P Peq csort cprod csigma ctypeeq cvar cconv
                                        cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
                                        cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift
-                                       ctxabs ctxapp ctxprod ctxpair ctxπ1 ctxπ2 ctxsum
-                                       ctxrefl ctxJ ctxteq ctxfunext ctxuip);
+                                       cstrrefl cstrtrans cstrsymm cstrctx);
 symbol der_eq_ind S P Peq csort cprod csigma ctypeeq cvar cconv
                   cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
                   cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift
-                  ctxabs ctxapp ctxprod ctxpair ctxπ1 ctxπ2 ctxsum
-                  ctxrefl ctxJ ctxteq ctxfunext ctxuip
+                  cstrrefl cstrtrans cstrsymm cstrctx
                   ≔ get_der_eq_ind S P Peq
                                    (der_ind' S P Peq csort cprod csigma ctypeeq cvar cconv
                                              cabs capp cpair cπ1 cπ2 crefl cuip cJ cfunext
                                              cbeta ceqJ ceqπ1 ceqπ2 ceqconv ceqlift
-                                             ctxabs ctxapp ctxprod ctxpair ctxπ1 ctxπ2 ctxsum
-                                             ctxrefl ctxJ ctxteq ctxfunext ctxuip);
+                                             cstrrefl cstrtrans cstrsymm cstrctx);
 
 // Computation rules
 // rule get_der_ind _ _ _ (der_ind' _ _ _ $csort _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _) _ _ (der_sort $s)
