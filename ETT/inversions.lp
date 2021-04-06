@@ -1,6 +1,5 @@
 
 require open ETT.main;
-require open ETT.der_ind;
 require ETT.itt as ITT;
 
 // Lemmas

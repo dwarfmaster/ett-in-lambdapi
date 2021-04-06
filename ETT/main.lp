@@ -1,4 +1,9 @@
 
+constant symbol Prop : TYPE;
+builtin "Prop" ≔ Prop;
+injective symbol π : Prop → TYPE;
+builtin "P" ≔ π;
+
 /* Sorts */
 symbol Sort : TYPE;
 constant symbol s0 : Sort;
@@ -81,112 +86,118 @@ constant symbol uip
               → Term;
 
 /* Typing derivation */
-constant symbol der : Term → Term → Sort → TYPE;
-constant symbol der_eq : Sort → Term → Term → Term → TYPE;
 constant symbol Var : TYPE;
 constant symbol VAR : Var → Term → Sort → Term; // Represents a bound variable of type its argument
 
-// Helpers
-symbol derT (T : Term) (s : Sort) : TYPE ≔ der T (tsort s) (snext s);
-symbol der_eqT (s : Sort) (T1 T2 : Term) : TYPE ≔ der_eq (snext s) (tsort s) T1 T2;
+inductive der : Term → Term → Sort → TYPE ≔
 
 // Types
-constant symbol der_sort : Π(s : Sort), der (tsort s) (tsort (snext s)) (snext (snext s));
-constant symbol der_prod :
+| der_sort : Π(s : Sort), der (tsort s) (tsort (snext s)) (snext (snext s))
+| der_prod :
   Π(s s' : Sort), Π(A : Term), Π(B : Term → Term),
-  derT A s → (Π(v : Var), derT (B (VAR v A s)) s')
-  → derT (tfun A B) (smax s s');
-constant symbol der_sigma :
+  der A (tsort s) (snext s) → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s'))
+  → der (tfun A B) (tsort (smax s s')) (snext (smax s s'))
+| der_sigma :
   Π(s s' : Sort), Π(A : Term), Π(B : Term → Term),
-  derT A s → (Π(v : Var), derT (B (VAR v A s)) s')
-  → derT (tsum A B) (smax s s');
-constant symbol der_prop_type_eq :
+  der A (tsort s) (snext s) → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s'))
+  → der (tsum A B) (tsort (smax s s')) (snext (smax s s'))
+| der_prop_type_eq :
   Π(s : Sort), Π(A u v : Term),
-  derT A s → der u A s → der v A s → derT (teq A u v) s;
+  der A (tsort s) (snext s) → der u A s → der v A s → der (teq A u v) (tsort s) (snext s)
 
 // Structural rules
-constant symbol der_var : Π(s : Sort), Π(A : Term), Π(v : Var), der (VAR v A s) A s;
-constant symbol der_type_conv :
+| der_var : Π(s : Sort), Π(A : Term), Π(v : Var), der (VAR v A s) A s
+| der_type_conv :
   Π (u A B : Term), Π(s : Sort),
-  der u A s → der_eqT s A B → der u B s;
+  der u A s → der_eq (snext s) (tsort s) A B → der u B s
 
 // λ-calculus terms
-constant symbol der_abs :
+| der_abs :
   Π(s s' : Sort), Π(A : Term), Π(t B : Term → Term),
-  derT A s → (Π(v : Var), derT (B (VAR v A s)) s') → (Π(v : Var), der (t (VAR v A s)) (B (VAR v A s)) s')
-  → der (tabs A B t) (tfun A B) (smax s s');
-constant symbol der_app :
+  der A (tsort s) (snext s) → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s'))
+  → (Π(v : Var), der (t (VAR v A s)) (B (VAR v A s)) s')
+  → der (tabs A B t) (tfun A B) (smax s s')
+| der_app :
   Π(s s' : Sort), Π(A t u : Term), Π(B : Term → Term),
-  derT A s → (Π(v : Var), derT (B (VAR v A s)) s')
-  → der t (tfun A B) (smax s s') → der u A s → der (tapp A B t u) (B u) s';
-constant symbol der_pair :
+  der A (tsort s) (snext s) → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s'))
+  → der t (tfun A B) (smax s s') → der u A s → der (tapp A B t u) (B u) s'
+| der_pair :
   Π(s s' : Sort), Π(u A v : Term), Π(B : Term → Term),
-  derT A s → der u A s → (Π(v : Var), derT (B (VAR v A s)) s') → der v (B u) s'
-  → der (tpair A B u v) (tsum A B) (smax s s');
-constant symbol der_π1 :
+  der A (tsort s) (snext s) → der u A s
+  → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s')) → der v (B u) s'
+  → der (tpair A B u v) (tsum A B) (smax s s')
+| der_π1 :
   Π(s s' : Sort), Π(p A : Term), Π(B : Term → Term),
-  derT A s →
-  der p (tsum A B) (smax s s') → der (π1 A B p) A s;
-constant symbol der_π2 :
+  der A (tsort s) (snext s) →
+  der p (tsum A B) (smax s s') → der (π1 A B p) A s
+| der_π2 :
   Π(s s' : Sort), Π(p A : Term), Π(B : Term → Term),
-  derT A s → (Π(v : Var), derT (B (VAR v A s)) s') →
-  der p (tsum A B) (smax s s') → der (π2 A B p) (B (π1 A B p)) s';
+  der A (tsort s) (snext s) → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s')) →
+  der p (tsum A B) (smax s s') → der (π2 A B p) (B (π1 A B p)) s'
+
 // Equality terms
-constant symbol der_refl :
+| der_refl :
   Π(s : Sort), Π(u A : Term),
-  derT A s → der u A s → der (trefl A u) (teq A u u) s;
-constant symbol der_uip :
+  der A (tsort s) (snext s) → der u A s → der (trefl A u) (teq A u u) s
+| der_uip :
   Π(s : Sort), Π(e1 e2 u v A : Term),
-  der e1 (teq A u v) s → der e2 (teq A u v) s → der (uip A u v e1 e2) (teq (teq A u v) e1 e2) s;
-constant symbol der_J :
+  der e1 (teq A u v) s → der e2 (teq A u v) s → der (uip A u v e1 e2) (teq (teq A u v) e1 e2) s
+| der_J :
   Π(s s' : Sort), Π(A u v p w : Term), Π(P : Term → Term → Term),
-  derT A s → der u A s → der v A s
-  → (Π(v1 v2 : Var), derT (P (VAR v1 A s) (VAR v2 (teq A u (VAR v1 A s)) s)) s')
+  der A (tsort s) (snext s) → der u A s → der v A s
+  → (Π(v1 v2 : Var), der (P (VAR v1 A s) (VAR v2 (teq A u (VAR v1 A s)) s)) (tsort s') (snext s'))
   → der p (teq A u v) s → der w (P u (trefl A u)) s'
-  → der (J A u P w v p) (P v p) s';
-constant symbol der_funext :
+  → der (J A u P w v p) (P v p) s'
+| der_funext :
   Π(s : Sort), Π(f g A e : Term), Π(B : Term → Term),
   der f (tfun A B) s → der g (tfun A B) s
   → der e (tfun A (λ u, teq (B u) (tapp A B f u) (tapp A B g u))) s
-  → der (funext A B f g e) (teq (tfun A B) f g) s;
+  → der (funext A B f g e) (teq (tfun A B) f g) s
+
+with der_eq : Sort → Term → Term → Term → TYPE ≔
+
 // Computation
-constant symbol der_eq_beta :
+| der_eq_beta :
   Π(s s' : Sort), Π(u A : Term), Π(t B : Term → Term),
-  derT A s → (Π(v : Var), derT (B (VAR v A s)) s') → (Π(v : Var), der (t (VAR v A s)) (B (VAR v A s)) s') → der u A s
-  → der_eq s' (B u) (tapp A B (tabs A B t) u) (t u);
-constant symbol der_eq_J :
+  der A (tsort s) (snext s) → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s'))
+  → (Π(v : Var), der (t (VAR v A s)) (B (VAR v A s)) s') → der u A s
+  → der_eq s' (B u) (tapp A B (tabs A B t) u) (t u)
+| der_eq_J :
   Π(s s' : Sort), Π(u A w : Term), Π(P : Term → Term → Term),
-  derT A s → der u A s → (Π(v1 v2 : Var), derT (P (VAR v1 A s) (VAR v2 (teq A u (VAR v1 A s)) s)) s')
+  der A (tsort s) (snext s) → der u A s
+  → (Π(v1 v2 : Var), der (P (VAR v1 A s) (VAR v2 (teq A u (VAR v1 A s)) s)) (tsort s') (snext s'))
   → der w (P u (trefl A u)) s'
-  → der_eq s' (P u (trefl A u)) (J A u P w u (trefl A u)) w;
-constant symbol der_eq_π1 :
+  → der_eq s' (P u (trefl A u)) (J A u P w u (trefl A u)) w
+| der_eq_π1 :
   Π(s s' : Sort), Π(u A v : Term), Π(B : Term → Term),
-  derT A s → der u A s → (Π(v : Var), derT (B (VAR v A s)) s') → der v (B u) s'
-  → der_eq s A (π1 A B (tpair A B u v)) u;
-constant symbol der_eq_π2 :
+  der A (tsort s) (snext s) → der u A s → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s')) → der v (B u) s'
+  → der_eq s A (π1 A B (tpair A B u v)) u
+| der_eq_π2 :
   Π(s s' : Sort), Π(u A v : Term), Π(B : Term → Term),
-  derT A s → der u A s → (Π(v : Var), derT (B (VAR v A s)) s') → der v (B u) s'
-  → der_eq s' (B u) (π2 A B (tpair A B u v)) v;
+  der A (tsort s) (snext s) → der u A s → (Π(v : Var), der (B (VAR v A s)) (tsort s') (snext s')) → der v (B u) s'
+  → der_eq s' (B u) (π2 A B (tpair A B u v)) v
+
 // Conversion
-constant symbol der_eq_conversion :
+| der_eq_conversion :
   Π(s : Sort), Π(t1 t2 T1 T2 : Term),
-  derT T1 s → derT T2 s
-  → der_eq s T1 t1 t2 → der_eqT s T1 T2
-  → der_eq s T2 t1 t2;
-constant symbol der_eq_lift :
+  der T1 (tsort s) (snext s) → der T2 (tsort s) (snext s)
+  → der_eq s T1 t1 t2 → der_eq (snext s) (tsort s) T1 T2
+  → der_eq s T2 t1 t2
+| der_eq_lift :
   Π(s : Sort), Π(e u v A : Term),
-  der e (teq A u v) s → der_eq s A u v;
+  der e (teq A u v) s → der_eq s A u v
+
 // Congruence
-constant symbol der_eq_refl :
-  Π(s : Sort), Π(u A : Term), der u A s → der_eq s A u u;
-constant symbol der_eq_trans :
+| der_eq_refl :
+  Π(s : Sort), Π(u A : Term), der u A s → der_eq s A u u
+| der_eq_trans :
   Π(s : Sort), Π(u v w A : Term),
-  der_eq s A u v → der_eq s A v w → der_eq s A u w;
-constant symbol der_eq_symm :
-  Π(s : Sort), Π(u v A : Term), der_eq s A u v → der_eq s A v u;
-constant symbol der_eq_context :
+  der_eq s A u v → der_eq s A v w → der_eq s A u w
+| der_eq_symm :
+  Π(s : Sort), Π(u v A : Term), der_eq s A u v → der_eq s A v u
+| der_eq_context :
   Π(s s' : Sort), Π(u u' A B : Term), Π(C C' : Term → Term),
-  der_eq s A u u' → derT B s'
+  der_eq s A u u' → der B (tsort s') (snext s')
   → (Π(v : Var), der_eq s' B (C (VAR v A s)) (C' (VAR v A s)))
   → der_eq s' B (C u) (C' u');
 
