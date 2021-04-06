@@ -22,14 +22,13 @@ rule τ_s ETT.s0 ↪ ITT.s0
 with τ_s (ETT.snext $s) ↪ ITT.snext (τ_s $s);
 
 // Translation declaration
-symbol τ_T (T : ETT.Term) (s : ETT.Sort) : ETT.der T (ETT.tsort s) → univ (τ_s s);
-symbol τ (t T : ETT.Term) (d : ETT.der t T) :
-  ε (τ_s (I.inv_get_sort t T d)) (τ_T T (I.inv_get_sort t T d) (I.inv_sort t T d));
-symbol τ_eq (T t1 t2 : ETT.Term) (d : ETT.der_eq T t1 t2) :
-  let s ≔ I.inv_eq_get_sort T t1 t2 d in
-  let d1 ≔ I.inv_eq_t1 T t1 t2 d in
-  let d2 ≔ I.inv_eq_t2 T t1 t2 d in
+symbol τ_T (T : ETT.Term) (s : ETT.Sort) : ETT.der T (ETT.tsort s) (ETT.snext s) → univ (τ_s s);
+symbol τ (s : ETT.Sort) (t T : ETT.Term) (d : ETT.der t T s) :
+  ε (τ_s s) (τ_T T s (I.inv_sort s t T d));
+symbol τ_eq (s : ETT.Sort) (T t1 t2 : ETT.Term) (d : ETT.der_eq s T t1 t2) :
+  let d1 ≔ I.inv_eq_t1 s T t1 t2 d in
+  let d2 ≔ I.inv_eq_t2 s T t1 t2 d in
   heterogeneous_eq (τ_s s)
-    (τ_T T s (I.inv_sort t1 T d1))
-    (τ_T T s (I.inv_sort t2 T d2))
-    (τ t1 T d1) (τ t2 T d2);
+    (τ_T T s (I.inv_sort s t1 T d1))
+    (τ_T T s (I.inv_sort s t2 T d2))
+    (τ s t1 T d1) (τ s t2 T d2);

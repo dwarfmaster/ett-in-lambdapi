@@ -3,17 +3,15 @@ require open ETT.main;
 require ETT.itt as ITT;
 
 // Lemmas
-symbol inv_teq_t1 (t1 t2 T e : Term) (d : der e (teq T t1 t2)) : der t1 T;
-symbol inv_teq_t2 (t1 t2 T e : Term) (d : der e (teq T t1 t2)) : der t2 T;
-symbol inv_eq_t2 : Π(T t1 t2 : Term), der_eq T t1 t2 → der t2 T;
-symbol inv_eq_t1 : Π(T t1 t2 : Term), der_eq T t1 t2 → der t1 T;
-symbol inv_eq_get_sort : Π(T t1 t2 : Term), der_eq T t1 t2 → Sort;
-symbol inv_eq_sort : Π(T t1 t2 : Term), Π(d : der_eq T t1 t2), der T (tsort (inv_eq_get_sort T t1 t2 d));
-symbol inv_get_sort : Π(t T : Term), der t T → Sort;
-symbol inv_sort : Π(t T : Term), Π(d : der t T), der T (tsort (inv_get_sort t T d));
-symbol substitution (A B : Term) (C : Term → Term) :
-  (Π(v : Var), der (C (VAR v A)) B)
-  → Π(u : Term), der u A → der (C u) B;
+symbol inv_teq_t1 (s : Sort) (t1 t2 T e : Term) (d : der e (teq T t1 t2) s) : der t1 T s;
+symbol inv_teq_t2 (s : Sort) (t1 t2 T e : Term) (d : der e (teq T t1 t2) s) : der t2 T s;
+symbol inv_eq_t2 : Π(s : Sort), Π(T t1 t2 : Term), der_eq s T t1 t2 → der t2 T s;
+symbol inv_eq_t1 : Π(s : Sort), Π(T t1 t2 : Term), der_eq s T t1 t2 → der t1 T s;
+symbol inv_eq_sort : Π(s : Sort), Π(T t1 t2 : Term), Π(d : der_eq s T t1 t2), der T (tsort s) (snext s);
+symbol inv_sort : Π(s : Sort), Π(t T : Term), Π(d : der t T s), der T (tsort s) (snext s);
+symbol substitution (s s' : Sort) (A B : Term) (C : Term → Term) :
+  (Π(v : Var), der (C (VAR v A s)) B s')
+  → Π(u : Term), der u A s → der (C u) B s';
 
 // Definitions
 // rule inv_eq_t1 ↪
