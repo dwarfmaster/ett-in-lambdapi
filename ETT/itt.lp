@@ -1,6 +1,4 @@
 
-require ETT.main as ETT;
-
 // Sorts
 constant symbol Sort : TYPE;
 constant symbol s0 : Sort;
@@ -50,9 +48,3 @@ constant symbol I (s : Sort) : ε s (⊤ s);
 // False
 constant symbol ⊥ (s : Sort) : U s;
 constant symbol ⊥_elim (s1 s2 : Sort) (A : U s2) : ε _ (P s1 s2 (⊥ s1) (λ _, A));
-
-// Derivation
-symbol ider : ETT.Term → ETT.Term → U s0;
-symbol ider_eq : ETT.Term → ETT.Term → ETT.Term → U s0;
-rule ε s0 (ider $t $T) ↪ ETT.der $t $T
-with ε s0 (ider_eq $T $t1 $t2) ↪ ETT.der_eq $T $t1 $t2;

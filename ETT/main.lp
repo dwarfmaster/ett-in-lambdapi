@@ -1,7 +1,15 @@
 
+require ETT.itt as ITT;
+
 constant symbol Prop : TYPE;
+constant symbol mkProp : Π(s : ITT.Sort), ITT.U s → Prop;
+symbol getSort : Prop → ITT.Sort;
+symbol getProp : Π(P : Prop), ITT.U (getSort P);
+rule getSort (mkProp $s _) ↪ $s;
+rule getProp (mkProp _ $p) ↪ $p;
 builtin "Prop" ≔ Prop;
-injective symbol π : Prop → TYPE;
+injective symbol π : Prop → TYPE ≔
+  λ p, ITT.ε (getSort p) (getProp p);
 builtin "P" ≔ π;
 
 /* Sorts */
@@ -206,3 +214,9 @@ with der_eq : Sort → Term → Term → Term → TYPE ≔
 // Aliases
 symbol tarrow : Term → Term → Term
  ≔ λ A B, tfun A (λ _, B);
+
+// Reification in ITT
+symbol ider : Term → Term → Sort → ITT.U ITT.s0;
+symbol ider_eq : Sort → Term → Term → Term → ITT.U ITT.s0;
+rule ITT.ε ITT.s0 (ider $t $T $s) ↪ der $t $T $s
+with ITT.ε ITT.s0 (ider_eq $s $T $t1 $t2) ↪ der_eq $s $T $t1 $t2;
