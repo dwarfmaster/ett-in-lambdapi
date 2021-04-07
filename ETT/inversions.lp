@@ -3,15 +3,14 @@ require open ETT.main;
 require ETT.itt as ITT;
 
 // Lemmas
-symbol inv_teq_t1 (s : Sort) (t1 t2 T e : Term) (d : der e (teq T t1 t2) s) : der t1 T s;
-symbol inv_teq_t2 (s : Sort) (t1 t2 T e : Term) (d : der e (teq T t1 t2) s) : der t2 T s;
-symbol inv_eq_t2 : Π(s : Sort), Π(T t1 t2 : Term), der_eq s T t1 t2 → der t2 T s;
-symbol inv_eq_t1 : Π(s : Sort), Π(T t1 t2 : Term), der_eq s T t1 t2 → der t1 T s;
-symbol inv_eq_sort : Π(s : Sort), Π(T t1 t2 : Term), Π(d : der_eq s T t1 t2), der T (tsort s) (snext s);
-symbol inv_sort : Π(s : Sort), Π(t T : Term), Π(d : der t T s), der T (tsort s) (snext s);
-symbol substitution (s s' : Sort) (A B : Term) (C : Term → Term) :
-  (Π(v : Var), der (C (VAR v A s)) B s')
-  → Π(u : Term), der u A s → der (C u) B s';
+symbol substitution (Γ : Context) (s s' : Sort) (A B : Term) (C : Term) :
+  der (Push A s Γ) C B s' → Π(u : Term), der Γ u A s → der Γ (apply1 C u) B s';
+symbol inv_context : Π(Γ : Context), Π(s : Sort), Π(t T : Term), Π(d : der Γ t T s), der_context Γ;
+symbol inv_eq_context : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 : Term), Π(d : der_eq Γ s T t1 t2), der_context Γ;
+symbol inv_sort : Π(Γ : Context), Π(s : Sort), Π(t T : Term), Π(d : der Γ t T s), der Γ T (tsort s) (snext s);
+symbol inv_eq_sort : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 : Term), Π(d : der_eq Γ s T t1 t2), der Γ T (tsort s) (snext s);
+symbol inv_eq_t2 : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 : Term), der_eq Γ s T t1 t2 → der Γ t2 T s;
+symbol inv_eq_t1 : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 : Term), der_eq Γ s T t1 t2 → der Γ t1 T s;
 
 // Definitions
 // rule inv_eq_t1 ↪
