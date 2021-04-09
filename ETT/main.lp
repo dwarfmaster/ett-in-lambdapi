@@ -161,12 +161,20 @@ symbol apply2 (t u v : Term) : Term ≔
 constant symbol Context : TYPE;
 constant symbol Push : Term → Sort → Context → Context;
 constant symbol Empty : Context;
+symbol Append : Context → Context → Context;
+rule Append (Push $t $s $Γ) $Γ2 ↪ Push $t $s (Append $Γ $Γ2)
+with Append Empty $Γ ↪ $Γ;
+
 symbol get : Context → DBId → Term;
 symbol getS : Context → DBId → Sort;
+symbol getΓ : Context → DBId → Context;
 rule get (Push $t _ _) db0 ↪ $t
-with get (Push _ _ $t) (dbsucc $i) ↪ get $t $i;
-rule getS (Push _ $s _) db0 ↪ $s
-with getS (Push _ _ $t) (dbsucc $i) ↪ getS $t $i;
+with get (Push _ _ $t) (dbsucc $i) ↪ get $t $i
+with getS (Push _ $s _) db0 ↪ $s
+with getS (Push _ _ $t) (dbsucc $i) ↪ getS $t $i
+with getΓ (Push _ _ $t) db0 ↪ $t
+with getΓ (Push _ _ $t) (dbsucc $i) ↪ getΓ $t $i;
+
 
 // Typing derivation
 inductive der_context : Context → TYPE ≔
