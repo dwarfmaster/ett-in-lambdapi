@@ -83,11 +83,16 @@ symbol tget (id : ETT.DBId) (Γ : TContext) : ITT.ε (τ_s (tgetS id Γ)) (tgetT
 rule tget ETT.db0 (TPush _ _ _ _ $a) ↪ $a
 with tget (ETT.dbsucc $id) (TPush $t _ _ _ _) ↪ tget $id $t;
 
-// // Translation of type
-rule τ_T _ _ _ (ETT.der_sort _ $s _) ↪ ITT.u (τ_s $s);
-rule τ_T $Γ _ _ (ETT.der_prod _ $s $s' $A _ $dA $dB)
-   ↪ ITT.P (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA)
-            (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB);
+// Translation of type
+rule τ_T _ _ _ (ETT.der_sort _ $s _) ↪ ITT.u (τ_s $s)
+with τ_T $Γ _ _ (ETT.der_prod _ $s $s' $A _ $dA $dB)
+  ↪ ITT.P (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA)
+           (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB)
+with τ_T $Γ _ _ (ETT.der_sigma _ $s $s' $A _ $dA $dB)
+  ↪ ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA)
+           (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB)
+with τ_T $Γ _ _ (ETT.der_prop_type_eq _ $s $A $u $v $dA $du $dv)
+  ↪ ITT.eq (τ_s $s) (τ_T $Γ _ _ $dA) (τ $Γ _ _ _ $du) (τ $Γ _ _ _ $dv);
 
 rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
    ↪ let p ≔ convert_T (tgetΓ $id $Γ) _ _ (tgetD $id $Γ) (I.der_subΓ (τ_Γ $Γ) $id $dΓ) in
