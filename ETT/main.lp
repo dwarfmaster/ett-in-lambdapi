@@ -20,11 +20,17 @@ symbol smax : Sort → Sort → Sort;
 rule smax s0 $n ↪ $n
 with smax $n s0 ↪ $n
 with smax (snext $n) (snext $m) ↪ snext (smax $n $m);
+symbol sadd : Sort → Sort → Sort;
+rule sadd s0 $n ↪ $n
+with sadd $n s0 ↪ $n
+with sadd (snext $n) $m ↪ snext (sadd $n $m)
+with sadd $n (snext $m) ↪ snext (sadd $n $m);
 
 /* De Bruijn indices */
 constant symbol DBId : TYPE;
 constant symbol db0 : DBId;
 constant symbol dbsucc : DBId → DBId;
+symbol dbadd : DBId → DBId → DBId;
 symbol db1 : DBId ≔ dbsucc db0;
 symbol db2 : DBId ≔ dbsucc db1;
 // Increments the second argument if it is (not strictly) greater than the
@@ -32,7 +38,11 @@ symbol db2 : DBId ≔ dbsucc db1;
 symbol dbshift : DBId → DBId → DBId;
 rule dbshift (dbsucc $i) (dbsucc $j) ↪ dbsucc (dbshift $i $j)
 with dbshift db0 $d ↪ dbsucc $d
-with dbshift (dbsucc _) db0 ↪ db0;
+with dbshift (dbsucc _) db0 ↪ db0
+with dbadd db0 $id ↪ $id
+with dbadd $id db0 ↪ $id
+with dbadd (dbsucc $n) $m ↪ dbsucc (dbadd $n $m)
+with dbadd $n (dbsucc $m) ↪ dbsucc (dbadd $n $m);
 
 /* Terms */
 inductive Term : TYPE ≔
@@ -126,6 +136,10 @@ with shift $i (funext $A $B $f $g $ext) ↪ funext (shift $i $A) (shift (dbsucc 
                                                   (shift $i $f) (shift $i $g) (shift $i $ext)
 with shift $i (uip $A $u $v $p $q) ↪ uip (shift $i $A) (shift $i $u) (shift $i $v) (shift $i $p) (shift $i $q);
 symbol Shift : Term → Term ≔ shift db0;
+symbol ShiftN : DBId → Term → Term;
+rule ShiftN db0 $t ↪ Shift $t
+with ShiftN (dbsucc $n) $t ↪ Shift (ShiftN $n $t)
+with ShiftN _ (tsort $s) ↪ tsort $s;
 
 // Select a term depending on whether two indices are equal
 symbol dbselect : DBId → DBId → Term → Term → Term;
@@ -173,7 +187,8 @@ with get (Push _ _ $t) (dbsucc $i) ↪ get $t $i
 with getS (Push _ $s _) db0 ↪ $s
 with getS (Push _ _ $t) (dbsucc $i) ↪ getS $t $i
 with getΓ (Push _ _ $t) db0 ↪ $t
-with getΓ (Push _ _ $t) (dbsucc $i) ↪ getΓ $t $i;
+with getΓ (Push _ _ $t) (dbsucc $i) ↪ getΓ $t $i
+with getΓ (getΓ $Γ $n) $m ↪ getΓ $Γ (dbsucc (dbadd $n $m));
 
 
 // Typing derivation
@@ -199,7 +214,9 @@ with der : Context → Term → Term → Sort → TYPE ≔
   Π(Γ : Context), Π(s : Sort), Π(A u v : Term),
   der Γ A (tsort s) (snext s) → der Γ u A s → der Γ v A s → der Γ (teq A u v) (tsort s) (snext s)
 // Structural rules
-| der_var : Π(Γ : Context), Π(id : DBId), der_context Γ → der Γ (var id) (get Γ id) (getS Γ id)
+| der_var :
+  Π(Γ : Context), Π(id : DBId), der_context Γ
+  → der Γ (var id) (ShiftN id (get Γ id)) (getS Γ id)
 | der_type_conv :
   Π(Γ : Context), Π(u A B : Term), Π(s : Sort),
   der Γ u A s → der_eq Γ (snext s) (tsort s) A B → der Γ u B s
@@ -364,3 +381,10 @@ symbol ider_eq : Context → Sort → Term → Term → Term → ITT.U ITT.s0;
 rule ITT.ε ITT.s0 (ider_context $Γ) ↪ der_context $Γ
 with ITT.ε ITT.s0 (ider $Γ $t $T $s) ↪ der $Γ $t $T $s
 with ITT.ε ITT.s0 (ider_eq $Γ $s $T $t1 $t2) ↪ der_eq $Γ $s $T $t1 $t2;
+
+
+// Lemmas
+symbol der_shift1 (Γ : Context) (t T : Term) (s : Sort) (_ : der (getΓ Γ db0) t T s) : der Γ (Shift t) (Shift T) s;
+symbol der_shift (id : DBId) (Γ : Context) (t T : Term) (s : Sort) (_ : der (getΓ Γ id) t T s) : der Γ (ShiftN id t) (ShiftN id T) s;
+rule der_shift db0 $Γ $t $T $s $d ↪ der_shift1 $Γ $t $T $s $d
+with der_shift (dbsucc $id) $Γ $t $T $s $d ↪ der_shift1 $Γ _ _ _ (der_shift $id _ $t $T $s $d);

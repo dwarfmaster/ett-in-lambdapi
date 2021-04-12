@@ -38,24 +38,24 @@ rule τ_Γ (tgetΓ $id $Γ) ↪ ETT.getΓ (τ_Γ $Γ) $id;
 symbol τ_T (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s) → univ (τ_s s);
 symbol τ (Γ : TContext) (s : ETT.Sort) (t T : ETT.Term) (d : ETT.der (τ_Γ Γ) t T s) :
   let sort ≔ I.inv_sort (τ_Γ Γ) s t T d in
-  ε (τ_s s) (τ_T (tgetΓ (I.subId sort) Γ) T s (I.subP sort));
+  ε (τ_s s) (τ_T Γ T s sort);
 symbol τ_eq (Γ : TContext) (s : ETT.Sort) (T t1 t2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) s T t1 t2) :
   let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) s T t1 t2 d in
   let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) s T t1 t2 d in
-  let s1 ≔ I.inv_sort (τ_Γ Γ) s t1 T d1 in
-  let s2 ≔ I.inv_sort (τ_Γ Γ) s t2 T d2 in
+  let ds1 ≔ I.inv_sort (τ_Γ Γ) s t1 T d1 in
+  let ds2 ≔ I.inv_sort (τ_Γ Γ) s t2 T d2 in
   heterogeneous_eq (τ_s s)
-    (τ_T (tgetΓ (I.subId s1) Γ) T s (I.subP s1))
-    (τ_T (tgetΓ (I.subId s2) Γ) T s (I.subP s2))
+    (τ_T Γ T s ds1)
+    (τ_T Γ T s ds2)
     (τ Γ s t1 T d1) (τ Γ s t2 T d2);
 symbol convert_T (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) (d1 d2 : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s)) :
   let S ≔ τ_s s in ε (ITT.snext S) (ITT.eq (ITT.snext S) (ITT.u S) (τ_T Γ _ _ d1) (τ_T Γ _ _ d2));
 symbol convert (Γ : TContext) (s : ETT.Sort) (t T : ETT.Term) (d1 d2 : ETT.der (τ_Γ Γ) t T s) :
-  let s1 ≔ I.inv_sort (τ_Γ Γ) s t T d1 in
-  let s2 ≔ I.inv_sort (τ_Γ Γ) s t T d2 in
+  let ds1 ≔ I.inv_sort (τ_Γ Γ) s t T d1 in
+  let ds2 ≔ I.inv_sort (τ_Γ Γ) s t T d2 in
   heterogeneous_eq (τ_s s)
-    (τ_T (tgetΓ (I.subId s1) Γ) T s (I.subP s1))
-    (τ_T (tgetΓ (I.subId s2) Γ) T s (I.subP s2))
+    (τ_T Γ T s ds1)
+    (τ_T Γ T s ds2)
     (τ Γ s t T d1) (τ Γ s t T d2);
 
 
@@ -68,6 +68,8 @@ constant symbol TPush
 rule τ_Γ TEmpty ↪ ETT.Empty
 with τ_Γ (TPush $t $s $A _ _) ↪ ETT.Push $A $s (τ_Γ $t);
 
+rule τ_T (TPush $Γ _ _ _ _) _ _ (ETT.der_shift1 _ _ (ETT.tsort _) _ $d) ↪ τ_T $Γ _ _ $d;
+
 symbol tgetS (id : ETT.DBId) (Γ : TContext) : ETT.Sort ≔ ETT.getS (τ_Γ Γ) id;
 symbol tgetA (id : ETT.DBId) (Γ : TContext) : ETT.Term ≔ ETT.get (τ_Γ Γ) id;
 
@@ -79,9 +81,15 @@ with tgetD (ETT.dbsucc $id) (TPush $t _ _ _ _) ↪ tgetD $id $t;
 
 symbol tgetT (id : ETT.DBId) (Γ : TContext) : ITT.U (τ_s (tgetS id Γ)) ≔
   τ_T (tgetΓ id Γ) (tgetA id Γ) (tgetS id Γ) (tgetD id Γ);
+symbol tgetTShift (id : ETT.DBId) (Γ : TContext) : ITT.U (τ_s (tgetS id Γ)) ≔
+  τ_T Γ (ETT.ShiftN id (tgetA id Γ)) (tgetS id Γ) (ETT.der_shift id (τ_Γ Γ) _ _ _ (tgetD id Γ));
+
 symbol tget (id : ETT.DBId) (Γ : TContext) : ITT.ε (τ_s (tgetS id Γ)) (tgetT id Γ);
 rule tget ETT.db0 (TPush _ _ _ _ $a) ↪ $a
 with tget (ETT.dbsucc $id) (TPush $t _ _ _ _) ↪ tget $id $t;
+symbol tgetShift (id : ETT.DBId) (Γ : TContext) : ITT.ε (τ_s (tgetS id Γ)) (tgetTShift id Γ);
+rule tgetShift ETT.db0 (TPush _ _ _ _ $a) ↪ $a
+with tgetShift (ETT.dbsucc $id) (TPush $Γ _ _ _ _) ↪ tgetShift $id $Γ;
 
 // Translation of type
 rule τ_T _ _ _ (ETT.der_sort _ $s _) ↪ ITT.u (τ_s $s)
@@ -90,10 +98,12 @@ with τ_T $Γ _ _ (ETT.der_prod _ $s $s' $A _ $dA $dB)
            (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB)
 with τ_T $Γ _ _ (ETT.der_sigma _ $s $s' $A _ $dA $dB)
   ↪ ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA)
-           (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB)
-with τ_T $Γ _ _ (ETT.der_prop_type_eq _ $s $A $u $v $dA $du $dv)
-  ↪ ITT.eq (τ_s $s) (τ_T $Γ _ _ $dA) (τ $Γ _ _ _ $du) (τ $Γ _ _ _ $dv);
+           (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB);
+// with τ_T $Γ _ _ (ETT.der_prop_type_eq _ $s $A $u $v $dA $du $dv)
+//   ↪ ITT.eq (τ_s $s) (τ_T $Γ _ _ $dA) (τ $Γ _ _ _ $du) (τ $Γ _ _ _ $dv);
+
 
 rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
-   ↪ let p ≔ convert_T (tgetΓ $id $Γ) _ _ (tgetD $id $Γ) (I.der_subΓ (τ_Γ $Γ) $id $dΓ) in
-      transport _ _ _ p (tget $id $Γ);
+  ↪ let shift ≔ ETT.der_shift $id (τ_Γ $Γ) (tgetA $id $Γ) (ETT.tsort (tgetS $id $Γ)) (ETT.snext (tgetS $id $Γ)) in
+     let p ≔ convert_T $Γ _ _ (shift (tgetD $id $Γ)) (shift (I.der_subΓ (τ_Γ $Γ) $id $dΓ)) in
+     transport _ _ _ p (tgetShift $id $Γ);
