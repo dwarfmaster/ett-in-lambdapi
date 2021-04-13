@@ -31,6 +31,7 @@ constant symbol DBId : TYPE;
 constant symbol db0 : DBId;
 constant symbol dbsucc : DBId → DBId;
 symbol dbadd : DBId → DBId → DBId;
+symbol dbprev : DBId → DBId;
 symbol db1 : DBId ≔ dbsucc db0;
 symbol db2 : DBId ≔ dbsucc db1;
 // Increments the second argument if it is (not strictly) greater than the
@@ -42,7 +43,8 @@ with dbshift (dbsucc _) db0 ↪ db0
 with dbadd db0 $id ↪ $id
 with dbadd $id db0 ↪ $id
 with dbadd (dbsucc $n) $m ↪ dbsucc (dbadd $n $m)
-with dbadd $n (dbsucc $m) ↪ dbsucc (dbadd $n $m);
+with dbadd $n (dbsucc $m) ↪ dbsucc (dbadd $n $m)
+with dbprev (dbsucc $n) ↪ $n;
 
 /* Terms */
 inductive Term : TYPE ≔
@@ -141,16 +143,16 @@ rule ShiftN db0 $t ↪ Shift $t
 with ShiftN (dbsucc $n) $t ↪ Shift (ShiftN $n $t)
 with ShiftN _ (tsort $s) ↪ tsort $s;
 
-// Select a term depending on whether two indices are equal
-symbol dbselect : DBId → DBId → Term → Term → Term;
-rule dbselect db0 db0 $if _ ↪ $if
-with dbselect (dbsucc $i) (dbsucc $j) $if $else ↪ dbselect $i $j $if $else
-with dbselect db0 (dbsucc _) _ $else ↪ $else
-with dbselect (dbsucc _) db0 _ $else ↪ $else;
+// Select a term depending on whether two indices are equal, the first one is greater, or lower
+symbol dbselect : DBId → DBId → Term → Term → Term → Term;
+rule dbselect db0 db0 $eq _ _ ↪ $eq
+with dbselect (dbsucc $i) (dbsucc $j) $eq $gt $lt ↪ dbselect $i $j $eq $gt $lt
+with dbselect db0 (dbsucc _) _ _ $lt ↪ $lt
+with dbselect (dbsucc _) db0 _ $gt _ ↪ $gt;
 
-// Substitution
+// Substitution (and shift everything above the substituted index)
 symbol subst : DBId → Term → Term → Term;
-rule subst $i $V (var $id) ↪ dbselect $i $id $V (var $id)
+rule subst $i $V (var $id) ↪ dbselect $i $id $V (var $id) (var (dbprev $id))
 with subst $i $V (tabs $A $B $t) ↪ tabs (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B) (subst (dbsucc $i) (Shift $V) $t)
 with subst $i $V (tapp $A $B $f $u) ↪ tapp (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B) (subst $i $V $f) (subst $i $V $u)
 with subst $i $V (tfun $A $B) ↪ tfun (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B)
@@ -167,6 +169,7 @@ with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst
 with subst $i $V (funext $A $B $f $g $ext) ↪ funext (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B)
                                                      (subst $i $V $f) (subst $i $V $g) (subst $i $V $ext)
 with subst $i $V (uip $A $u $v $p $q) ↪ uip (subst $i $V $A) (subst $i $V $u) (subst $i $V $v) (subst $i $V $p) (subst $i $V $q);
+rule subst db0 _ (Shift $t) ↪ $t;
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
 symbol apply2 (t u v : Term) : Term ≔
   subst db0 v (subst db1 u t);
@@ -255,14 +258,15 @@ with der : Context → Term → Term → Sort → TYPE ≔
 | der_J :
   Π(Γ : Context), Π(s s' : Sort), Π(A u v p w P : Term),
   der Γ A (tsort s) (snext s) → der Γ u A s → der Γ v A s
-  → der (Push (teq A u (var db0)) s (Push A s Γ)) P (tsort s') (snext s')
+  → der (Push (teq (Shift A) (Shift u) (var db0)) s (Push A s Γ)) P (tsort s') (snext s')
   → der Γ p (teq A u v) s → der Γ w (apply2 P u (trefl A u)) s'
   → der Γ (J A u P w v p) (apply2 P v p) s'
 | der_funext :
-  Π(Γ : Context), Π(s : Sort), Π(f g A e B : Term),
-  der Γ f (tfun A B) s → der Γ g (tfun A B) s
-  → der Γ e (tfun A (teq B (tapp A B f (var db0)) (tapp A B g (var db0)))) s
-  → der Γ (funext A B f g e) (teq (tfun A B) f g) s
+  Π(Γ : Context), Π(s s' : Sort), Π(f g A e B : Term),
+  der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
+  → der Γ f (tfun A B) (smax s s') → der Γ g (tfun A B) (smax s s')
+  → der Γ e (tfun A (teq B (tapp A B f (var db0)) (tapp A B g (var db0)))) (smax s s')
+  → der Γ (funext A B f g e) (teq (tfun A B) f g) (smax s s')
 
 with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
 
