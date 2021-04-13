@@ -94,6 +94,16 @@ symbol tgetShift (id : ETT.DBId) (Γ : TContext) : ITT.ε (τ_s (tgetS id Γ)) (
 rule tgetShift ETT.db0 (TPush _ _ _ _ $a) ↪ $a
 with tgetShift (ETT.dbsucc $id) (TPush $Γ _ _ _ _) ↪ tgetShift $id $Γ;
 
+// Properties of translation
+symbol τ_fun (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
+             (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s)) (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s'))
+             (df : ETT.der (τ_Γ Γ) (ETT.tfun A B) (ETT.tsort (ETT.smax s s')) (ETT.snext (ETT.smax s s'))) :
+  ε (τ_s (ETT.smax s s')) (τ_T Γ _ _ df) → Π(a : ε (τ_s s) (τ_T Γ _ _ dA)), ε (τ_s s') (τ_T (TPush Γ s A dA a) _ _ dB);
+symbol τ_subst (Γ : TContext) (s s' : ETT.Sort) (A B u : ETT.Term)
+               (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) (du : ETT.der (τ_Γ Γ) u A s) :
+  ε (τ_s s') (τ_T (TPush Γ s A (I.inv_sort _ _ _ _ du) (τ Γ s u A du)) B s' dB)
+  → ε (τ_s s') (τ_T Γ (ETT.apply1 B u) s' (I.substitution (τ_Γ Γ) s (ETT.snext s') A (ETT.tsort s') B dB u du));
+
 // Translation of type
 rule τ_T _ (ETT.tsort $s) (ETT.snext $s) _ ↪ ITT.u (τ_s $s);
 rule τ $Γ (ETT.snext $s) $T (ETT.tsort $s) $d ↪ τ_T $Γ $T $s $d;
@@ -122,4 +132,7 @@ rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
 with τ $Γ _ _ _ (ETT.der_abs _ $s _ $A _ _ $dA $dB $dt)
   ↪ λ a, let p ≔ convert_T (TPush $Γ $s $A $dA a) _ _ (I.inv_sort (ETT.Push $A $s (τ_Γ $Γ)) _ _ _ $dt) $dB in
           transport _ _ _ p (τ (TPush $Γ $s $A $dA a) _ _ _ $dt)
+with τ $Γ _ _ _ (ETT.der_app _ $s $s' $A _ $u $B _ $dB $dt $du)
+  ↪ let f ≔ τ_fun $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB (I.inv_sort (τ_Γ $Γ) _ _ _ $dt) (τ $Γ _ _ _ $dt) in
+     τ_subst $Γ $s $s' $A $B $u $dB $du (f (τ $Γ _ _ _ $du))
 ;
