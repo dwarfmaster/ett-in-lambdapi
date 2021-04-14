@@ -34,6 +34,10 @@ constant symbol refl (s : Sort) (A : U s) (x : ε s A) : ε s (eq s A x x);
 symbol J (s s' : Sort) (A : U s) (u : ε s A) (P : Π(x : ε s A), ε s (eq s A u x) → U s')
          (_ : ε s' (P u (refl s A u))) (v : ε s A) (p : ε s (eq s A u v)) : ε s' (P v p);
 rule J _ _ _ _ _ $w _ (refl _ _ _) ↪ $w;
+symbol inv_eq {s : Sort} {A : U s} {u v : ε s A} : ε s (eq s A u v) → ε s (eq s A v u) ≔
+  λ p, J s s A u (λ x _, eq s A x u) (refl s A u) v p;
+symbol trans_eq {s : Sort} {A : U s} {u v w : ε s A} : ε s (eq s A u v) → ε s (eq s A v w) → ε s (eq s A u w) ≔
+  λ p1 p2, J s s A v (λ x _, eq s A u x) p1 w p2;
 
 // Axioms
 constant symbol uip (s : Sort) (A : U s) (u v : ε s A) (e1 e2 : ε s (eq s A u v)) : ε s (eq s (eq s A u v) e1 e2);
