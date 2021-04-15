@@ -30,9 +30,9 @@ rule inv_sort _ _ _ _ (der_var $Γ $id $dΓ) ↪ der_shift $id $Γ _ _ _ (der_su
 with inv_sort _ _ _ _ (der_abs $Γ $s $s' $A _ $B $dA $dB _) ↪ der_prod $Γ $s $s' $A $B $dA $dB
 with inv_sort _ _ _ _ (der_app $Γ $s $s' $A _ $u $B _ $dB _ $du) ↪ substitution $Γ $s (snext $s') $A (tsort $s') $B $dB $u $du
 with inv_sort _ _ _ _ (der_pair $Γ $s $s' _ $A _ $B $dA _ $dB _) ↪ der_sigma $Γ $s $s' $A $B $dA $dB
-with inv_sort _ _ _ _ (der_π1 _ _ _ _ _ _ $dA _) ↪ $dA
+with inv_sort _ _ _ _ (der_π1 _ _ _ _ _ _ $dA _ _) ↪ $dA
 with inv_sort _ _ _ _ (der_π2 $Γ $s $s' $p $A $B $dA $dB $dp) ↪ substitution $Γ $s (snext $s') $A (tsort $s') $B $dB (π1 $A $B $p)
-                                                                              (der_π1 $Γ $s $s' $p $A $B $dA $dp)
+                                                                              (der_π1 $Γ $s $s' $p $A $B $dA $dB $dp)
 with inv_sort _ _ _ _ (der_refl $Γ $s $u $A $dA $du) ↪ der_prop_type_eq $Γ $s $A $u $u $dA $du $du
 with inv_sort _ _ _ _ (der_uip $Γ $s $e1 $e2 $u $v $A $de1 $de2) ↪ der_prop_type_eq $Γ $s (teq $A $u $v) $e1 $e2
                                                                                      (inv_sort _ _ _ _ $de1) $de1 $de2

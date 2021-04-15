@@ -241,7 +241,7 @@ with der : Context → Term → Term → Sort → TYPE ≔
   → der Γ (tpair A B u v) (tsum A B) (smax s s')
 | der_π1 :
   Π(Γ : Context), Π(s s' : Sort), Π(p A B : Term),
-  der Γ A (tsort s) (snext s) →
+  der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s') →
   der Γ p (tsum A B) (smax s s') → der Γ (π1 A B p) A s
 | der_π2 :
   Π(Γ : Context), Π(s s' : Sort), Π(p A B : Term),
