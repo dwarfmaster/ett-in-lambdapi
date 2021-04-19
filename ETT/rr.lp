@@ -3,6 +3,9 @@ require ETT.main as ETT;
 require ETT.itt as ITT;
 require ETT.inversions as I;
 
+// Cheater
+symbol magic (s : ITT.Sort) (A : ITT.U s) : ITT.ε s A;
+
 // Helper definitions
 symbol ε ≔ ITT.ε;
 symbol univ ≔ ITT.U;

@@ -92,15 +92,6 @@ inductive Term : TYPE ≔
   : Term // Type
   → Term // Term
   → Term
-| J
-  : Term // Type of the term to rewrite A
-  → Term // Term to rewrite u
-  → Term // Proposition depending on the term and the equality aka P
-         // db0 is the proof of equality and db1 the term
-  → Term // Proof of P(u, refl A u)
-  → Term // Term to rewrite u by
-  → Term // Proof of equality between the terms to rewrite
-  → Term
 | teq
   : Term // Type of the equality
   → Term → Term → Term
@@ -131,8 +122,6 @@ with shift $i (π1 $A $B $p) ↪ π1 (shift $i $A) (shift (dbsucc $i) $B) (shift
 with shift $i (π2 $A $B $p) ↪ π2 (shift $i $A) (shift (dbsucc $i) $B) (shift $i $p)
 with shift $i (tsum $A $B) ↪ tsum (shift $i $A) (shift (dbsucc $i) $B)
 with shift $i (trefl $A $u) ↪ trefl (shift $i $A) (shift $i $u)
-with shift $i (J $A $u $P $w $v $p) ↪ J (shift $i $A) (shift $i $u) (shift (dbsucc (dbsucc $i)) $P)
-                                         (shift $i $w) (shift $i $v) (shift $i $p)
 with shift $i (teq $A $u $v) ↪ teq (shift $i $A) (shift $i $u) (shift $i $v)
 with shift $i (funext $A $B $f $g $ext) ↪ funext (shift $i $A) (shift (dbsucc $i) $B)
                                                   (shift $i $f) (shift $i $g) (shift $i $ext)
@@ -162,17 +151,12 @@ with subst $i $V (π1 $A $B $p) ↪ π1 (subst $i $V $A) (subst (dbsucc $i) (Shi
 with subst $i $V (π2 $A $B $p) ↪ π2 (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B) (subst $i $V $p)
 with subst $i $V (tsum $A $B) ↪ tsum (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B)
 with subst $i $V (trefl $A $u) ↪ trefl (subst $i $V $A) (subst $i $V $u)
-with subst $i $V (J $A $u $P $w $v $p) ↪ J (subst $i $V $A) (subst $i $V $u)
-                                            (subst (dbsucc (dbsucc $i)) (Shift (Shift $V)) $P)
-                                            (subst $i $V $w) (subst $i $V $v) (subst $i $V $p)
 with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst $i $V $v)
 with subst $i $V (funext $A $B $f $g $ext) ↪ funext (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B)
                                                      (subst $i $V $f) (subst $i $V $g) (subst $i $V $ext)
 with subst $i $V (uip $A $u $v $p $q) ↪ uip (subst $i $V $A) (subst $i $V $u) (subst $i $V $v) (subst $i $V $p) (subst $i $V $q);
 rule subst db0 _ (Shift $t) ↪ $t;
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
-symbol apply2 (t u v : Term) : Term ≔
-  subst db0 v (subst db1 u t);
 
 // Typing context
 constant symbol Context : TYPE;
@@ -255,12 +239,6 @@ with der : Context → Term → Term → Sort → TYPE ≔
 | der_uip :
   Π(Γ : Context), Π(s : Sort), Π(e1 e2 u v A : Term),
   der Γ e1 (teq A u v) s → der Γ e2 (teq A u v) s → der Γ (uip A u v e1 e2) (teq (teq A u v) e1 e2) s
-| der_J :
-  Π(Γ : Context), Π(s s' : Sort), Π(A u v p w P : Term),
-  der Γ A (tsort s) (snext s) → der Γ u A s → der Γ v A s
-  → der (Push (teq (Shift A) (Shift u) (var db0)) s (Push A s Γ)) P (tsort s') (snext s')
-  → der Γ p (teq A u v) s → der Γ w (apply2 P u (trefl A u)) s'
-  → der Γ (J A u P w v p) (apply2 P v p) s'
 | der_funext :
   Π(Γ : Context), Π(s s' : Sort), Π(f g A e B : Term),
   der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
@@ -276,12 +254,6 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
   → der (Push A s Γ) t B s' → der Γ u A s
   → der_eq Γ s' (apply1 B u) (tapp A B (tabs A B t) u) (apply1 t u)
-| der_eq_J :
-  Π(Γ : Context), Π(s s' : Sort), Π(u A w P : Term),
-  der Γ A (tsort s) (snext s) → der Γ u A s
-  → der (Push (teq A u (var db0)) s (Push A s Γ)) P (tsort s') (snext s')
-  → der Γ w (apply2 P u (trefl A u)) s'
-  → der_eq Γ s' (apply2 P u (trefl A u)) (J A u P w u (trefl A u)) w
 | der_eq_π1 :
   Π(Γ : Context), Π(s s' : Sort), Π(u A v B : Term),
   der Γ A (tsort s) (snext s) → der Γ u A s → der (Push A s Γ) B (tsort s') (snext s') → der Γ v (apply1 B u) s'
@@ -348,12 +320,6 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   Π(Γ : Context), Π(s : Sort), Π(A A' u u' : Term),
   der_eq Γ (snext s) (tsort s) A A' → der_eq Γ s A u u'
   → der_eq Γ s (teq A u u) (trefl A u) (trefl A' u')
-| der_eq_ctx_J :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' u u' P P' w w' v v' p p' : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der_eq Γ s A u u' → der_eq Γ s A v v'
-  → der_eq (Push (teq A u (var db0)) s (Push A s Γ)) (snext s') (tsort s') P P'
-  → der_eq Γ s' (apply2 P u (trefl A u)) w w' → der_eq Γ s (teq A u v) p p'
-  → der_eq Γ s' (apply2 P v p) (J A u P w v p) (J A' u' P' w' v' p')
 | der_eq_ctx_teq :
   Π(Γ : Context), Π(s : Sort), Π(A A' u u' v v' : Term),
   der_eq Γ (snext s) (tsort s) A A' → der_eq Γ s A u u' → der_eq Γ s A v v'
