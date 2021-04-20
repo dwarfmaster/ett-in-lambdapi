@@ -83,6 +83,26 @@ constant symbol TPush
 rule τ_Γ TEmpty ↪ ETT.Empty
 with τ_Γ (TPush $t $s $A _ _) ↪ ETT.Push $A $s (τ_Γ $t);
 
+// Translation of shifting
+symbol τ_shift_eq (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
+                  (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
+                  (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
+                  (a : ε _ (τ_T' Γ _ _ dA)) :
+  ε _ (ITT.eq _ (ITT.u (τ_s s))
+      (τ_T' Γ T s dT)
+      (τ_T' (TPush Γ s' A dA a) (ETT.Shift T) s (ETT.der_shift1 (ETT.Push A s' (τ_Γ Γ)) T (ETT.tsort s) (ETT.snext s) dT)));
+symbol τ_shift (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
+               (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
+               (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
+               (a : ε _ (τ_T' Γ _ _ dA)) ≔
+  transport _ _ _ (τ_shift_eq Γ s s' T A dT dA a);
+symbol τ_shift' (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
+                (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
+                (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
+                (a : ε _ (τ_T' Γ _ _ dA)) ≔
+  transport _ _ _ (ITT.inv_eq (τ_shift_eq Γ s s' T A dT dA a));
+
+// Accessing the context
 symbol tgetS (id : ETT.DBId) (Γ : TContext) : ETT.Sort ≔ ETT.getS (τ_Γ Γ) id;
 symbol tgetA (id : ETT.DBId) (Γ : TContext) : ETT.Term ≔ ETT.get (τ_Γ Γ) id;
 
@@ -94,15 +114,20 @@ with tgetD (ETT.dbsucc $id) (TPush $t _ _ _ _) ↪ tgetD $id $t;
 
 symbol tgetT (id : ETT.DBId) (Γ : TContext) : ITT.U (τ_s (tgetS id Γ)) ≔
   τ_T' (tgetΓ id Γ) (tgetA id Γ) (tgetS id Γ) (tgetD id Γ);
-// symbol tgetTShift (id : ETT.DBId) (Γ : TContext) : ITT.U (τ_s (tgetS id Γ)) ≔
-//   τ_T' Γ (ETT.ShiftN id (tgetA id Γ)) (tgetS id Γ) (ETT.der_shift id (τ_Γ Γ) _ _ _ (tgetD id Γ));
+symbol tgetTShift (id : ETT.DBId) (Γ : TContext) : ITT.U (τ_s (tgetS id Γ)) ≔
+  τ_T' Γ (ETT.ShiftN id (tgetA id Γ)) (tgetS id Γ) (ETT.der_shift id (τ_Γ Γ) _ _ _ (tgetD id Γ));
 
 symbol tget (id : ETT.DBId) (Γ : TContext) : ITT.ε (τ_s (tgetS id Γ)) (tgetT id Γ);
 rule tget ETT.db0 (TPush _ _ _ _ $a) ↪ $a
 with tget (ETT.dbsucc $id) (TPush $t _ _ _ _) ↪ tget $id $t;
-// symbol tgetShift (id : ETT.DBId) (Γ : TContext) : ITT.ε (τ_s (tgetS id Γ)) (tgetTShift id Γ);
-// rule tgetShift ETT.db0 (TPush _ _ _ _ $a) ↪ $a
-// with tgetShift (ETT.dbsucc $id) (TPush $Γ _ _ _ _) ↪ tgetShift $id $Γ;
+symbol tgetShift (id : ETT.DBId) (Γ : TContext) : ITT.ε (τ_s (tgetS id Γ)) (tgetTShift id Γ);
+rule tgetShift ETT.db0 (TPush $Γ $s $A $dA $a)
+     ↪ τ_shift $Γ $s $s $A $A
+          $dA $dA $a $a
+with tgetShift (ETT.dbsucc $id) (TPush $Γ $s $A $dA $a)
+  ↪ τ_shift $Γ (tgetS $id $Γ) $s (ETT.ShiftN $id (tgetA $id $Γ)) $A
+        (ETT.der_shift $id (τ_Γ $Γ) _ _ _ (tgetD $id $Γ))
+        $dA $a (tgetShift $id $Γ);
 
 // Converting in the context
 symbol convert_Γ (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term) (d1 d2 : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
@@ -185,10 +210,10 @@ with τ $Γ _ _ _ (ETT.der_sigma $Γ' $s $s' $A $B $dA $dB)
 with τ $Γ _ _ _ (ETT.der_prop_type_eq $Γ' $s $A $u $v $dA $du $dv)
   ↪ τ_T' $Γ _ _ (ETT.der_prop_type_eq $Γ' $s $A $u $v $dA $du $dv)
 
-// with τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
-//   ↪ let shift ≔ ETT.der_shift $id (τ_Γ $Γ) (tgetA $id $Γ) (ETT.tsort (tgetS $id $Γ)) (ETT.snext (tgetS $id $Γ)) in
-//      let p ≔ convert_T $Γ _ _ (shift (tgetD $id $Γ)) (shift (I.der_subΓ (τ_Γ $Γ) $id $dΓ)) in
-//      transport _ _ _ p (tgetShift $id $Γ)
+with τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
+  ↪ let shift ≔ ETT.der_shift $id (τ_Γ $Γ) (tgetA $id $Γ) (ETT.tsort (tgetS $id $Γ)) (ETT.snext (tgetS $id $Γ)) in
+     let p ≔ convert_T $Γ _ _ (shift (tgetD $id $Γ)) (shift (I.der_subΓ (τ_Γ $Γ) $id $dΓ)) in
+     transport _ _ _ p (tgetShift $id $Γ)
 with τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ $du $deq)
   ↪ let pAB ≔ τ_eqT $Γ _ _ _ $deq in
      let p ≔ convert_T $Γ _ _ (I.inv_sort _ _ _ _ $du) (I.inv_eq_t1 _ _ _ _ _ $deq) in
