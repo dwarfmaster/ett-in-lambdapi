@@ -28,6 +28,7 @@ symbol pushΓ {Γ : Context} {s : Sort} {T : Term} (d : der Γ T (tsort s) (snex
 
 // Definitions
 rule inv_sort _ _ _ _ (der_var $Γ $id $dΓ) ↪ der_shift $id $Γ _ _ _ (der_subΓ _ $id $dΓ)
+with inv_sort _ _ _ _ (der_type_conv _ _ _ _ _ _ $deq) ↪ inv_eq_t2 _ _ _ _ _ $deq
 with inv_sort _ _ _ _ (der_abs $Γ $s $s' $A _ $B $dA $dB _) ↪ der_prod $Γ $s $s' $A $B $dA $dB
 with inv_sort _ _ _ _ (der_app $Γ $s $s' $A _ $u $B _ $dB _ $du) ↪ substitution $Γ $s (snext $s') $A (tsort $s') $B $dB $u $du
 with inv_sort _ _ _ _ (der_pair $Γ $s $s' _ $A _ $B $dA _ $dB _) ↪ der_sigma $Γ $s $s' $A $B $dA $dB
