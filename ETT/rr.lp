@@ -219,11 +219,11 @@ with τ $Γ _ _ (ETT.tsort $s) (ETT.der_prop_type_eq _ $s _ _ _ $dA $du $dv)
 symbol τ_eqT (Γ : TContext) (s : ETT.Sort) (T1 T2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) (ETT.snext s) (ETT.tsort s) T1 T2) :
   let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) _ _ _ _ d in
   let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) _ _ _ _ d in
-  ε _ (ITT.eq _ (ITT.u (τ_s s)) (τ_T Γ T1 s d1) (τ_T Γ T2 s d2));
-//   let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) _ _ _ _ d in
-//   let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) _ _ _ _ d in
-//   let heq ≔ τ_eq Γ (ETT.snext s) (ETT.tsort s) T1 T2 d in
-//   heq_to_eq (ITT.snext (τ_s s)) (ITT.u (τ_s s)) (τ_T Γ T1 s d1) (τ_T Γ T2 s d2) heq;
+  ε _ (ITT.eq _ (ITT.u (τ_s s)) (τ_T Γ T1 s d1) (τ_T Γ T2 s d2)) ≔
+  let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) _ _ _ _ d in
+  let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) _ _ _ _ d in
+  let heq ≔ τ_eq Γ (ETT.snext s) (ETT.tsort s) T1 T2 d in
+  heq_to_eq (ITT.snext (τ_s s)) (ITT.u (τ_s s)) (τ_T Γ T1 s d1) (τ_T Γ T2 s d2) heq;
 
 // Translation of terms
 rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
