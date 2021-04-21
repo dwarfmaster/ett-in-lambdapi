@@ -41,44 +41,35 @@ constant symbol TContext : TYPE;
 symbol tgetΓ : ETT.DBId → TContext → TContext;
 symbol τ_Γ : TContext → ETT.Context;
 rule τ_Γ (tgetΓ $id $Γ) ↪ ETT.getΓ (τ_Γ $Γ) $id;
-symbol τ_T (Γ : TContext) (T S : ETT.Term) (s s' : ETT.Sort) :
-  ETT.der (τ_Γ Γ) T S s' → ETT.der_eq (τ_Γ Γ) (ETT.snext (ETT.snext s)) (ETT.tsort (ETT.snext s)) (ETT.tsort s) S → univ (τ_s s);
-symbol τ_T' (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) (d : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s)) : univ (τ_s s) ≔
-  τ_T Γ T (ETT.tsort s) s (ETT.snext s) d
-      (ETT.der_eq_refl (τ_Γ Γ) (ETT.snext (ETT.snext s)) (ETT.tsort s) (ETT.tsort (ETT.snext s))
-                       (ETT.der_sort (τ_Γ Γ) s (I.inv_context (τ_Γ Γ) _ _ _ d)));
+symbol τ_T (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) :
+  ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s) → univ (τ_s s);
 symbol τ (Γ : TContext) (s : ETT.Sort) (t T : ETT.Term) (d : ETT.der (τ_Γ Γ) t T s) :
   let sort ≔ I.inv_sort (τ_Γ Γ) s t T d in
-  ε (τ_s s) (τ_T' Γ T s sort);
-symbol τ_eqT (Γ : TContext) (s : ETT.Sort) (T1 T2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) (ETT.snext s) (ETT.tsort s) T1 T2) :
-  let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) _ _ _ _ d in
-  let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) _ _ _ _ d in
-  ε _ (ITT.eq _ (ITT.u (τ_s s)) (τ_T' Γ T1 s d1) (τ_T' Γ T2 s d2));
+  ε (τ_s s) (τ_T Γ T s sort);
 symbol τ_eq (Γ : TContext) (s : ETT.Sort) (T t1 t2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) s T t1 t2) :
   let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) s T t1 t2 d in
   let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) s T t1 t2 d in
   let ds1 ≔ I.inv_sort (τ_Γ Γ) s t1 T d1 in
   let ds2 ≔ I.inv_sort (τ_Γ Γ) s t2 T d2 in
   heterogeneous_eq (τ_s s)
-    (τ_T' Γ T s ds1)
-    (τ_T' Γ T s ds2)
+    (τ_T Γ T s ds1)
+    (τ_T Γ T s ds2)
     (τ Γ s t1 T d1) (τ Γ s t2 T d2);
 symbol convert_T (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) (d1 d2 : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s)) :
-  let S ≔ τ_s s in ε (ITT.snext S) (ITT.eq (ITT.snext S) (ITT.u S) (τ_T' Γ _ _ d1) (τ_T' Γ _ _ d2));
+  let S ≔ τ_s s in ε (ITT.snext S) (ITT.eq (ITT.snext S) (ITT.u S) (τ_T Γ _ _ d1) (τ_T Γ _ _ d2));
 symbol convert (Γ : TContext) (s : ETT.Sort) (t T : ETT.Term) (d1 d2 : ETT.der (τ_Γ Γ) t T s) :
   let ds1 ≔ I.inv_sort (τ_Γ Γ) s t T d1 in
   let ds2 ≔ I.inv_sort (τ_Γ Γ) s t T d2 in
   heterogeneous_eq (τ_s s)
-    (τ_T' Γ T s ds1)
-    (τ_T' Γ T s ds2)
+    (τ_T Γ T s ds1)
+    (τ_T Γ T s ds2)
     (τ Γ s t T d1) (τ Γ s t T d2);
-
 
 // Translation context
 constant symbol TEmpty : TContext;
 constant symbol TPush
   (Γ : TContext) (s : ETT.Sort) (A : ETT.Term) (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
-  : ITT.ε (τ_s s) (τ_T' Γ A s dA) → TContext;
+  : ITT.ε (τ_s s) (τ_T Γ A s dA) → TContext;
 
 rule τ_Γ TEmpty ↪ ETT.Empty
 with τ_Γ (TPush $t $s $A _ _) ↪ ETT.Push $A $s (τ_Γ $t);
@@ -87,19 +78,19 @@ with τ_Γ (TPush $t $s $A _ _) ↪ ETT.Push $A $s (τ_Γ $t);
 symbol τ_shift_eq (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
                   (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
                   (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
-                  (a : ε _ (τ_T' Γ _ _ dA)) :
+                  (a : ε _ (τ_T Γ _ _ dA)) :
   ε _ (ITT.eq _ (ITT.u (τ_s s))
-      (τ_T' Γ T s dT)
-      (τ_T' (TPush Γ s' A dA a) (ETT.Shift T) s (ETT.der_shift1 (ETT.Push A s' (τ_Γ Γ)) T (ETT.tsort s) (ETT.snext s) dT)));
+      (τ_T Γ T s dT)
+      (τ_T (TPush Γ s' A dA a) (ETT.Shift T) s (ETT.der_shift1 (ETT.Push A s' (τ_Γ Γ)) T (ETT.tsort s) (ETT.snext s) dT)));
 symbol τ_shift (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
                (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
                (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
-               (a : ε _ (τ_T' Γ _ _ dA)) ≔
+               (a : ε _ (τ_T Γ _ _ dA)) ≔
   transport _ _ _ (τ_shift_eq Γ s s' T A dT dA a);
 symbol τ_shift' (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
                 (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
                 (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
-                (a : ε _ (τ_T' Γ _ _ dA)) ≔
+                (a : ε _ (τ_T Γ _ _ dA)) ≔
   transport _ _ _ (ITT.inv_eq (τ_shift_eq Γ s s' T A dT dA a));
 
 // Accessing the context
@@ -113,9 +104,9 @@ rule tgetD ETT.db0 (TPush _ _ _ $d _) ↪ $d
 with tgetD (ETT.dbsucc $id) (TPush $t _ _ _ _) ↪ tgetD $id $t;
 
 symbol tgetT (id : ETT.DBId) (Γ : TContext) : ITT.U (τ_s (tgetS id Γ)) ≔
-  τ_T' (tgetΓ id Γ) (tgetA id Γ) (tgetS id Γ) (tgetD id Γ);
+  τ_T (tgetΓ id Γ) (tgetA id Γ) (tgetS id Γ) (tgetD id Γ);
 symbol tgetTShift (id : ETT.DBId) (Γ : TContext) : ITT.U (τ_s (tgetS id Γ)) ≔
-  τ_T' Γ (ETT.ShiftN id (tgetA id Γ)) (tgetS id Γ) (ETT.der_shift id (τ_Γ Γ) _ _ _ (tgetD id Γ));
+  τ_T Γ (ETT.ShiftN id (tgetA id Γ)) (tgetS id Γ) (ETT.der_shift id (τ_Γ Γ) _ _ _ (tgetD id Γ));
 
 symbol tget (id : ETT.DBId) (Γ : TContext) : ITT.ε (τ_s (tgetS id Γ)) (tgetT id Γ);
 rule tget ETT.db0 (TPush _ _ _ _ $a) ↪ $a
@@ -131,17 +122,17 @@ with tgetShift (ETT.dbsucc $id) (TPush $Γ $s $A $dA $a)
 
 // Converting in the context
 symbol convert_Γ (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term) (d1 d2 : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
-                 (a1 : ε _ (τ_T' Γ _ _ d1)) (a2 : ε _ (τ_T' Γ _ _ d2))
+                 (a1 : ε _ (τ_T Γ _ _ d1)) (a2 : ε _ (τ_T Γ _ _ d2))
                  (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) :
-  ε _ (ITT.eq _ (ITT.u (τ_s s')) (τ_T' (TPush Γ s A d1 a1) _ _ dB) (τ_T' (TPush Γ s A d2 a2) _ _ dB));
+  ε _ (ITT.eq _ (ITT.u (τ_s s')) (τ_T (TPush Γ s A d1 a1) _ _ dB) (τ_T (TPush Γ s A d2 a2) _ _ dB));
 
 // Translation of product
 symbol τ_fun_eq (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
              (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s)) (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s'))
              (df : ETT.der (τ_Γ Γ) (ETT.tfun A B) (ETT.tsort (ETT.smax s s')) (ETT.snext (ETT.smax s s'))) :
   ε _ (ITT.eq _ (ITT.u (τ_s (ETT.smax s s')))
-    (τ_T' Γ _ _ df)
-    (ITT.P (τ_s s) (τ_s s') (τ_T' Γ _ _ dA) (λ a, τ_T' (TPush Γ s A dA a) _ _ dB)));
+    (τ_T Γ _ _ df)
+    (ITT.P (τ_s s) (τ_s s') (τ_T Γ _ _ dA) (λ a, τ_T (TPush Γ s A dA a) _ _ dB)));
 symbol τ_fun (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
              (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s)) (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s'))
              (df : ETT.der (τ_Γ Γ) (ETT.tfun A B) (ETT.tsort (ETT.smax s s')) (ETT.snext (ETT.smax s s'))) ≔
@@ -155,8 +146,8 @@ symbol τ_fun' (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
 symbol τ_subst_eq (Γ : TContext) (s s' : ETT.Sort) (A B u : ETT.Term)
                (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) (du : ETT.der (τ_Γ Γ) u A s) :
   ITT.ε _ (ITT.eq _ (ITT.u (τ_s s'))
-    (τ_T' (TPush Γ s A (I.inv_sort _ _ _ _ du) (τ Γ s u A du)) B s' dB)
-    (τ_T' Γ (ETT.apply1 B u) s' (I.substitution (τ_Γ Γ) s (ETT.snext s') A (ETT.tsort s') B dB u du)));
+    (τ_T (TPush Γ s A (I.inv_sort _ _ _ _ du) (τ Γ s u A du)) B s' dB)
+    (τ_T Γ (ETT.apply1 B u) s' (I.substitution (τ_Γ Γ) s (ETT.snext s') A (ETT.tsort s') B dB u du)));
 symbol τ_subst (Γ : TContext) (s s' : ETT.Sort) (A B u : ETT.Term)
                (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) (du : ETT.der (τ_Γ Γ) u A s) ≔
   transport _ _ _ (τ_subst_eq Γ s s' A B u dB du);
@@ -169,8 +160,8 @@ symbol τ_sum_eq (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
              (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s)) (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s'))
              (dp : ETT.der (τ_Γ Γ) (ETT.tsum A B) (ETT.tsort (ETT.smax s s')) (ETT.snext (ETT.smax s s'))) :
   ε _ (ITT.eq _ (ITT.u (τ_s (ETT.smax s s')))
-      (τ_T' Γ _ _ dp)
-      (ITT.S (τ_s s) (τ_s s') (τ_T' Γ _ _ dA) (λ a, τ_T' (TPush Γ s A dA a) _ _ dB)));
+      (τ_T Γ _ _ dp)
+      (ITT.S (τ_s s) (τ_s s') (τ_T Γ _ _ dA) (λ a, τ_T (TPush Γ s A dA a) _ _ dB)));
 symbol τ_sum (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
              (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s)) (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s'))
              (dp : ETT.der (τ_Γ Γ) (ETT.tsum A B) (ETT.tsort (ETT.smax s s')) (ETT.snext (ETT.smax s s'))) ≔
@@ -200,30 +191,41 @@ symbol eq_pair (s s' : ITT.Sort) (A A' : ITT.U s) (B : ITT.ε s A → ITT.U s') 
                ITT.ε _ (ITT.eq (ITT.snext (ITT.smax s s')) (ITT.u (ITT.smax s s')) (ITT.S s s' A B) (ITT.S s s' A' B'));
 
 // For things to type, we need to make sure that the translation of a sort is a universe
-rule τ_T _ (ETT.tsort $s) _ (ETT.snext $s) _ _ _ ↪ ITT.u (τ_s $s);
+rule τ_T _ (ETT.tsort $s) (ETT.snext $s) _ ↪ ITT.u (τ_s $s);
 rule τ _ (ETT.snext (ETT.snext $s)) (ETT.tsort $s) (ETT.tsort (ETT.snext $s)) _ ↪ ITT.u (τ_s $s);
 
 // Translation of type
 // This is done simply by invoking a term translation of the type
 // We know the der_eq is always an instance of der_eq_refl, so we don't bother
 // defining it for other proofs of equality.
-rule τ_T $Γ $T _ $s $s' $d (ETT.der_eq_refl _ _ _ _ _)
-  ↪ τ $Γ (ETT.snext $s) $T (ETT.tsort $s) (der_recover_sort (τ_Γ $Γ) $s $s' $T $d);
+rule τ_T $Γ $T $s $d
+  ↪ τ $Γ (ETT.snext $s) $T (ETT.tsort $s) $d;
 
 rule τ _ _ _ _ (ETT.der_sort _ $s _)
   ↪ ITT.u (τ_s $s)
 with τ $Γ _ _ _ (ETT.der_prod _ $s $s' $A _ $dA $dB)
-  ↪ ITT.P (τ_s $s) (τ_s $s') (τ_T' $Γ _ _ $dA)
-           (λ a, τ_T' (TPush $Γ $s $A $dA a) _ _ $dB)
+  ↪ ITT.P (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA)
+           (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB)
 with τ $Γ _ _ (ETT.tsort (ETT.smax $s $s')) (ETT.der_sigma _ $s $s' $A _ $dA $dB)
-  ↪ ITT.S (τ_s $s) (τ_s $s') (τ_T' $Γ _ _ $dA)
-           (λ a, τ_T' (TPush $Γ $s $A $dA a) _ _ $dB)
+  ↪ ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA)
+           (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB)
 with τ $Γ _ _ (ETT.tsort $s) (ETT.der_prop_type_eq _ $s _ _ _ $dA $du $dv)
   ↪ let pu ≔ convert_T $Γ _ _ (I.inv_sort (τ_Γ $Γ) _ _ _ $du) $dA in
      let pv ≔ convert_T $Γ _ _ (I.inv_sort (τ_Γ $Γ) _ _ _ $dv) $dA in
-     ITT.eq (τ_s $s) (τ_T' $Γ _ _ $dA) (transport _ _ _ pu (τ $Γ _ _ _ $du)) (transport _ _ _ pv (τ $Γ _ _ _ $dv))
+     ITT.eq (τ_s $s) (τ_T $Γ _ _ $dA) (transport _ _ _ pu (τ $Γ _ _ _ $du)) (transport _ _ _ pv (τ $Γ _ _ _ $dv))
 ;
 
+// Translation of type equality
+symbol τ_eqT (Γ : TContext) (s : ETT.Sort) (T1 T2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) (ETT.snext s) (ETT.tsort s) T1 T2) :
+  let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) _ _ _ _ d in
+  let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) _ _ _ _ d in
+  ε _ (ITT.eq _ (ITT.u (τ_s s)) (τ_T Γ T1 s d1) (τ_T Γ T2 s d2));
+//   let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) _ _ _ _ d in
+//   let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) _ _ _ _ d in
+//   let heq ≔ τ_eq Γ (ETT.snext s) (ETT.tsort s) T1 T2 d in
+//   heq_to_eq (ITT.snext (τ_s s)) (ITT.u (τ_s s)) (τ_T Γ T1 s d1) (τ_T Γ T2 s d2) heq;
+
+// Translation of terms
 rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
   ↪ let shift ≔ ETT.der_shift $id (τ_Γ $Γ) (tgetA $id $Γ) (ETT.tsort (tgetS $id $Γ)) (ETT.snext (tgetS $id $Γ)) in
      let p ≔ convert_T $Γ _ _ (shift (tgetD $id $Γ)) (shift (I.der_subΓ (τ_Γ $Γ) $id $dΓ)) in
@@ -242,23 +244,23 @@ with τ $Γ _ _ _ (ETT.der_app _ $s $s' $A _ $u $B _ $dB $dt $du)
 
 with τ $Γ _ _ _ (ETT.der_pair _ $s $s' $u $A _ $B $dA $du $dB $dv)
   ↪ let pv ≔ convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du) in
-     let p ≔ eq_pair (τ_s $s) (τ_s $s') (τ_T' $Γ _ _ (I.inv_sort _ _ _ _ $du)) (τ_T' $Γ _ _ $dA)
-                     (λ (a : ε _ (τ_T' $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T' (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
-                     (λ (a : ε _ (τ_T' $Γ _ _ $dA)), τ_T' (TPush $Γ $s $A $dA a) _ _ $dB)
+     let p ≔ eq_pair (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (τ_T $Γ _ _ $dA)
+                     (λ (a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+                     (λ (a : ε _ (τ_T $Γ _ _ $dA)), τ_T (TPush $Γ $s $A $dA a) _ _ $dB)
                      (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $du) $dA)
-                     (λ (a : ε _ (τ_T' $Γ _ _ (I.inv_sort _ _ _ _ $du))), convert_Γ $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dA a
+                     (λ (a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), convert_Γ $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dA a
                                                                                    (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $du) $dA) a) $dB) in
-     transport _ (ITT.S _ _ (τ_T' $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T' (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
-                 (ITT.S _ _ (τ_T' $Γ _ _ $dA) (λ a, τ_T' (TPush $Γ $s $A $dA a) _ _ $dB))
+     transport _ (ITT.S _ _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
+                 (ITT.S _ _ (τ_T $Γ _ _ $dA) (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB))
                  p
-       (ITT.mkS (τ_s $s) (τ_s $s') (τ_T' $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T' (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+       (ITT.mkS (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
             (τ $Γ _ _ _ $du) (τ_subst' $Γ $s $s' $A $B $u $dB $du (transport _ _ _ pv (τ $Γ _ _ _ $dv))))
 with τ $Γ _ _ _ (ETT.der_π1 _ $s $s' _ $A $B $dA $dB $dp)
   ↪ let pr ≔ τ_sum $Γ $s $s' $A $B $dA $dB (I.inv_sort (τ_Γ $Γ) _ _ _ $dp) (τ $Γ _ _ _ $dp) in
-     ITT.proj1 (τ_s $s) (τ_s $s') (τ_T' $Γ _ _ $dA) (λ a, τ_T' (TPush $Γ $s $A $dA a) _ _ $dB) pr
+     ITT.proj1 (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA) (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB) pr
 with τ $Γ _ _ _ (ETT.der_refl _ $s _ _ $dA $du)
   ↪ let p ≔ convert_T $Γ _ _ (I.inv_sort _ _ _ _ $du) $dA in
-     ITT.refl (τ_s $s) (τ_T' $Γ _ _ $dA) (transport _ _ _ p (τ $Γ _ _ _ $du))
+     ITT.refl (τ_s $s) (τ_T $Γ _ _ $dA) (transport _ _ _ p (τ $Γ _ _ _ $du))
 ;
 
 
@@ -267,5 +269,7 @@ rule τ $Γ _ _ _ (ETT.der_π2 _ $s $s' $p $A $B $dA $dB $dp)
   ↪ let pr ≔ τ_sum $Γ $s $s' $A $B $dA $dB (I.inv_sort (τ_Γ $Γ) _ _ _ $dp) (τ $Γ _ _ _ $dp) in
      τ_subst $Γ $s $s' $A $B (ETT.π1 $A $B $p) $dB
        (ETT.der_π1 (τ_Γ $Γ) $s $s' $p $A $B $dA $dB $dp)
-       (ITT.proj2 (τ_s $s) (τ_s $s') (τ_T' $Γ _ _ $dA) (λ a, τ_T' (TPush $Γ $s $A $dA a) _ _ $dB) pr)
+       (ITT.proj2 (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA) (λ a, τ_T (TPush $Γ $s $A $dA a) _ _ $dB) pr)
 ;
+
+// Translation of equality
