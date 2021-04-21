@@ -180,37 +180,51 @@ symbol τ_sum' (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
              (dp : ETT.der (τ_Γ Γ) (ETT.tsum A B) (ETT.tsort (ETT.smax s s')) (ETT.snext (ETT.smax s s'))) ≔
   transport _ _ _ (ITT.inv_eq (τ_sum_eq Γ s s' A B dA dB dp));
 
+// Recovering well sortedness
+symbol der_recover_sort (Γ : ETT.Context) (s s' : ETT.Sort) (A : ETT.Term) :
+  ETT.der Γ A (ETT.tsort s) s' → ETT.der Γ A (ETT.tsort s) (ETT.snext s);
+rule der_recover_sort _ _ _ _ (ETT.der_sort $Γ $s $dΓ)
+  ↪ ETT.der_sort $Γ $s $dΓ
+with der_recover_sort _ _ _ _ (ETT.der_prod $Γ $s $s' $A $B $dA $dB)
+  ↪ ETT.der_prod $Γ $s $s' $A $B $dA $dB
+with der_recover_sort _ _ _ _ (ETT.der_sigma $Γ $s $s' $A $B $dA $dB)
+  ↪ ETT.der_sigma $Γ $s $s' $A $B $dA $dB
+with der_recover_sort _ _ _ _ (ETT.der_prop_type_eq $Γ $s $A $u $v $dA $du $dv)
+  ↪ ETT.der_prop_type_eq $Γ $s $A $u $v $dA $du $dv
+;
+
 // Equalities
 symbol eq_pair (s s' : ITT.Sort) (A A' : ITT.U s) (B : ITT.ε s A → ITT.U s') (B' : ITT.ε s A' → ITT.U s')
                (eqA : ε _ (ITT.eq (ITT.snext s) (ITT.u s) A A'))
                (eqB : Π(a : ε s A), ITT.ε _ (ITT.eq (ITT.snext s') (ITT.u s') (B a) (B' (transport _ _ _ eqA a)))) :
                ITT.ε _ (ITT.eq (ITT.snext (ITT.smax s s')) (ITT.u (ITT.smax s s')) (ITT.S s s' A B) (ITT.S s s' A' B'));
 
-// Translation of type
+// For things to type, we need to make sure that the translation of a sort is a universe
 rule τ_T _ (ETT.tsort $s) _ (ETT.snext $s) _ _ _ ↪ ITT.u (τ_s $s);
+rule τ _ (ETT.snext (ETT.snext $s)) (ETT.tsort $s) (ETT.tsort (ETT.snext $s)) _ ↪ ITT.u (τ_s $s);
 
-rule τ_T $Γ _ _ (ETT.smax $s $s') _ (ETT.der_prod _ $s $s' $A _ $dA $dB) _
+// Translation of type
+// This is done simply by invoking a term translation of the type
+// We know the der_eq is always an instance of der_eq_refl, so we don't bother
+// defining it for other proofs of equality.
+rule τ_T $Γ $T _ $s $s' $d (ETT.der_eq_refl _ _ _ _ _)
+  ↪ τ $Γ (ETT.snext $s) $T (ETT.tsort $s) (der_recover_sort (τ_Γ $Γ) $s $s' $T $d);
+
+rule τ _ _ _ _ (ETT.der_sort _ $s _)
+  ↪ ITT.u (τ_s $s)
+with τ $Γ _ _ _ (ETT.der_prod _ $s $s' $A _ $dA $dB)
   ↪ ITT.P (τ_s $s) (τ_s $s') (τ_T' $Γ _ _ $dA)
            (λ a, τ_T' (TPush $Γ $s $A $dA a) _ _ $dB)
-with τ_T $Γ _ _ (ETT.smax $s $s') _ (ETT.der_sigma _ $s $s' $A _ $dA $dB) _
+with τ $Γ _ _ (ETT.tsort (ETT.smax $s $s')) (ETT.der_sigma _ $s $s' $A _ $dA $dB)
   ↪ ITT.S (τ_s $s) (τ_s $s') (τ_T' $Γ _ _ $dA)
            (λ a, τ_T' (TPush $Γ $s $A $dA a) _ _ $dB)
-with τ_T $Γ _ _ $s _ (ETT.der_prop_type_eq _ $s _ _ _ $dA $du $dv) _
+with τ $Γ _ _ (ETT.tsort $s) (ETT.der_prop_type_eq _ $s _ _ _ $dA $du $dv)
   ↪ let pu ≔ convert_T $Γ _ _ (I.inv_sort (τ_Γ $Γ) _ _ _ $du) $dA in
      let pv ≔ convert_T $Γ _ _ (I.inv_sort (τ_Γ $Γ) _ _ _ $dv) $dA in
      ITT.eq (τ_s $s) (τ_T' $Γ _ _ $dA) (transport _ _ _ pu (τ $Γ _ _ _ $du)) (transport _ _ _ pv (τ $Γ _ _ _ $dv))
 ;
 
-rule τ $Γ _ _ _ (ETT.der_sort $Γ' $s $dΓ)
-  ↪ τ_T' $Γ _ _ (ETT.der_sort $Γ' $s $dΓ)
-with τ $Γ _ _ _ (ETT.der_prod $Γ' $s $s' $A $B $dA $dB)
-  ↪ τ_T' $Γ _ _ (ETT.der_prod $Γ' $s $s' $A $B $dA $dB)
-with τ $Γ _ _ _ (ETT.der_sigma $Γ' $s $s' $A $B $dA $dB)
-  ↪ τ_T' $Γ _ _ (ETT.der_sigma $Γ' $s $s' $A $B $dA $dB)
-with τ $Γ _ _ _ (ETT.der_prop_type_eq $Γ' $s $A $u $v $dA $du $dv)
-  ↪ τ_T' $Γ _ _ (ETT.der_prop_type_eq $Γ' $s $A $u $v $dA $du $dv)
-
-with τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
+rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
   ↪ let shift ≔ ETT.der_shift $id (τ_Γ $Γ) (tgetA $id $Γ) (ETT.tsort (tgetS $id $Γ)) (ETT.snext (tgetS $id $Γ)) in
      let p ≔ convert_T $Γ _ _ (shift (tgetD $id $Γ)) (shift (I.der_subΓ (τ_Γ $Γ) $id $dΓ)) in
      transport _ _ _ p (tgetShift $id $Γ)
