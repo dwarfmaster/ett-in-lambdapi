@@ -11,6 +11,16 @@ symbol ε ≔ ITT.ε;
 symbol univ ≔ ITT.U;
 symbol transport (s : ITT.Sort) (T U : univ s) (e : ε _ (ITT.eq (ITT.snext s) (ITT.u s) T U)) : ε s T → ε s U ≔
   λ t, ITT.J (ITT.snext s) s (ITT.u s) T (λ (X : univ s) (_ : ε (ITT.snext s) (ITT.eq (ITT.snext s) _ T X)), X) t U e;
+symbol path_comp (s : ITT.Sort) (T U V : univ s) (p1 : ε _ (ITT.eq _ (ITT.u s) T U)) (p2 : ε _ (ITT.eq _ (ITT.u s) U V)) (t : ε _ T) :
+  ε _ (ITT.eq s V
+              (transport s T V (ITT.trans_eq p1 p2) t)
+              (transport s U V p2 (transport s T U p1 t))) ≔
+  ITT.J (ITT.snext s) s (ITT.u s) U
+        (λ (V : univ s) p, ITT.eq s V (transport s T V (ITT.trans_eq p1 p) t) (transport s U V p (transport s T U p1 t)))
+        (ITT.refl s U (transport s T U p1 t)) V p2;
+symbol homotopy (s : ITT.Sort) (T U : univ s) (p1 p2 : ε _ (ITT.eq _ (ITT.u s) T U)) (p : ε _ (ITT.eq _ (ITT.eq _ (ITT.u s) T U) p1 p2)) (t : ε _ T) :
+  ε _ (ITT.eq s U (transport _ _ _ p1 t) (transport _ _ _ p2 t)) ≔
+  ITT.lift_eq (λ (p : ε _ (ITT.eq _ (ITT.u s) T U)), transport s T U p t) p1 p2 p;
 
 symbol heterogeneous_eq' (s : ITT.Sort) (T U : univ s) (t : ε s T) (u : ε s U) : ITT.U _ ≔
   ITT.S _ _ (ITT.eq _ (ITT.u s) T U) (λ p, ITT.eq s U (transport s T U p t) u);
@@ -18,6 +28,35 @@ symbol heterogeneous_eq (s : ITT.Sort) (T U : univ s) (t : ε s T) (u : ε s U) 
   ε _ (heterogeneous_eq' s T U t u);
 symbol Pack' (s : ITT.Sort) (A1 A2 : univ s) : ITT.U _ ≔
   ITT.S _ _ A1 (λ x, ITT.S _ _ A2 (λ y, heterogeneous_eq' s A1 A2 x y));
+
+symbol mkHeq {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U) (p : ε _ (ITT.eq _ (ITT.u s) T U)) :
+  (ε _ (ITT.eq s U (transport _ _ _ p t) u)) → heterogeneous_eq s T U t u ≔
+  λ eq, ITT.mkS _ _ (ITT.eq _ (ITT.u s) T U) (λ p, ITT.eq s U (transport _ _ _ p t) u) p eq;
+symbol getTeq {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U) (heq : heterogeneous_eq s T U t u) : ε _ (ITT.eq _ (ITT.u s) T U) ≔
+  ITT.proj1 _ _ (ITT.eq (ITT.snext s) (ITT.u s) T U) (λ p, ITT.eq s U (transport _ _ _ p t) u) heq;
+symbol getEq {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U) (heq : heterogeneous_eq s T U t u) :
+  ε _ (ITT.eq s U (transport _ _ _ (getTeq T U t u heq) t) u) ≔
+  ITT.proj2 _ _ (ITT.eq (ITT.snext s) (ITT.u s) T U) (λ p, ITT.eq s U (transport _ _ _ p t) u) heq;
+
+symbol eq_to_heq {s : ITT.Sort} (T : univ s) (t u : ε s T) (p : ε _ (ITT.eq s T t u)) : heterogeneous_eq s T T t u ≔
+  mkHeq T T t u (ITT.refl (ITT.snext s) (ITT.u s) T) p;
+symbol heq_refl {s : ITT.Sort} (T : univ s) (t : ε s T) : heterogeneous_eq s T T t t ≔
+  eq_to_heq T t t (ITT.refl s T t);
+symbol heq_trans {s : ITT.Sort} (T U V : univ s) (t : ε s T) (u : ε s U) (v : ε s V)
+                 (htu : heterogeneous_eq s T U t u) (huv : heterogeneous_eq s U V u v) : heterogeneous_eq s T V t v ≔
+  mkHeq T V t v (ITT.trans_eq (getTeq T U t u htu) (getTeq U V u v huv))
+        (ITT.trans_eq
+          (path_comp s T U V (getTeq T U t u htu) (getTeq U V u v huv) t)
+          (ITT.trans_eq (ITT.lift_eq (transport _ _ _ (getTeq U V u v huv)) (transport _ _ _ (getTeq T U t u htu) t) u (getEq T U t u htu)) (getEq U V u v huv)));
+symbol heq_symm {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U)
+                (h : heterogeneous_eq s T U t u) : heterogeneous_eq s U T u t ≔
+  mkHeq U T u t (ITT.inv_eq (getTeq T U t u h))
+        (ITT.trans_eq
+          (ITT.inv_eq (ITT.trans_eq
+            (path_comp s T U T (getTeq T U t u h) (ITT.inv_eq (getTeq T U t u h)) t)
+            (ITT.lift_eq (transport _ _ _ (ITT.inv_eq (getTeq T U t u h))) (transport _ _ _ (getTeq T U t u h) t) u (getEq T U t u h))))
+          (homotopy s T T (ITT.trans_eq (getTeq T U t u h) (ITT.inv_eq (getTeq T U t u h))) (ITT.refl _ (ITT.u s) T) (ITT.eq_inverse (getTeq T U t u h)) t));
+
 
 // Proved using uip
 symbol heq_to_eq (s : ITT.Sort) (T : univ s) (t u : ε s T) : heterogeneous_eq s T T t u → ε s (ITT.eq s T t u);
@@ -273,3 +312,8 @@ rule τ $Γ _ _ _ (ETT.der_π2 _ $s $s' $p $A $B $dA $dB $dp)
 ;
 
 // Translation of equality
+
+// Congruence
+// rule τ_eq $Γ _ _ _ _ (ETT.der_eq_refl _ $s $u $A $du)
+//   ↪ ITT.mkS (τ_s $s) (τ_s $s)
+// ;

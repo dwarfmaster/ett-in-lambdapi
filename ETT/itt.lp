@@ -38,6 +38,10 @@ symbol inv_eq {s : Sort} {A : U s} {u v : ε s A} : ε s (eq s A u v) → ε s (
   λ p, J s s A u (λ x _, eq s A x u) (refl s A u) v p;
 symbol trans_eq {s : Sort} {A : U s} {u v w : ε s A} : ε s (eq s A u v) → ε s (eq s A v w) → ε s (eq s A u w) ≔
   λ p1 p2, J s s A v (λ x _, eq s A u x) p1 w p2;
+symbol lift_eq {s s' : Sort} {A : U s} {B : U s'} (f : ε _ (P s s' A (λ _, B))) (u v : ε _ A) (p : ε _ (eq s A u v)) : ε _ (eq s' B (f u) (f v)) ≔
+  J s s' A u (λ x _, eq s' B (f u) (f x)) (refl s' B (f u)) v p;
+symbol eq_inverse {s : Sort} {A : U s} {u v : ε s A} (p : ε s (eq s A u v)) : ε _ (eq s (eq s A u u) (trans_eq p (inv_eq p)) (refl s A u)) ≔
+  J s s A u (λ (x : ε s A) (p : ε s (eq s A u x)), eq s (eq s A u u) (trans_eq p (inv_eq p)) (refl s A u)) (refl s (eq s A u u) (refl s A u)) v p;
 
 // Axioms
 constant symbol uip (s : Sort) (A : U s) (u v : ε s A) (e1 e2 : ε s (eq s A u v)) : ε s (eq s (eq s A u v) e1 e2);
