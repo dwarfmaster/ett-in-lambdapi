@@ -26,7 +26,7 @@ symbol pushΓ {Γ : Context} {s : Sort} {T : Term} (d : der Γ T (tsort s) (snex
   der_context_push Γ s T d (inv_context _ _ _ _ d);
 
 
-// Definitions
+// Definition of inv_sort
 rule inv_sort _ _ _ _ (der_var $Γ $id $dΓ) ↪ der_shift $id $Γ _ _ _ (der_subΓ _ $id $dΓ)
 with inv_sort _ _ _ _ (der_type_conv _ _ _ _ _ _ $deq) ↪ inv_eq_t2 _ _ _ _ _ $deq
 with inv_sort _ _ _ _ (der_abs $Γ $s $s' $A _ $B $dA $dB _) ↪ der_prod $Γ $s $s' $A $B $dA $dB
@@ -40,4 +40,16 @@ with inv_sort _ _ _ _ (der_uip $Γ $s $e1 $e2 $u $v $A $de1 $de2) ↪ der_prop_t
                                                                                      (inv_sort _ _ _ _ $de1) $de1 $de2
 with inv_sort _ _ _ _ (der_funext $Γ $s $s' $f $g $A _ $B $dA $dB $df $dg _)
   ↪ der_prop_type_eq $Γ (smax $s $s') (tfun $A $B) $f $g (der_prod $Γ $s $s' $A $B $dA $dB) $df $dg
+;
+
+// Definition of inv_eq*
+rule inv_eq_sort _ _ _ _ _ (der_eq_refl _ _ _ _ $du) ↪ inv_sort _ _ _ _ $du
+with inv_eq_t1   _ _ _ _ _ (der_eq_refl _ _ _ _ $du) ↪ $du
+with inv_eq_t2   _ _ _ _ _ (der_eq_refl _ _ _ _ $du) ↪ $du
+with inv_eq_sort _ _ _ _ _ (der_eq_trans _ _ _ _ _ _ $duv _) ↪ inv_eq_sort _ _ _ _ _ $duv
+with inv_eq_t1   _ _ _ _ _ (der_eq_trans _ _ _ _ _ _ $duv _) ↪ inv_eq_t1   _ _ _ _ _ $duv
+with inv_eq_t2   _ _ _ _ _ (der_eq_trans _ _ _ _ _ _ _ $dvw) ↪ inv_eq_t2   _ _ _ _ _ $dvw
+with inv_eq_sort _ _ _ _ _ (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_sort _ _ _ _ _ $duv
+with inv_eq_t1   _ _ _ _ _ (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_t2   _ _ _ _ _ $duv
+with inv_eq_t2   _ _ _ _ _ (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_t1  _ _ _ _ _ $duv
 ;

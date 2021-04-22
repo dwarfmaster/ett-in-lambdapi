@@ -314,6 +314,26 @@ rule τ $Γ _ _ _ (ETT.der_π2 _ $s $s' $p $A $B $dA $dB $dp)
 // Translation of equality
 
 // Congruence
-// rule τ_eq $Γ _ _ _ _ (ETT.der_eq_refl _ $s $u $A $du)
-//   ↪ ITT.mkS (τ_s $s) (τ_s $s)
-// ;
+rule τ_eq $Γ _ _ _ _ (ETT.der_eq_refl _ _ _ _ $du)
+  ↪ heq_refl (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (τ $Γ _ _ _ $du)
+with τ_eq $Γ _ _ _ _ (ETT.der_eq_trans _ $s _ $v _ $A $duv $dvw)
+  ↪ heq_trans
+         (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $duv)))
+         (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $dvw)))
+         (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $dvw)))
+         (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $duv))
+         (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $dvw))
+         (τ $Γ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $dvw))
+       (heq_trans
+            (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $duv)))
+            (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $duv)))
+            (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $dvw)))
+            (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $duv))
+            (τ $Γ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $duv))
+            (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $dvw))
+          (τ_eq $Γ _ _ _ _ $duv)
+          (convert $Γ $s $v $A (I.inv_eq_t2 _ _ _ _ _ $duv) (I.inv_eq_t1 _ _ _ _ _ $dvw)))
+       (τ_eq $Γ _ _ _ _ $dvw)
+with τ_eq $Γ _ _ _ _ (ETT.der_eq_symm _ _ _ _ _ $duv)
+  ↪ heq_symm _ _ _ _ (τ_eq $Γ _ _ _ _ $duv)
+;
