@@ -266,8 +266,7 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
 // Conversion
 | der_eq_conversion :
   Π(Γ : Context), Π(s : Sort), Π(t1 t2 T1 T2 : Term),
-  der Γ T1 (tsort s) (snext s) → der Γ T2 (tsort s) (snext s)
-  → der_eq Γ s T1 t1 t2 → der_eq Γ (snext s) (tsort s) T1 T2
+  der_eq Γ s T1 t1 t2 → der_eq Γ (snext s) (tsort s) T1 T2
   → der_eq Γ s T2 t1 t2
 | der_eq_lift :
   Π(Γ : Context), Π(s : Sort), Π(e u v A : Term),
@@ -358,3 +357,4 @@ symbol der_shift1 (Γ : Context) (t T : Term) (s : Sort) (_ : der (getΓ Γ db0)
 symbol der_shift (id : DBId) (Γ : Context) (t T : Term) (s : Sort) (_ : der (getΓ Γ id) t T s) : der Γ (ShiftN id t) (ShiftN id T) s;
 rule der_shift db0 $Γ $t $T $s $d ↪ der_shift1 $Γ $t $T $s $d
 with der_shift (dbsucc $id) $Γ $t $T $s $d ↪ der_shift1 $Γ _ _ _ (der_shift $id _ $t $T $s $d);
+

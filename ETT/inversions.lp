@@ -13,6 +13,10 @@ symbol inv_eq_sort : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 : Term), Π(d : 
 symbol inv_eq_t2 : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 : Term), der_eq Γ s T t1 t2 → der Γ t2 T s;
 symbol inv_eq_t1 : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 : Term), der_eq Γ s T t1 t2 → der Γ t1 T s;
 
+symbol inv_teq_sort : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 e : Term), Π(d : der Γ e (teq T t1 t2) s), der Γ T (tsort s) (snext s);
+symbol inv_teq_t1 : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 e : Term), Π(d : der Γ e (teq T t1 t2) s), der Γ t1 T s;
+symbol inv_teq_t2 : Π(Γ : Context), Π(s : Sort), Π(T t1 t2 e : Term), Π(d : der Γ e (teq T t1 t2) s), der Γ t2 T s;
+
 symbol inv_type : Π(Γ : Context), Π(s s' : Sort), Π(A : Term), der Γ A (tsort s) s' → der Γ A (tsort s) (snext s);
 symbol inv_eq_type : Π(Γ : Context), Π(s s' : Sort), Π(s1 s2 : Sort), der_eq Γ s' (tsort s) (tsort s1) (tsort s2) →
   der_eq Γ (snext (snext s1)) (tsort (snext s1)) (tsort s1) (tsort s1);
@@ -43,7 +47,15 @@ with inv_sort _ _ _ _ (der_funext $Γ $s $s' $f $g $A _ $B $dA $dB $df $dg _)
 ;
 
 // Definition of inv_eq*
-rule inv_eq_sort _ _ _ _ _ (der_eq_refl _ _ _ _ $du) ↪ inv_sort _ _ _ _ $du
+// Conversion
+rule inv_eq_sort _ _ _ _ _ (der_eq_conversion _ _ _ _ _ _ _ $deqT) ↪ inv_eq_t2 _ _ _ _ _ $deqT
+with inv_eq_t1   _ _ _ _ _ (der_eq_conversion $Γ $s $t1 _ $T1 $T2 $deq $deqT) ↪ der_type_conv $Γ $t1 $T1 $T2 $s (inv_eq_t1 _ _ _ _ _ $deq) $deqT
+with inv_eq_t2   _ _ _ _ _ (der_eq_conversion $Γ $s _ $t2 $T1 $T2 $deq $deqT) ↪ der_type_conv $Γ $t2 $T1 $T2 $s (inv_eq_t2 _ _ _ _ _ $deq) $deqT
+with inv_eq_sort _ _ _ _ _ (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_sort _ _ _ _ _ _ $de
+with inv_eq_t1   _ _ _ _ _ (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_t1   _ _ _ _ _ _ $de
+with inv_eq_t2   _ _ _ _ _ (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_t2   _ _ _ _ _ _ $de
+// Congruence
+with inv_eq_sort _ _ _ _ _ (der_eq_refl _ _ _ _ $du) ↪ inv_sort _ _ _ _ $du
 with inv_eq_t1   _ _ _ _ _ (der_eq_refl _ _ _ _ $du) ↪ $du
 with inv_eq_t2   _ _ _ _ _ (der_eq_refl _ _ _ _ $du) ↪ $du
 with inv_eq_sort _ _ _ _ _ (der_eq_trans _ _ _ _ _ _ $duv _) ↪ inv_eq_sort _ _ _ _ _ $duv

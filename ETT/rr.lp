@@ -85,15 +85,16 @@ symbol τ_T (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) :
 symbol τ (Γ : TContext) (s : ETT.Sort) (t T : ETT.Term) (d : ETT.der (τ_Γ Γ) t T s) :
   let sort ≔ I.inv_sort (τ_Γ Γ) s t T d in
   ε (τ_s s) (τ_T Γ T s sort);
-symbol τ_eq (Γ : TContext) (s : ETT.Sort) (T t1 t2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) s T t1 t2) :
+symbol τ_eq_type (Γ : TContext) (s : ETT.Sort) (T t1 t2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) s T t1 t2) : ITT.U _ ≔
   let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) s T t1 t2 d in
   let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) s T t1 t2 d in
   let ds1 ≔ I.inv_sort (τ_Γ Γ) s t1 T d1 in
   let ds2 ≔ I.inv_sort (τ_Γ Γ) s t2 T d2 in
-  heterogeneous_eq (τ_s s)
+  heterogeneous_eq' (τ_s s)
     (τ_T Γ T s ds1)
     (τ_T Γ T s ds2)
     (τ Γ s t1 T d1) (τ Γ s t2 T d2);
+symbol τ_eq (Γ : TContext) (s : ETT.Sort) (T t1 t2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) s T t1 t2) : ε _ (τ_eq_type Γ s T t1 t2 d);
 symbol convert_T (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) (d1 d2 : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s)) :
   let S ≔ τ_s s in ε (ITT.snext S) (ITT.eq (ITT.snext S) (ITT.u S) (τ_T Γ _ _ d1) (τ_T Γ _ _ d2));
 symbol convert (Γ : TContext) (s : ETT.Sort) (t T : ETT.Term) (d1 d2 : ETT.der (τ_Γ Γ) t T s) :
@@ -313,8 +314,26 @@ rule τ $Γ _ _ _ (ETT.der_π2 _ $s $s' $p $A $B $dA $dB $dp)
 
 // Translation of equality
 
+// Conversion
+rule τ_eq $Γ _ _ _ _ (ETT.der_eq_conversion _ $s $t1 $t2 $T1 $T2 $deq $deqT)
+  ↪ mkHeq
+       (τ_T $Γ _ _ (I.inv_eq_t2 _ _ _ _ _ $deqT))
+       (τ_T $Γ _ _ (I.inv_eq_t2 _ _ _ _ _ $deqT))
+       (τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $deq) $deqT))
+       (τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $deq) $deqT))
+       (ITT.trans_eq (ITT.trans_eq (ITT.inv_eq (τ_eqT $Γ _ _ _ $deqT)) (ITT.inv_eq (convert_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $deq)) (I.inv_eq_t1 _ _ _ _ _ $deqT))))
+                     (ITT.trans_eq (getTeq _ _ _ _ (τ_eq $Γ _ _ _ _ $deq))
+                                   (ITT.trans_eq (convert_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $deq)) (I.inv_eq_t1 _ _ _ _ _ $deqT)) (τ_eqT $Γ _ _ _ $deqT))))
+       (magic _
+         (ITT.eq _ (τ_T $Γ _ _ (I.inv_eq_t2 _ _ _ _ _ $deqT))
+           (transport _ _ _ (ITT.trans_eq (ITT.trans_eq (ITT.inv_eq (τ_eqT $Γ _ _ _ $deqT)) (ITT.inv_eq (convert_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $deq)) (I.inv_eq_t1 _ _ _ _ _ $deqT))))
+                                          (ITT.trans_eq (getTeq _ _ _ _ (τ_eq $Γ _ _ _ _ $deq))
+                                                        (ITT.trans_eq (convert_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $deq)) (I.inv_eq_t1 _ _ _ _ _ $deqT)) (τ_eqT $Γ _ _ _ $deqT))))
+              (τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $deq) $deqT)))
+           (τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $deq) $deqT))))
+
 // Congruence
-rule τ_eq $Γ _ _ _ _ (ETT.der_eq_refl _ _ _ _ $du)
+with τ_eq $Γ _ _ _ _ (ETT.der_eq_refl _ _ _ _ $du)
   ↪ heq_refl (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (τ $Γ _ _ _ $du)
 with τ_eq $Γ _ _ _ _ (ETT.der_eq_trans _ $s _ $v _ $A $duv $dvw)
   ↪ heq_trans
