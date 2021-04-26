@@ -19,7 +19,8 @@ constant symbol snext : Sort → Sort;
 symbol smax : Sort → Sort → Sort;
 rule smax s0 $n ↪ $n
 with smax $n s0 ↪ $n
-with smax (snext $n) (snext $m) ↪ snext (smax $n $m);
+with smax (snext $n) (snext $m) ↪ snext (smax $n $m)
+with smax $s $s ↪ $s;
 symbol sadd : Sort → Sort → Sort;
 rule sadd s0 $n ↪ $n
 with sadd $n s0 ↪ $n

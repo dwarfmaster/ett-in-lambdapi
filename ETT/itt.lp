@@ -6,7 +6,8 @@ constant symbol snext : Sort → Sort;
 symbol smax : Sort → Sort → Sort;
 rule smax s0 $s ↪ $s
 with smax $s s0 ↪ $s
-with smax (snext $s1) (snext $s2) ↪ snext (smax $s1 $s2);
+with smax (snext $s1) (snext $s2) ↪ snext (smax $s1 $s2)
+with smax $s $s ↪ $s;
 
 // Interpretation of sorts
 constant symbol U : Sort → TYPE;
