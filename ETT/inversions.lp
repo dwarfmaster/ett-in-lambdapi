@@ -52,6 +52,10 @@ rule inv_eq_sort _ _ _ _ _ (der_eq_beta $Γ $s $s' $u $A _  $B _ _ $dt $du) ↪ 
 with inv_eq_t1   _ _ _ _ _ (der_eq_beta $Γ $s $s' $u $A $t $B _ _ $dt $du) ↪ der_app $Γ $s $s' $A (tabs $A $B $t) $u $B (inv_sort _ _ _ _ $du) (inv_sort _ _ _ _ $dt)
                                                                                       (der_abs $Γ $s $s' $A $t $B (inv_sort _ _ _ _ $du) (inv_sort _ _ _ _ $dt) $dt) $du
 with inv_eq_t2   _ _ _ _ _ (der_eq_beta $Γ $s $s' $u $A $t $B _ _ $dt $du) ↪ substitution $Γ $s $s' $A $B $t $dt $u $du
+with inv_eq_sort _ _ _ _ _ (der_eq_π1 _  _  _   _  _  _  _  _ $du _   _  ) ↪ inv_sort _ _ _ _ $du
+with inv_eq_t1   _ _ _ _ _ (der_eq_π1 $Γ $s $s' $u $A $v $B _ $du $dB $dv) ↪ der_π1 $Γ $s $s' (tpair $A $B $u $v) $A $B (inv_sort _ _ _ _ $du) $dB
+                                                                                       (der_pair $Γ $s $s' $u $A $v $B (inv_sort _ _ _ _ $du) $du $dB $dv)
+with inv_eq_t2   _ _ _ _ _ (der_eq_π1 _  _  _   _  _  _  _  _ $du _   _  ) ↪ $du
 // Conversion
 with inv_eq_sort _ _ _ _ _ (der_eq_conversion _ _ _ _ _ _ _ $deqT) ↪ inv_eq_t2 _ _ _ _ _ $deqT
 with inv_eq_t1   _ _ _ _ _ (der_eq_conversion $Γ $s $t1 _ $T1 $T2 $deq $deqT) ↪ der_type_conv $Γ $t1 $T1 $T2 $s (inv_eq_t1 _ _ _ _ _ $deq) $deqT

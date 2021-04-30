@@ -415,6 +415,45 @@ rule τ_eq $Γ _ _ _ _ (ETT.der_eq_beta _ $s $s' $u $A $t $B $dA $dB $dt $du)
                   (τ $Γ _ _ _ $du))
            (τ_substT_eq $Γ $s $s' $A $B $u (I.inv_sort _ _ _ _ $dt) $du))))
 
+with τ_eq $Γ _ _ _ _ (ETT.der_eq_π1 _ $s $s' $u $A $v $B _ $du $dB $dv)
+  ↪ eq_to_heq _ _ _
+      (ITT.inv_eq
+        (@ITT.lift_eq (ITT.smax (τ_s $s) (τ_s $s')) (τ_s $s)
+          (ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
+          (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))
+          (λ(s : ε _ (ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))), ITT.proj1 _ _ _ _ s)
+          // u
+          (ITT.mkS (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))
+              (λ(a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+              (τ $Γ _ _ _ $du)
+              (τ_substT' $Γ $s $s' $A $B $u $dB $du
+                (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv))))
+          // v
+          (τ_sum $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB)
+            (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+          // u = v
+          (ITT.trans_eq
+           (eq_of_transport (ITT.smax (τ_s $s) (τ_s $s'))
+             (ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))
+                    (λ(a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
+             (ITT.mkS (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))
+              (λ(a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+              (τ $Γ _ _ _ $du)
+              (τ_substT' $Γ $s $s' $A $B $u $dB $du
+                (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv))))
+             (eq_pair (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))
+               (λ (a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+               (λ (a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+               (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $du) (I.inv_sort _ _ _ _ $du))
+               (λ (a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))),
+                  convert_Γ $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) (I.inv_sort _ _ _ _ $du) a
+                            (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $du) (I.inv_sort _ _ _ _ $du)) a) $dB)))
+           (eq_of_transport (ITT.smax (τ_s $s) (τ_s $s'))
+             (ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))
+                    (λ(a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
+             (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))
+             (τ_sum_eq $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB))))))
+
 // Conversion
 // rule τ_eq $Γ _ _ _ _ (ETT.der_eq_conversion _ $s $t1 $t2 $T1 $T2 $deq $deqT)
 //   ↪ mkHeq
