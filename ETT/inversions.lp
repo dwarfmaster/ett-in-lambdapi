@@ -54,8 +54,15 @@ with inv_eq_t1   _ _ _ _ _ (der_eq_beta $Γ $s $s' $u $A $t $B _ _ $dt $du) ↪ 
 with inv_eq_t2   _ _ _ _ _ (der_eq_beta $Γ $s $s' $u $A $t $B _ _ $dt $du) ↪ substitution $Γ $s $s' $A $B $t $dt $u $du
 with inv_eq_sort _ _ _ _ _ (der_eq_π1 _  _  _   _  _  _  _  _ $du _   _  ) ↪ inv_sort _ _ _ _ $du
 with inv_eq_t1   _ _ _ _ _ (der_eq_π1 $Γ $s $s' $u $A $v $B _ $du $dB $dv) ↪ der_π1 $Γ $s $s' (tpair $A $B $u $v) $A $B (inv_sort _ _ _ _ $du) $dB
-                                                                                       (der_pair $Γ $s $s' $u $A $v $B (inv_sort _ _ _ _ $du) $du $dB $dv)
+                                                                                     (der_pair $Γ $s $s' $u $A $v $B (inv_sort _ _ _ _ $du) $du $dB $dv)
 with inv_eq_t2   _ _ _ _ _ (der_eq_π1 _  _  _   _  _  _  _  _ $du _   _  ) ↪ $du
+with inv_eq_sort _ _ _ _ _ (der_eq_π2 _  _  _   _  _  _  _  _ _   _   $dv) ↪ inv_sort _ _ _ _ $dv
+with inv_eq_t1   _ _ _ _ _ (der_eq_π2 $Γ $s $s' $u $A $v $B _ $du $dB $dv) ↪ der_type_conv $Γ (π2 $A $B (tpair $A $B $u $v)) (apply1 $B (π1 $A $B (tpair $A $B $u $v))) (apply1 $B $u) $s'
+                                                                                  (der_π2 $Γ $s $s' (tpair $A $B $u $v) $A $B (inv_sort _ _ _ _ $du) $dB
+                                                                                    (der_pair $Γ $s $s' $u $A $v $B (inv_sort _ _ _ _ $du) $du $dB $dv))
+                                                                                  (der_eq_ctx $Γ $s (snext $s') $B (tsort $s') (π1 $A $B (tpair $A $B $u $v)) $u $A
+                                                                                    (der_eq_π1 $Γ $s $s' $u $A $v $B (inv_sort _ _ _ _ $du) $du $dB $dv) $dB)
+with inv_eq_t2   _ _ _ _ _ (der_eq_π2 _  _  _   _  _  _  _  _ _   _   $dv) ↪ $dv
 // Conversion
 with inv_eq_sort _ _ _ _ _ (der_eq_conversion _ _ _ _ _ _ _ $deqT) ↪ inv_eq_t2 _ _ _ _ _ $deqT
 with inv_eq_t1   _ _ _ _ _ (der_eq_conversion $Γ $s $t1 _ $T1 $T2 $deq $deqT) ↪ der_type_conv $Γ $t1 $T1 $T2 $s (inv_eq_t1 _ _ _ _ _ $deq) $deqT

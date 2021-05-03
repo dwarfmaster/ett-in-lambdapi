@@ -56,6 +56,10 @@ symbol heq_symm {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U)
             (path_comp s T U T (getTeq T U t u h) (ITT.inv_eq (getTeq T U t u h)) t)
             (ITT.lift_eq (transport _ _ _ (ITT.inv_eq (getTeq T U t u h))) (transport _ _ _ (getTeq T U t u h) t) u (getEq T U t u h))))
           (homotopy s T T (ITT.trans_eq (getTeq T U t u h) (ITT.inv_eq (getTeq T U t u h))) (ITT.refl _ (ITT.u s) T) (ITT.eq_inverse (getTeq T U t u h)) t));
+symbol lift_to_heq {s s' : ITT.Sort} {A : ITT.U s} {B : ε s A → ITT.U s'}
+                   (f : ε _ (ITT.P s s' A B)) (u v : ε s A) (p : ε _ (ITT.eq s A u v))
+                   : heterogeneous_eq s' (B u) (B v) (f u) (f v) ≔
+  ITT.J s _ A u (λ v _, heterogeneous_eq' s' (B u) (B v) (f u) (f v)) (heq_refl (B u) (f u)) v p;
 
 // Proved using uip
 symbol heq_to_eq (s : ITT.Sort) (T : univ s) (t u : ε s T) : heterogeneous_eq s T T t u → ε s (ITT.eq s T t u);
@@ -453,6 +457,152 @@ with τ_eq $Γ _ _ _ _ (ETT.der_eq_π1 _ $s $s' $u $A $v $B _ $du $dB $dv)
                     (λ(a : ε _ (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))), τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
              (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))
              (τ_sum_eq $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB))))))
+
+with τ_eq $Γ _ _ _ _ (ETT.der_eq_π2 _ $s $s' $u $A $v $B $dA $du $dB $dv)
+  ↪ heq_symm
+       (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $dv))
+       (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv))))
+       (τ $Γ _ _ _ $dv)
+       (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv)))
+       (heq_trans
+         (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $dv))
+         (τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) (τ $Γ _ _ _ $du)) _ _ $dB)
+         (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv))))
+         (τ $Γ _ _ _ $dv)
+         (τ_substT' $Γ $s $s' $A $B $u $dB $du (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv)))
+         (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv)))
+
+         // Equality from the translation of $v to the second projection of the untransported pair
+         (heq_trans
+           (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $dv))
+           (τ_T $Γ _ _ (I.substitution _ _ _ _ _ _ $dB _ $du))
+           (τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) (τ $Γ _ _ _ $du)) _ _ $dB)
+           (τ $Γ _ _ _ $dv)
+           (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv))
+           (τ_substT' $Γ $s $s' $A $B $u $dB $du (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv)))
+           (heq_of_transport _ _ _
+             (τ $Γ _ _ _ $dv)
+             (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)))
+           (heq_of_transport _ _ _
+             (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv))
+             (ITT.inv_eq (τ_substT_eq $Γ $s $s' $A $B $u $dB $du))))
+
+         (heq_trans
+           (τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) (τ $Γ _ _ _ $du)) _ _ $dB)
+           (τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du)
+                       (ITT.proj1 _ _ _ _ (τ_sum $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                                 (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB)
+                                                 (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))))
+                _ _ $dB)
+           (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv))))
+           (τ_substT' $Γ $s $s' $A $B $u $dB $du (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv)))
+           (ITT.proj2 _ _ _ _ (τ_sum $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                     (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB)
+                                     (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))))
+           (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv)))
+
+           // Equality between the projection of the pair and the transported pair
+           (@lift_to_heq
+             (ITT.smax (τ_s $s) (τ_s $s')) (τ_s $s')
+             (ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
+             (λ p, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) (ITT.proj1 _ _ _ _ p)) _ _ $dB)
+             (λ p, ITT.proj2 _ _ _ _ p)
+             (ITT.mkS (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+                      (τ $Γ _ _ _ $du)
+                      (τ_substT' $Γ $s $s' $A $B $u $dB $du (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv))))
+             (τ_sum $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB
+                    (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB)
+                    (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+             (heq_to_eq _ _ _ _
+               (heq_trans
+                 (ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
+                 (τ_T $Γ _ _ (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB))
+                 (ITT.S (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB))
+                 (ITT.mkS (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+                          (τ $Γ _ _ _ $du)
+                          (τ_substT' $Γ $s $s' $A $B $u $dB $du (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv))))
+                 (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))
+                 (τ_sum $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB
+                        (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB)
+                        (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+                 (heq_of_transport _ _ _
+                   (ITT.mkS (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+                            (τ $Γ _ _ _ $du)
+                            (τ_substT' $Γ $s $s' $A $B $u $dB $du (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $dv) (I.substitution _ _ _ _ _ _ $dB _ $du)) (τ $Γ _ _ _ $dv))))
+                   (eq_pair (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du)) (τ_T $Γ _ _ (I.inv_sort _ _ _ _ $du))
+                     (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+                     (λ a, τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du) a) _ _ $dB)
+                     (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $du) (I.inv_sort _ _ _ _ $du))
+                     (λ a, convert_Γ $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) (I.inv_sort _ _ _ _ $du) a
+                                     (transport _ _ _ (convert_T $Γ _ _ (I.inv_sort _ _ _ _ $du) (I.inv_sort _ _ _ _ $du)) a) $dB)))
+                 (heq_of_transport _ _ _
+                   (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))
+                   (τ_sum_eq $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB
+                     (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB))))))
+
+           // Equality between the projection of the transported pair and the converted second element
+           (heq_trans
+             (τ_T (TPush $Γ $s $A (I.inv_sort _ _ _ _ $du)
+                         (ITT.proj1 _ _ _ _ (τ_sum $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                                   (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB)
+                                                   (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))))
+                  _ _ $dB)
+             (τ_T $Γ _ _ (I.substitution _ _ _ _ _ _ $dB _ (ETT.der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                                              (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))))
+             (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv))))
+             (ITT.proj2 _ _ _ _ (τ_sum $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                       (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB)
+                                       (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))))
+             (τ $Γ _ _ _ (ETT.der_π2 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                     (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+             (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv)))
+             // Substitution
+             (heq_of_transport _ _ _
+               (ITT.proj2 _ _ _ _ (τ_sum $Γ $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                         (ETT.der_sigma (τ_Γ $Γ) $s $s' $A $B (I.inv_sort _ _ _ _ $du) $dB)
+                                         (τ $Γ _ _ _ (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))))
+               (τ_substT_eq $Γ $s $s' $A $B (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $dB
+                 (ETT.der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                             (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))))
+             // Type conversion
+             (heq_trans
+               (τ_T $Γ _ _ (I.substitution _ _ _ _ _ _ $dB _ (ETT.der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                                                (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))))
+               (τ_T $Γ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
+                                                    (ETT.der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv) $dB)))
+               (τ_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv))))
+               (τ $Γ _ _ _ (ETT.der_π2 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                       (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+               (transport _ _ _
+                 (convert_T $Γ _ _
+                   (I.substitution _ _ _ _ _ _ $dB _ (ETT.der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                                       (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+                   (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
+                                             (ETT.der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv) $dB)))
+                 (τ $Γ _ _ _ (ETT.der_π2 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                         (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))))
+               (τ $Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_π2 (τ_Γ $Γ) $s $s' $u $A $v $B $dA $du $dB $dv)))
+
+               (heq_of_transport _ _ _
+                 (τ $Γ _ _ _ (ETT.der_π2 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+                 (convert_T $Γ _ _
+                   (I.substitution _ _ _ _ _ _ $dB _ (ETT.der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                                       (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+                   (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
+                                             (ETT.der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv) $dB))))
+               (heq_of_transport _ _ _
+                 (transport _ _ _
+                   (convert_T $Γ _ _
+                     (I.substitution _ _ _ _ _ _ $dB _ (ETT.der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                                         (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv)))
+                     (I.inv_eq_t1 _ _ _ _ _ (ETT.der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
+                                               (ETT.der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv) $dB)))
+                   (τ $Γ _ _ _ (ETT.der_π2 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (I.inv_sort _ _ _ _ $du) $dB
+                                           (ETT.der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv))))
+                 (τ_eqT $Γ _ _ _
+                        (ETT.der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
+                                    (ETT.der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (I.inv_sort _ _ _ _ $du) $du $dB $dv) $dB)))))))
 
 // Conversion
 // rule τ_eq $Γ _ _ _ _ (ETT.der_eq_conversion _ $s $t1 $t2 $T1 $T2 $deq $deqT)

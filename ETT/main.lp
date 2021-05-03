@@ -359,3 +359,6 @@ symbol der_shift (id : DBId) (Γ : Context) (t T : Term) (s : Sort) (_ : der (ge
 rule der_shift db0 $Γ $t $T $s $d ↪ der_shift1 $Γ $t $T $s $d
 with der_shift (dbsucc $id) $Γ $t $T $s $d ↪ der_shift1 $Γ _ _ _ (der_shift $id _ $t $T $s $d);
 
+symbol der_eq_ctx (Γ : Context) (s s' : Sort) (c C t1 t2 T : Term)
+                  (_ : der_eq Γ s T t1 t2) (_ : der (Push T s Γ) c C s')
+                  : der_eq Γ s' (apply1 C t1) (apply1 c t1) (apply1 c t2);
