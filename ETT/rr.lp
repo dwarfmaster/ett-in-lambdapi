@@ -275,6 +275,10 @@ symbol eq_pair (s s' : ITT.Sort) (A A' : ITT.U s) (B : ITT.ε s A → ITT.U s') 
                (eqA : ε _ (ITT.eq (ITT.snext s) (ITT.u s) A A'))
                (eqB : Π(a : ε s A), ITT.ε _ (ITT.eq (ITT.snext s') (ITT.u s') (B a) (B' (transport _ _ _ eqA a)))) :
                ITT.ε _ (ITT.eq (ITT.snext (ITT.smax s s')) (ITT.u (ITT.smax s s')) (ITT.S s s' A B) (ITT.S s s' A' B'));
+symbol eq_prod (s s' : ITT.Sort) (A A' : ITT.U s) (B : ε s A → ITT.U s') (B' : ε s A' → ITT.U s')
+               (eqA : ε _ (ITT.eq (ITT.snext s) (ITT.u s) A A'))
+               (eqB : Π(a : ε s A), ITT.ε _ (ITT.eq (ITT.snext s') (ITT.u s') (B a) (B' (transport _ _ _ eqA a))))
+               : ε _ (ITT.eq (ITT.snext (ITT.smax s s')) (ITT.u (ITT.smax s s')) (ITT.P s s' A B) (ITT.P s s' A' B'));
 
 // For things to type, we need to make sure that the translation of a sort is a universe
 rule τ_T _ (ETT.tsort $s) (ETT.snext $s) _ ↪ ITT.u (τ_s $s);
@@ -310,6 +314,29 @@ symbol τ_eqT (Γ : TContext) (s : ETT.Sort) (T1 T2 : ETT.Term) (d : ETT.der_eq 
   let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) _ _ _ _ d in
   let heq ≔ τ_eq Γ (ETT.snext s) (ETT.tsort s) T1 T2 d in
   heq_to_eq (ITT.snext (τ_s s)) (ITT.u (τ_s s)) (τ_T Γ T1 s d1) (τ_T Γ T2 s d2) heq;
+
+// Translation of context conversion
+symbol τ_conv_in_ctx (Γ : TContext) (s s' : ETT.Sort) (A A' t B : ETT.Term)
+                     (deqA : ETT.der_eq (τ_Γ Γ) (ETT.snext s) (ETT.tsort s) A A')
+                     (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) t B s')
+                     (a : ε _ (τ Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ deqA)))
+                     : heterogeneous_eq (τ_s s')
+                        (τ_T (TPush Γ s A (I.inv_eq_t1 _ _ _ _ _ deqA) a) _ _ (I.inv_sort _ _ _ _ dB))
+                        (τ_T (TPush Γ s A' (I.inv_eq_t2 _ _ _ _ _ deqA) (transport _ _ _ (τ_eqT Γ _ _ _ deqA) a)) _ _
+                             (I.inv_sort _ _ _ _ (ETT.der_conv_in_ctx (τ_Γ Γ) s s' A A' t B deqA dB)))
+                        (τ (TPush Γ s A (I.inv_eq_t1 _ _ _ _ _ deqA) a) _ _ _ dB)
+                        (τ (TPush Γ s A' (I.inv_eq_t2 _ _ _ _ _ deqA) (transport _ _ _ (τ_eqT Γ _ _ _ deqA) a)) _ _ _
+                           (ETT.der_conv_in_ctx (τ_Γ Γ) s s' A A' t B deqA dB));
+symbol τ_convT_in_ctx (Γ : TContext) (s s' : ETT.Sort) (A A' B : ETT.Term)
+                      (deqA : ETT.der_eq (τ_Γ Γ) (ETT.snext s) (ETT.tsort s) A A')
+                      (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s'))
+                      (a : ε _ (τ Γ _ _ _ (I.inv_eq_t1 _ _ _ _ _ deqA)))
+                      : ε _ (ITT.eq (τ_s (ETT.snext s')) (ITT.u (τ_s s'))
+                               (τ_T (TPush Γ s A (I.inv_eq_t1 _ _ _ _ _ deqA) a) _ _ dB)
+                               (τ_T (TPush Γ s A' (I.inv_eq_t2 _ _ _ _ _ deqA) (transport _ _ _ (τ_eqT Γ _ _ _ deqA) a)) _ _
+                                  (ETT.der_conv_in_ctx (τ_Γ Γ) s (ETT.snext s') A A' B (ETT.tsort s') deqA dB))) ≔
+  heq_to_eq _ _ _ _ (τ_conv_in_ctx Γ s (ETT.snext s') A A' B (ETT.tsort s') deqA dB a);
+
 
 // Translation of terms
 rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
@@ -659,4 +686,16 @@ with τ_eq $Γ _ _ _ _ (ETT.der_eq_trans _ $s _ $v _ $A $duv $dvw)
        (τ_eq $Γ _ _ _ _ $dvw)
 with τ_eq $Γ _ _ _ _ (ETT.der_eq_symm _ _ _ _ _ $duv)
   ↪ heq_symm _ _ _ _ (τ_eq $Γ _ _ _ _ $duv)
+
+// Context
+// prod
+with τ_eq $Γ _ _ _ _ (ETT.der_eq_ctx_prod_domain _ $s $s' $A $A' $B $deqA $dB)
+  ↪ eq_to_heq _ _ _ (eq_prod (τ_s $s) (τ_s $s') (τ_T $Γ _ _ (I.inv_eq_t1 _ _ _ _ _ $deqA)) (τ_T $Γ _ _ (I.inv_eq_t2 _ _ _ _ _ $deqA))
+            (λ a, τ_T (TPush $Γ $s $A (I.inv_eq_t1 _ _ _ _ _ $deqA) a) _ _ $dB)
+            (λ a, τ_T (TPush $Γ $s $A' (I.inv_eq_t2 _ _ _ _ _ $deqA) a) _ _ (ETT.der_conv_in_ctx (τ_Γ $Γ) $s (ETT.snext $s') $A $A' $B (ETT.tsort $s') $deqA $dB))
+            (τ_eqT $Γ _ _ _ $deqA)
+            (λ a, τ_convT_in_ctx $Γ $s $s' $A $A' $B $deqA $dB a))
+// tabs
+with τ_eq $Γ _ _ _ _ (ETT.der_eq_ctx_tabs_domain _ $s $s' $A $A' $B $t $deqA $dB $dt)
+  ↪ magic _ (τ_eq_type $Γ _ _ _ _ (ETT.der_eq_ctx_tabs_domain (τ_Γ $Γ) $s $s' $A $A' $B $t $deqA $dB $dt))
 ;

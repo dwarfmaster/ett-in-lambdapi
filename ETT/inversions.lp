@@ -80,4 +80,25 @@ with inv_eq_t2   _ _ _ _ _ (der_eq_trans _ _ _ _ _ _ _ $dvw) ↪ inv_eq_t2   _ _
 with inv_eq_sort _ _ _ _ _ (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_sort _ _ _ _ _ $duv
 with inv_eq_t1   _ _ _ _ _ (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_t2   _ _ _ _ _ $duv
 with inv_eq_t2   _ _ _ _ _ (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_t1  _ _ _ _ _ $duv
+// Context
+// prod
+with inv_eq_sort _ _ _ _ _ (der_eq_ctx_prod_domain $Γ $s $s' _  _   _  $deqA _  )
+  ↪ der_sort $Γ (smax $s $s') (inv_eq_context $Γ _ _ _ _ $deqA)
+with inv_eq_t1   _ _ _ _ _ (der_eq_ctx_prod_domain $Γ $s $s' $A _   $B $deqA $dB)
+  ↪ der_prod $Γ $s $s' $A $B (inv_eq_t1 _ _ _ _ _ $deqA) $dB
+with inv_eq_t2   _ _ _ _ _ (der_eq_ctx_prod_domain $Γ $s $s' $A $A' $B $deqA $dB)
+  ↪ der_prod $Γ $s $s' $A' $B (inv_eq_t2 _ _ _ _ _ $deqA)
+              (der_conv_in_ctx $Γ $s (snext $s') $A $A' $B (tsort $s') $deqA $dB)
+// abs
+with inv_eq_sort _ _ _ _ _ (der_eq_ctx_tabs_domain $Γ $s $s' $A _   $B _  $deqA $dB _  )
+  ↪ der_prod $Γ $s $s' $A $B (inv_eq_t1 _ _ _ _ _ $deqA) $dB
+with inv_eq_t1   _ _ _ _ _ (der_eq_ctx_tabs_domain $Γ $s $s' $A _   $B $t $deqA $dB $dt)
+  ↪ der_abs $Γ $s $s' $A $t $B (inv_eq_t1 _ _ _ _ _ $deqA) $dB $dt
+with inv_eq_t2   _ _ _ _ _ (der_eq_ctx_tabs_domain $Γ $s $s' $A $A' $B $t $deqA $dB $dt)
+  ↪ der_type_conv $Γ (tabs $A' $B $t) (tfun $A' $B) (tfun $A $B) (smax $s $s')
+      (der_abs $Γ $s $s' $A' $t $B (inv_eq_t2 _ _ _ _ _ $deqA)
+             (der_conv_in_ctx $Γ $s (snext $s') $A $A' $B (tsort $s') $deqA $dB)
+             (der_conv_in_ctx $Γ $s $s' $A $A' $t $B $deqA $dt))
+      (der_eq_symm $Γ (snext (smax $s $s')) (tfun $A $B) (tfun $A' $B) (tsort (smax $s $s'))
+                   (der_eq_ctx_prod_domain $Γ $s $s' $A $A' $B $deqA $dB))
 ;
