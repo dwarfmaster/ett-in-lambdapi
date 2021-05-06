@@ -89,6 +89,12 @@ with inv_eq_t1   _ _ _ _ _ (der_eq_ctx_prod_domain $Γ $s $s' $A _   $B $deqA $d
 with inv_eq_t2   _ _ _ _ _ (der_eq_ctx_prod_domain $Γ $s $s' $A $A' $B $deqA $dB)
   ↪ der_prod $Γ $s $s' $A' $B (inv_eq_t2 _ _ _ _ _ $deqA)
               (der_conv_in_ctx $Γ $s (snext $s') $A $A' $B (tsort $s') $deqA $dB)
+with inv_eq_sort _ _ _ _ _ (der_eq_ctx_prod_codomain $Γ $s $s' _  _  _   $dA _    )
+  ↪ der_sort $Γ (smax $s $s') (inv_context $Γ _ _ _ $dA)
+with inv_eq_t1   _ _ _ _ _ (der_eq_ctx_prod_codomain $Γ $s $s' $A $B _   $dA $deqB)
+  ↪ der_prod $Γ $s $s' $A $B  $dA (inv_eq_t1 _ _ _ _ _ $deqB)
+with inv_eq_t2   _ _ _ _ _ (der_eq_ctx_prod_codomain $Γ $s $s' $A _  $B' $dA $deqB)
+  ↪ der_prod $Γ $s $s' $A $B' $dA (inv_eq_t2 _ _ _ _ _ $deqB)
 // abs
 with inv_eq_sort _ _ _ _ _ (der_eq_ctx_tabs_domain $Γ $s $s' $A _   $B _  $deqA $dB _  )
   ↪ der_prod $Γ $s $s' $A $B (inv_eq_t1 _ _ _ _ _ $deqA) $dB
