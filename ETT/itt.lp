@@ -43,6 +43,10 @@ symbol lift_eq {s s' : Sort} {A : U s} {B : U s'} (f : ε _ (P s s' A (λ _, B))
   J s s' A u (λ x _, eq s' B (f u) (f x)) (refl s' B (f u)) v p;
 symbol eq_inverse {s : Sort} {A : U s} {u v : ε s A} (p : ε s (eq s A u v)) : ε _ (eq s (eq s A u u) (trans_eq p (inv_eq p)) (refl s A u)) ≔
   J s s A u (λ (x : ε s A) (p : ε s (eq s A u x)), eq s (eq s A u u) (trans_eq p (inv_eq p)) (refl s A u)) (refl s (eq s A u u) (refl s A u)) v p;
+symbol apply_eq {s s' : Sort} {A : U s} {B : ε s A → U s'} {f g : ε _ (P s s' A B)}
+                (p : ε _ (eq _ (P s s' A B) f g)) (a : ε s A)
+                : ε _ (eq s' (B a) (f a) (g a)) ≔
+  J (smax s s') s' (P s s' A B) f (λ g _, eq s' (B a) (f a) (g a)) (refl s' (B a) (f a)) g p;
 
 // Axioms
 constant symbol uip (s : Sort) (A : U s) (u v : ε s A) (e1 e2 : ε s (eq s A u v)) : ε s (eq s (eq s A u v) e1 e2);

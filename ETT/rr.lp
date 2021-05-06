@@ -81,6 +81,20 @@ symbol eq_of_transport (s : ITT.Sort) (T : univ s) (t : ε s T)
                        (p : ε _ (ITT.eq _ (ITT.u s) T T)) :
                        ε _ (ITT.eq s T t (transport _ _ _ p t)) ≔
   heq_to_eq s T t (transport _ _ _ p t) (heq_of_transport s T T t p);
+symbol heq_funext (s s' : ITT.Sort) (A : ITT.U s) (B B' : ε s A → ITT.U s')
+                  (f : ε _ (ITT.P s s' A B)) (g : ε _ (ITT.P s s' A B'))
+                  (heq : Π a, heterogeneous_eq s' (B a) (B' a) (f a) (g a))
+                  : heterogeneous_eq (ITT.smax s s') (ITT.P s s' A B) (ITT.P s s' A B') f g ≔
+  ITT.J (ITT.smax s (ITT.snext s')) _ (ITT.P s (ITT.snext s') A (λ _, ITT.u s')) B
+        (λ B' p, ITT.P (ITT.smax s s') _ (ITT.P s s' A B')
+                       (λ g, ITT.P _ _ (ITT.P s _ A (λ a, ITT.eq s' (B' a) (transport _ _ _ (ITT.apply_eq p a) (f a)) (g a)))
+                                   (λ _, heterogeneous_eq' (ITT.smax s s') (ITT.P s s' A B) (ITT.P s s' A B') f g)))
+        (λ g eq, eq_to_heq (ITT.P s s' A B) f g (ITT.funext s s' A B f g eq))
+        B'
+        (ITT.funext s (ITT.snext s') A (λ _, ITT.u s') B B' (λ a, getTeq (B a) (B' a) (f a) (g a) (heq a))) // Equality of B and B'
+        g
+        (λ a, magic _ (ITT.eq s' (B' a) (transport _ _ _ (ITT.apply_eq (ITT.funext s (ITT.snext s') A (λ _, ITT.u s') B B' (λ a, getTeq (B a) (B' a) (f a) (g a) (heq a))) a) (f a)) (g a)));
+        // (λ a, getEq (B a) (B' a) (f a) (g a) (heq a));
 
 symbol Pack (s : ITT.Sort) (A1 A2 : univ s) : TYPE ≔ ε _ (Pack' s A1 A2);
 symbol Proj1 {s : ITT.Sort} {A1 A2 : univ s} (p : Pack s A1 A2) : ε s A1 ≔
