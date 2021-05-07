@@ -790,3 +790,8 @@ with τ_eq $Γ _ _ _ _ (ETT.der_eq_ctx_tabs_codomain _ $s $s' $A $B $B' $t $dA $
 // convert_T
 rule convert_T $Γ $T $s $d1 $d2
   ↪ heq_to_eq _ _ _ _ (convert $Γ (ETT.snext $s) $T (ETT.tsort $s) $d1 $d2);
+
+// convert
+rule convert _ _ _ _ (ETT.der_sort _ $s _) (ETT.der_sort _ _ _)
+  ↪ heq_refl (ITT.u (ITT.snext (τ_s $s))) (ITT.u (τ_s $s))
+;
