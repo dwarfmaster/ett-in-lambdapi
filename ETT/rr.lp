@@ -786,3 +786,7 @@ with τ_eq $Γ _ _ _ _ (ETT.der_eq_ctx_tabs_codomain _ $s $s' $A $B $B' $t $dA $
            (τ_eqT $Γ _ _ _ (ETT.der_eq_symm (τ_Γ $Γ) (ETT.snext (ETT.smax $s $s')) (ETT.tfun $A $B) (ETT.tfun $A $B') (ETT.tsort (ETT.smax $s $s'))
                              (ETT.der_eq_ctx_prod_codomain (τ_Γ $Γ) $s $s' $A $B $B' $dA $deqB)))))
 ;
+
+// convert_T
+rule convert_T $Γ $T $s $d1 $d2
+  ↪ heq_to_eq _ _ _ _ (convert $Γ (ETT.snext $s) $T (ETT.tsort $s) $d1 $d2);
