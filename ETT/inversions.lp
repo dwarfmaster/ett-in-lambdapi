@@ -107,4 +107,14 @@ with inv_eq_t2   _ _ _ _ _ (der_eq_ctx_tabs_domain $Γ $s $s' $A $A' $B $t $deqA
              (der_conv_in_ctx $Γ $s $s' $A $A' $t $B $deqA $dt))
       (der_eq_symm $Γ (snext (smax $s $s')) (tfun $A $B) (tfun $A' $B) (tsort (smax $s $s'))
                    (der_eq_ctx_prod_domain $Γ $s $s' $A $A' $B $deqA $dB))
+with inv_eq_sort _ _ _ _ _ (der_eq_ctx_tabs_codomain $Γ $s $s' $A $B _   _  $dA $deqB _  )
+  ↪ der_prod $Γ $s $s' $A $B $dA (inv_eq_t1 _ _ _ _ _ $deqB)
+with inv_eq_t1   _ _ _ _ _ (der_eq_ctx_tabs_codomain $Γ $s $s' $A $B _   $t $dA $deqB $dt)
+  ↪ der_abs $Γ $s $s' $A $t $B $dA (inv_eq_t1 _ _ _ _ _ $deqB) $dt
+with inv_eq_t2   _ _ _ _ _ (der_eq_ctx_tabs_codomain $Γ $s $s' $A $B $B' $t $dA $deqB $dt)
+  ↪ der_type_conv $Γ (tabs $A $B' $t) (tfun $A $B') (tfun $A $B) (smax $s $s')
+      (der_abs $Γ $s $s' $A $t $B' $dA (inv_eq_t2 _ _ _ _ _ $deqB)
+        (der_type_conv (Push $A $s $Γ) $t $B $B' $s' $dt $deqB))
+      (der_eq_symm $Γ (snext (smax $s $s')) (tfun $A $B) (tfun $A $B') (tsort (smax $s $s'))
+                   (der_eq_ctx_prod_codomain $Γ $s $s' $A $B $B' $dA $deqB))
 ;

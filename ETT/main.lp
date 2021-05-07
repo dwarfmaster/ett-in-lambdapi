@@ -301,12 +301,12 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   → der_eq Γ (smax s s') (tfun A B) (tabs A B t) (tabs A' B t)
 | der_eq_ctx_tabs_codomain :
   Π(Γ : Context), Π(s s' : Sort), Π(A B B' t : Term),
-  der Γ A (tsort s) (snext s') → der_eq (Push A s Γ) (snext s') (tsort s') B B'
+  der Γ A (tsort s) (snext s) → der_eq (Push A s Γ) (snext s') (tsort s') B B'
   → der (Push A s Γ) t B s'
   → der_eq Γ (smax s s') (tfun A B) (tabs A B t) (tabs A B' t)
 | der_eq_ctx_tabs_body :
   Π(Γ : Context), Π(s s' : Sort), Π(A B t t' : Term),
-  der Γ A (tsort s) (snext s') → der (Push A s Γ) B  (tsort s') (snext s')
+  der Γ A (tsort s) (snext s) → der (Push A s Γ) B  (tsort s') (snext s')
   → der_eq (Push A s Γ) s' B t t'
   → der_eq Γ (smax s s') (tfun A B) (tabs A B t) (tabs A B t')
 // App
