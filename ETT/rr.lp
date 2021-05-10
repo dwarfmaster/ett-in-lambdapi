@@ -351,6 +351,26 @@ symbol τ_convT_in_ctx (Γ : TContext) (s s' : ETT.Sort) (A A' B : ETT.Term)
                                   (ETT.der_conv_in_ctx (τ_Γ Γ) s (ETT.snext s') A A' B (ETT.tsort s') deqA dB))) ≔
   heq_to_eq _ _ _ _ (τ_conv_in_ctx Γ s (ETT.snext s') A A' B (ETT.tsort s') deqA dB a);
 
+symbol τ_transport_in_ctx (Γ : TContext) (s s' : ETT.Sort) (A B t : ETT.Term)
+                          (dA dA' : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
+                          (dt : ETT.der (ETT.Push A s (τ_Γ Γ)) t B s')
+                          (p : ε _ (ITT.eq _ (ITT.u (τ_s s)) (τ_T Γ _ _ dA) (τ_T Γ _ _ dA')))
+                          (a : ε _ (τ_T Γ _ _ dA))
+                          : heterogeneous_eq (τ_s s')
+                              (τ_T (TPush Γ s A dA a) _ _ (I.inv_sort _ _ _ _ dt))
+                              (τ_T (TPush Γ s A dA' (transport _ _ _ p a)) _ _ (I.inv_sort _ _ _ _ dt))
+                              (τ (TPush Γ s A dA a) _ _ _ dt)
+                              (τ (TPush Γ s A dA' (transport _ _ _ p a)) _ _ _ dt);
+symbol τ_T_transport_in_ctx (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
+                            (dA dA' : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
+                            (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s'))
+                            (p : ε _ (ITT.eq _ (ITT.u (τ_s s)) (τ_T Γ _ _ dA) (τ_T Γ _ _ dA')))
+                            (a : ε _ (τ_T Γ _ _ dA))
+                            : ε _ (ITT.eq _ (ITT.u (τ_s s'))
+                                (τ_T (TPush Γ s A dA a) _ _ dB)
+                                (τ_T (TPush Γ s A dA' (transport _ _ _ p a)) _ _ dB)) ≔
+  heq_to_eq _ _ _ _ (τ_transport_in_ctx Γ s (ETT.snext s') A (ETT.tsort s') B dA dA' dB p a);
+
 
 // Translation of terms
 rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
@@ -794,4 +814,16 @@ rule convert_T $Γ $T $s $d1 $d2
 // convert
 rule convert _ _ _ _ (ETT.der_sort _ $s _) (ETT.der_sort _ _ _)
   ↪ heq_refl (ITT.u (ITT.snext (τ_s $s))) (ITT.u (τ_s $s))
+with convert $Γ _ _ _ (ETT.der_prod _ $s $s' $A $B $dA $dB) (ETT.der_prod _ $s $s' $A $B $dA' $dB')
+  ↪ eq_to_heq _ _ _ (eq_prod (τ_s $s) (τ_s $s') (τ_T $Γ _ _ $dA) (τ_T $Γ _ _ $dA')
+       (λ a, τ_T (TPush $Γ $s $A $dA  a) _ _ $dB)
+       (λ a, τ_T (TPush $Γ $s $A $dA' a) _ _ $dB')
+       (convert_T $Γ $A $s $dA $dA')
+       (λ a, (@ITT.trans_eq _
+         (ITT.u (τ_s $s'))
+         (τ_T (TPush $Γ $s $A $dA a) _ _ $dB)
+         (τ_T (TPush $Γ $s $A $dA' (transport _ _ _ (convert_T $Γ $A $s $dA $dA') a)) _ _ $dB)
+         (τ_T (TPush $Γ $s $A $dA' (transport _ _ _ (convert_T $Γ $A $s $dA $dA') a)) _ _ $dB')
+         (τ_T_transport_in_ctx $Γ $s $s' $A $B $dA $dA' $dB (convert_T $Γ $A $s $dA $dA') a)
+         (convert_T (TPush $Γ $s $A $dA' (transport _ _ _ (convert_T $Γ $A $s $dA $dA') a)) $B $s' $dB $dB'))))
 ;
