@@ -1,173 +1,3 @@
-
-require ETT.main as ETT;
-require ETT.itt as ITT;
-require ETT.inversions as I;
-
-// Cheater
-symbol magic (s : ITT.Sort) (A : ITT.U s) : ITT.ε s A;
-
-// Helper definitions
-symbol ε ≔ ITT.ε;
-symbol univ ≔ ITT.U;
-symbol transport (s : ITT.Sort) (T U : univ s) (e : ε _ (ITT.eq (ITT.snext s) (ITT.u s) T U)) : ε s T → ε s U ≔
-  λ t, ITT.J (ITT.snext s) s (ITT.u s) T (λ (X : univ s) (_ : ε (ITT.snext s) (ITT.eq (ITT.snext s) _ T X)), X) t U e;
-symbol path_comp (s : ITT.Sort) (T U V : univ s) (p1 : ε _ (ITT.eq _ (ITT.u s) T U)) (p2 : ε _ (ITT.eq _ (ITT.u s) U V)) (t : ε _ T) :
-  ε _ (ITT.eq s V
-              (transport s T V (ITT.trans_eq p1 p2) t)
-              (transport s U V p2 (transport s T U p1 t))) ≔
-  ITT.J (ITT.snext s) s (ITT.u s) U
-        (λ (V : univ s) p, ITT.eq s V (transport s T V (ITT.trans_eq p1 p) t) (transport s U V p (transport s T U p1 t)))
-        (ITT.refl s U (transport s T U p1 t)) V p2;
-symbol homotopy (s : ITT.Sort) (T U : univ s) (p1 p2 : ε _ (ITT.eq _ (ITT.u s) T U)) (p : ε _ (ITT.eq _ (ITT.eq _ (ITT.u s) T U) p1 p2)) (t : ε _ T) :
-  ε _ (ITT.eq s U (transport _ _ _ p1 t) (transport _ _ _ p2 t)) ≔
-  ITT.lift_eq (λ (p : ε _ (ITT.eq _ (ITT.u s) T U)), transport s T U p t) p1 p2 p;
-
-symbol heterogeneous_eq' (s : ITT.Sort) (T U : univ s) (t : ε s T) (u : ε s U) : ITT.U _ ≔
-  ITT.S _ _ (ITT.eq _ (ITT.u s) T U) (λ p, ITT.eq s U (transport s T U p t) u);
-symbol heterogeneous_eq (s : ITT.Sort) (T U : univ s) (t : ε s T) (u : ε s U) : TYPE ≔
-  ε _ (heterogeneous_eq' s T U t u);
-symbol Pack' (s : ITT.Sort) (A1 A2 : univ s) : ITT.U _ ≔
-  ITT.S _ _ A1 (λ x, ITT.S _ _ A2 (λ y, heterogeneous_eq' s A1 A2 x y));
-
-symbol mkHeq {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U) (p : ε _ (ITT.eq _ (ITT.u s) T U)) :
-  (ε _ (ITT.eq s U (transport _ _ _ p t) u)) → heterogeneous_eq s T U t u ≔
-  λ eq, ITT.mkS _ _ (ITT.eq _ (ITT.u s) T U) (λ p, ITT.eq s U (transport _ _ _ p t) u) p eq;
-symbol getTeq {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U) (heq : heterogeneous_eq s T U t u) : ε _ (ITT.eq _ (ITT.u s) T U) ≔
-  ITT.proj1 _ _ (ITT.eq (ITT.snext s) (ITT.u s) T U) (λ p, ITT.eq s U (transport _ _ _ p t) u) heq;
-symbol getEq {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U) (heq : heterogeneous_eq s T U t u) :
-  ε _ (ITT.eq s U (transport _ _ _ (getTeq T U t u heq) t) u) ≔
-  ITT.proj2 _ _ (ITT.eq (ITT.snext s) (ITT.u s) T U) (λ p, ITT.eq s U (transport _ _ _ p t) u) heq;
-
-symbol eq_to_heq {s : ITT.Sort} (T : univ s) (t u : ε s T) (p : ε _ (ITT.eq s T t u)) : heterogeneous_eq s T T t u ≔
-  mkHeq T T t u (ITT.refl (ITT.snext s) (ITT.u s) T) p;
-symbol heq_refl {s : ITT.Sort} (T : univ s) (t : ε s T) : heterogeneous_eq s T T t t ≔
-  eq_to_heq T t t (ITT.refl s T t);
-symbol heq_trans {s : ITT.Sort} (T U V : univ s) (t : ε s T) (u : ε s U) (v : ε s V)
-                 (htu : heterogeneous_eq s T U t u) (huv : heterogeneous_eq s U V u v) : heterogeneous_eq s T V t v ≔
-  mkHeq T V t v (ITT.trans_eq (getTeq T U t u htu) (getTeq U V u v huv))
-        (ITT.trans_eq
-          (path_comp s T U V (getTeq T U t u htu) (getTeq U V u v huv) t)
-          (ITT.trans_eq (ITT.lift_eq (transport _ _ _ (getTeq U V u v huv)) (transport _ _ _ (getTeq T U t u htu) t) u (getEq T U t u htu)) (getEq U V u v huv)));
-symbol heq_symm {s : ITT.Sort} (T U : univ s) (t : ε s T) (u : ε s U)
-                (h : heterogeneous_eq s T U t u) : heterogeneous_eq s U T u t ≔
-  mkHeq U T u t (ITT.inv_eq (getTeq T U t u h))
-        (ITT.trans_eq
-          (ITT.inv_eq (ITT.trans_eq
-            (path_comp s T U T (getTeq T U t u h) (ITT.inv_eq (getTeq T U t u h)) t)
-            (ITT.lift_eq (transport _ _ _ (ITT.inv_eq (getTeq T U t u h))) (transport _ _ _ (getTeq T U t u h) t) u (getEq T U t u h))))
-          (homotopy s T T (ITT.trans_eq (getTeq T U t u h) (ITT.inv_eq (getTeq T U t u h))) (ITT.refl _ (ITT.u s) T) (ITT.eq_inverse (getTeq T U t u h)) t));
-symbol lift_to_heq {s s' : ITT.Sort} {A : ITT.U s} {B : ε s A → ITT.U s'}
-                   (f : ε _ (ITT.P s s' A B)) (u v : ε s A) (p : ε _ (ITT.eq s A u v))
-                   : heterogeneous_eq s' (B u) (B v) (f u) (f v) ≔
-  ITT.J s _ A u (λ v _, heterogeneous_eq' s' (B u) (B v) (f u) (f v)) (heq_refl (B u) (f u)) v p;
-
-// Proved using uip
-symbol heq_to_eq (s : ITT.Sort) (T : univ s) (t u : ε s T) : heterogeneous_eq s T T t u → ε s (ITT.eq s T t u);
-
-// Extend heterogeneous equality with transports to the left and to the right
-symbol heq_extend_R (s : ITT.Sort) (T U V : univ s) (t : ε s T) (v : ε s V)
-                    (p : ε _ (ITT.eq _ (ITT.u s) V U))
-                    (_ : heterogeneous_eq s T U t (transport _ _ _ p v)) :
-                    heterogeneous_eq s T V t v;
-symbol heq_extend_L (s : ITT.Sort) (T U V : univ s) (u : ε s U) (v : ε s V)
-                    (p : ε _ (ITT.eq _ (ITT.u s) U T))
-                    (_ : heterogeneous_eq s U V u v) :
-                    heterogeneous_eq s T V (transport _ _ _ p u) v;
-symbol heq_of_transport (s : ITT.Sort) (T U : univ s) (t : ε s T)
-                        (p : ε _ (ITT.eq _ (ITT.u s) T U)) :
-                        heterogeneous_eq s T U t (transport _ _ _ p t) ≔
-  mkHeq T U t (transport _ _ _ p t) p (ITT.refl s U (transport _ _ _ p t));
-symbol eq_of_transport (s : ITT.Sort) (T : univ s) (t : ε s T)
-                       (p : ε _ (ITT.eq _ (ITT.u s) T T)) :
-                       ε _ (ITT.eq s T t (transport _ _ _ p t)) ≔
-  heq_to_eq s T t (transport _ _ _ p t) (heq_of_transport s T T t p);
-symbol heq_funext (s s' : ITT.Sort) (A : ITT.U s) (B B' : ε s A → ITT.U s')
-                  (f : ε _ (ITT.P s s' A B)) (g : ε _ (ITT.P s s' A B'))
-                  (heq : Π a, heterogeneous_eq s' (B a) (B' a) (f a) (g a))
-                  : heterogeneous_eq (ITT.smax s s') (ITT.P s s' A B) (ITT.P s s' A B') f g ≔
-  ITT.J (ITT.smax s (ITT.snext s')) _ (ITT.P s (ITT.snext s') A (λ _, ITT.u s')) B
-        (λ B' p, ITT.P (ITT.smax s s') _ (ITT.P s s' A B')
-                       (λ g, ITT.P _ _ (ITT.P s _ A (λ a, ITT.eq s' (B' a) (transport _ _ _ (ITT.apply_eq p a) (f a)) (g a)))
-                                   (λ _, heterogeneous_eq' (ITT.smax s s') (ITT.P s s' A B) (ITT.P s s' A B') f g)))
-        (λ g eq, eq_to_heq (ITT.P s s' A B) f g (ITT.funext s s' A B f g eq))
-        B'
-        (ITT.funext s (ITT.snext s') A (λ _, ITT.u s') B B' (λ a, getTeq (B a) (B' a) (f a) (g a) (heq a))) // Equality of B and B'
-        g
-        (λ a, magic _ (ITT.eq s' (B' a) (transport _ _ _ (ITT.apply_eq (ITT.funext s (ITT.snext s') A (λ _, ITT.u s') B B' (λ a, getTeq (B a) (B' a) (f a) (g a) (heq a))) a) (f a)) (g a)));
-        // (λ a, getEq (B a) (B' a) (f a) (g a) (heq a));
-
-symbol Pack (s : ITT.Sort) (A1 A2 : univ s) : TYPE ≔ ε _ (Pack' s A1 A2);
-symbol Proj1 {s : ITT.Sort} {A1 A2 : univ s} (p : Pack s A1 A2) : ε s A1 ≔
-  ITT.proj1 _ _ _ _ p;
-symbol Proj2 {s : ITT.Sort} {A1 A2 : univ s} (p : Pack s A1 A2) : ε s A2 ≔
-  ITT.proj1 _ _ _ _ (ITT.proj2 _ _ _ _ p);
-symbol Proje {s : ITT.Sort} {A1 A2 : univ s} (p : Pack s A1 A2) : heterogeneous_eq s A1 A2 (Proj1 p) (Proj2 p) ≔
-  ITT.proj2 _ _ _ _ (ITT.proj2 _ _ _ _ p);
-
-// Translation of sorts
-symbol τ_s : ETT.Sort → ITT.Sort;
-rule τ_s ETT.s0 ↪ ITT.s0
-with τ_s (ETT.snext $s) ↪ ITT.snext (τ_s $s)
-with τ_s (ETT.smax $s $s') ↪ ITT.smax (τ_s $s) (τ_s $s');
-
-// Translation declarations
-constant symbol TContext : TYPE;
-symbol tgetΓ : ETT.DBId → TContext → TContext;
-symbol τ_Γ : TContext → ETT.Context;
-rule τ_Γ (tgetΓ $id $Γ) ↪ ETT.getΓ (τ_Γ $Γ) $id;
-symbol τ_T (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) :
-  ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s) → univ (τ_s s);
-symbol τ (Γ : TContext) (s : ETT.Sort) (t T : ETT.Term) (d : ETT.der (τ_Γ Γ) t T s) :
-  let sort ≔ I.inv_sort (τ_Γ Γ) s t T d in
-  ε (τ_s s) (τ_T Γ T s sort);
-symbol τ_eq_type (Γ : TContext) (s : ETT.Sort) (T t1 t2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) s T t1 t2) : ITT.U _ ≔
-  let d1 ≔ I.inv_eq_t1 (τ_Γ Γ) s T t1 t2 d in
-  let d2 ≔ I.inv_eq_t2 (τ_Γ Γ) s T t1 t2 d in
-  let ds1 ≔ I.inv_sort (τ_Γ Γ) s t1 T d1 in
-  let ds2 ≔ I.inv_sort (τ_Γ Γ) s t2 T d2 in
-  heterogeneous_eq' (τ_s s)
-    (τ_T Γ T s ds1)
-    (τ_T Γ T s ds2)
-    (τ Γ s t1 T d1) (τ Γ s t2 T d2);
-symbol τ_eq (Γ : TContext) (s : ETT.Sort) (T t1 t2 : ETT.Term) (d : ETT.der_eq (τ_Γ Γ) s T t1 t2) : ε _ (τ_eq_type Γ s T t1 t2 d);
-symbol convert_T (Γ : TContext) (T : ETT.Term) (s : ETT.Sort) (d1 d2 : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s)) :
-  let S ≔ τ_s s in ε (ITT.snext S) (ITT.eq (ITT.snext S) (ITT.u S) (τ_T Γ _ _ d1) (τ_T Γ _ _ d2));
-symbol convert (Γ : TContext) (s : ETT.Sort) (t T : ETT.Term) (d1 d2 : ETT.der (τ_Γ Γ) t T s) :
-  let ds1 ≔ I.inv_sort (τ_Γ Γ) s t T d1 in
-  let ds2 ≔ I.inv_sort (τ_Γ Γ) s t T d2 in
-  heterogeneous_eq (τ_s s)
-    (τ_T Γ T s ds1)
-    (τ_T Γ T s ds2)
-    (τ Γ s t T d1) (τ Γ s t T d2);
-
-// Translation context
-constant symbol TEmpty : TContext;
-constant symbol TPush
-  (Γ : TContext) (s : ETT.Sort) (A : ETT.Term) (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
-  : ITT.ε (τ_s s) (τ_T Γ A s dA) → TContext;
-
-rule τ_Γ TEmpty ↪ ETT.Empty
-with τ_Γ (TPush $t $s $A _ _) ↪ ETT.Push $A $s (τ_Γ $t);
-
-// Translation of shifting
-symbol τ_shift_eq (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
-                  (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
-                  (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
-                  (a : ε _ (τ_T Γ _ _ dA)) :
-  ε _ (ITT.eq _ (ITT.u (τ_s s))
-      (τ_T Γ T s dT)
-      (τ_T (TPush Γ s' A dA a) (ETT.Shift T) s (ETT.der_shift1 (ETT.Push A s' (τ_Γ Γ)) T (ETT.tsort s) (ETT.snext s) dT)));
-symbol τ_shift (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
-               (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
-               (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
-               (a : ε _ (τ_T Γ _ _ dA)) ≔
-  transport _ _ _ (τ_shift_eq Γ s s' T A dT dA a);
-symbol τ_shift' (Γ : TContext) (s s' : ETT.Sort) (T A : ETT.Term)
-                (dT : ETT.der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
-                (dA : ETT.der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
-                (a : ε _ (τ_T Γ _ _ dA)) ≔
-  transport _ _ _ (ITT.inv_eq (τ_shift_eq Γ s s' T A dT dA a));
-
 // Accessing the context
 symbol tgetS (id : ETT.DBId) (Γ : TContext) : ETT.Sort ≔ ETT.getS (τ_Γ Γ) id;
 symbol tgetA (id : ETT.DBId) (Γ : TContext) : ETT.Term ≔ ETT.get (τ_Γ Γ) id;
@@ -196,6 +26,7 @@ with tgetShift (ETT.dbsucc $id) (TPush $Γ $s $A $dA $a)
         $dA $a (tgetShift $id $Γ);
 
 // Converting in the context
+// TODO this is false ! It is only true if a1 d1~d2 a2
 symbol convert_Γ (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term) (d1 d2 : ETT.der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
                  (a1 : ε _ (τ_T Γ _ _ d1)) (a2 : ε _ (τ_T Γ _ _ d2))
                  (dB : ETT.der (ETT.Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) :
@@ -271,19 +102,6 @@ symbol τ_equality' (Γ : TContext) {s : ETT.Sort} {A u v e : ETT.Term}
                    (de : ETT.der (τ_Γ Γ) e (ETT.teq A u v) s) ≔
   transport _ _ _ (ITT.inv_eq (τ_equality_eq Γ s A u v e de));
 
-// Recovering well sortedness
-symbol der_recover_sort (Γ : ETT.Context) (s s' : ETT.Sort) (A : ETT.Term) :
-  ETT.der Γ A (ETT.tsort s) s' → ETT.der Γ A (ETT.tsort s) (ETT.snext s);
-rule der_recover_sort _ _ _ _ (ETT.der_sort $Γ $s $dΓ)
-  ↪ ETT.der_sort $Γ $s $dΓ
-with der_recover_sort _ _ _ _ (ETT.der_prod $Γ $s $s' $A $B $dA $dB)
-  ↪ ETT.der_prod $Γ $s $s' $A $B $dA $dB
-with der_recover_sort _ _ _ _ (ETT.der_sigma $Γ $s $s' $A $B $dA $dB)
-  ↪ ETT.der_sigma $Γ $s $s' $A $B $dA $dB
-with der_recover_sort _ _ _ _ (ETT.der_prop_type_eq $Γ $s $A $u $v $dA $du $dv)
-  ↪ ETT.der_prop_type_eq $Γ $s $A $u $v $dA $du $dv
-;
-
 // Equalities
 symbol eq_pair (s s' : ITT.Sort) (A A' : ITT.U s) (B : ITT.ε s A → ITT.U s') (B' : ITT.ε s A' → ITT.U s')
                (eqA : ε _ (ITT.eq (ITT.snext s) (ITT.u s) A A'))
@@ -293,10 +111,6 @@ symbol eq_prod (s s' : ITT.Sort) (A A' : ITT.U s) (B : ε s A → ITT.U s') (B' 
                (eqA : ε _ (ITT.eq (ITT.snext s) (ITT.u s) A A'))
                (eqB : Π(a : ε s A), ITT.ε _ (ITT.eq (ITT.snext s') (ITT.u s') (B a) (B' (transport _ _ _ eqA a))))
                : ε _ (ITT.eq (ITT.snext (ITT.smax s s')) (ITT.u (ITT.smax s s')) (ITT.P s s' A B) (ITT.P s s' A' B'));
-
-// For things to type, we need to make sure that the translation of a sort is a universe
-rule τ_T _ (ETT.tsort $s) (ETT.snext $s) _ ↪ ITT.u (τ_s $s);
-rule τ _ (ETT.snext (ETT.snext $s)) (ETT.tsort $s) (ETT.tsort (ETT.snext $s)) _ ↪ ITT.u (τ_s $s);
 
 // Translation of type
 // This is done simply by invoking a term translation of the type
@@ -371,6 +185,28 @@ symbol τ_T_transport_in_ctx (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term)
                                 (τ_T (TPush Γ s A dA' (transport _ _ _ p a)) _ _ dB)) ≔
   heq_to_eq _ _ _ _ (τ_transport_in_ctx Γ s (ETT.snext s') A (ETT.tsort s') B dA dA' dB p a);
 
+
+// Invariance of translation by extension
+symbol τ_extend_context (Γ1 Γ2 : TContext) (s : ETT.Sort) (t T : ETT.Term)
+                        (dt : ETT.der (τ_Γ Γ2) t T s)
+                        : heterogeneous_eq (τ_s s)
+                            (τ_T Γ2 _ _ (I.inv_sort _ _ _ _ dt))
+                            (τ_T (Extend Γ1 Γ2) _ _ (I.inv_sort _ _ _ _ (ETT.der_extend_context _ _ s t T (well_formed_tcontext Γ1) dt)))
+                            (τ Γ2 _ _ _ dt)
+                            (τ (Extend Γ1 Γ2) _ _ _ (ETT.der_extend_context _ _ s t T (well_formed_tcontext Γ1) dt));
+symbol τ_T_extend_context (Γ1 Γ2 : TContext) (s : ETT.Sort) (T : ETT.Term)
+                          (dT : ETT.der (τ_Γ Γ2) T (ETT.tsort s) (ETT.snext s))
+                          : ε _ (ITT.eq _ (ITT.u (τ_s s))
+                                (τ_T Γ2 _ _ dT)
+                                (τ_T (Extend Γ1 Γ2) _ _ (ETT.der_extend_context _ _ (ETT.snext s) T (ETT.tsort s) (well_formed_tcontext Γ1) dT))) ≔
+  heq_to_eq _ _ _ _ (τ_extend_context Γ1 Γ2 (ETT.snext s) T (ETT.tsort s) dT);
+
+// Implementation of extension
+rule Extend $Γ1 (TPush $Γ2 $s $A $dA $a)
+  ↪ TPush (Extend $Γ1 $Γ2) $s $A
+           (ETT.der_extend_context _ _ (ETT.snext $s) $A (ETT.tsort $s) (well_formed_tcontext $Γ1) $dA)
+           (transport _ _ _ (τ_T_extend_context $Γ1 $Γ2 $s $A $dA) $a)
+with Extend $Γ1 TEmpty ↪ $Γ1;
 
 // Translation of terms
 rule τ $Γ _ _ _ (ETT.der_var _ $id $dΓ)
@@ -826,4 +662,6 @@ with convert $Γ _ _ _ (ETT.der_prod _ $s $s' $A $B $dA $dB) (ETT.der_prod _ $s 
          (τ_T (TPush $Γ $s $A $dA' (transport _ _ _ (convert_T $Γ $A $s $dA $dA') a)) _ _ $dB')
          (τ_T_transport_in_ctx $Γ $s $s' $A $B $dA $dA' $dB (convert_T $Γ $A $s $dA $dA') a)
          (convert_T (TPush $Γ $s $A $dA' (transport _ _ _ (convert_T $Γ $A $s $dA $dA') a)) $B $s' $dB $dB'))))
+// with convert $Γ _ _ _ (ETT.der_abs _ $s $s' $A $t $B $dA $dB $dt) (ETT.der_abs _ $s $s' $A $t $B $dA' $dB' $dt')
+//   ↪
 ;
