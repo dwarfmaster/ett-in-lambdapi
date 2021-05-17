@@ -2,13 +2,12 @@
 require ETT.XAst as ETT;
 require open ETT.XTyping;
 require open ETT.DeBruijn;
-require open ETT.ETT;
+require open ETT.XLemmas;
 require open ETT.ITT;
 require open ETT.ILemmas;
 require ETT.Inversions as I;
 require open ETT.HEq;
 require open ETT.TranslationDefinition;
-
 
 // Translation of shifting
 symbol τ_shift_eq (Γ : TContext) {s s' : ETT.Sort} {T A : ETT.Term}

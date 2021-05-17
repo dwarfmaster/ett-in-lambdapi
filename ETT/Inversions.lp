@@ -2,7 +2,7 @@
 require open ETT.XAst;
 require open ETT.DeBruijn;
 require open ETT.XTyping;
-require open ETT.ETT;
+require open ETT.XLemmas;
 require ETT.ITT as ITT;
 
 // Lemmas

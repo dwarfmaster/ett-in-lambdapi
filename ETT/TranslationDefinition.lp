@@ -2,7 +2,7 @@
 require ETT.XAst as ETT;
 require open ETT.XTyping;
 require open ETT.DeBruijn;
-require open ETT.ETT;
+require open ETT.XLemmas;
 require open ETT.ITT;
 require ETT.Inversions as I;
 require open ETT.HEq;

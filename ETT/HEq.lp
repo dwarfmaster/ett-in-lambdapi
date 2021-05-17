@@ -1,7 +1,7 @@
 
 require open ETT.ITT;
 require open ETT.ILemmas;
-require ETT.ETT as X;
+require ETT.XLemmas as X;
 
 // Intuitionistic heterogeneous equality
 // It is OK to mark them as injective because they are the combination of injective symbols.
