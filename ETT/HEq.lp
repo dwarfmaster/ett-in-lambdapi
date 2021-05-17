@@ -19,10 +19,10 @@ symbol getEq {s : Sort} {A B : U s} {a : ε s A} {b : ε s B} (heq : HEq s A B a
   ε _ (eq s B (transport (@getTeq s A B a b heq) a) b) ≔
   proj2 _ _ (eq (snext s) (u s) A B) (λ p, eq s B (transport p a) b) heq;
 
-symbol eq_to_heq {s : Sort} (A : U s) (a b : ε s A) (p : ε _ (eq s A a b)) : HEq s A A a b ≔
+symbol eq_to_heq {s : Sort} {A : U s} {a b : ε s A} (p : ε _ (eq s A a b)) : HEq s A A a b ≔
   mkHeq A A a b (refl (snext s) (u s) A) p;
 symbol heq_refl {s : Sort} (A : U s) (a : ε s A) : HEq s A A a a ≔
-  eq_to_heq A a a (refl s A a);
+  eq_to_heq (refl s A a);
 symbol heq_trans {s : Sort} {A B C : U s} {a : ε s A} {b : ε s B} {c : ε s C}
                  (hab : HEq s A B a b) (hbc : HEq s B C b c) : HEq s A C a c ≔
   mkHeq A C a c (trans_eq (getTeq hab) (getTeq hbc))
