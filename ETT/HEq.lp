@@ -9,6 +9,8 @@ injective symbol HEq' (s : Sort) (A B : U s) (a : ε s A) (b : ε s B) : U _ ≔
   S _ _ (eq _ (u s) A B) (λ p, eq s B (transport p a) b);
 injective symbol HEq (s : Sort) (A B : U s) (a : ε s A) (b : ε s B) : TYPE ≔
   ε _ (HEq' s A B a b);
+symbol H' {s : Sort} {A B : U s} (a : ε s A) (b : ε s B) ≔ HEq' s A B a b;
+symbol H {s : Sort} {A B : U s} (a : ε s A) (b : ε s B)  ≔ HEq  s A B a b;
 
 symbol mkHeq {s : Sort} (A B : U s) (a : ε s A) (b : ε s B) (p : ε _ (eq _ (u s) A B)) :
   (ε _ (eq s B (transport p a) b)) → HEq s A B a b ≔
@@ -66,3 +68,4 @@ symbol heq_funext {s s' : Sort} (A : U s) (B B' : ε s A → U s')
                   (f : ε _ (P s s' A B)) (g : ε _ (P s s' A B'))
                   (_ : Π a, HEq s' (B a) (B' a) (f a) (g a))
                   : HEq (smax s s') (P s s' A B) (P s s' A B') f g;
+

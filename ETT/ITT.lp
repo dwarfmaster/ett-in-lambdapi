@@ -16,6 +16,7 @@ injective symbol ε : Π(s : Sort), U s → TYPE;
 // Axioms
 constant symbol u : Π(s : Sort), U (snext s);
 rule ε (snext $s) (u $s) ↪ U $s;
+unif_rule U $s ≡ ε $s' $x ↪ [ $s' ≡ (snext $s); $x ≡ u $s ];
 
 // Product
 constant symbol P : Π(s1 s2 : Sort), Π(a : U s1), (ε s1 a → U s2) → U (smax s1 s2);
