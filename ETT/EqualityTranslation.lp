@@ -197,20 +197,8 @@ with τ_eq $Γ (der_eq_lift _ _ _ _ _ _ $de)
 with τ_eq $Γ (der_eq_refl _ _ _ _ $du)
   ↪ heq_refl (τ_T $Γ (inv_sort $du)) (τ $Γ $du)
 with τ_eq $Γ (der_eq_trans _ _ _ _ _ _ $duv $dvw)
-  ↪ @heq_trans _
-         (τ_T $Γ (inv_sort (inv_eq_t1 $duv)))
-         (τ_T $Γ (inv_sort (inv_eq_t1 $dvw)))
-         (τ_T $Γ (inv_sort (inv_eq_t2 $dvw)))
-         (τ $Γ (inv_eq_t1 $duv))
-         (τ $Γ (inv_eq_t1 $dvw))
-         (τ $Γ (inv_eq_t2 $dvw))
-       (@heq_trans _
-            (τ_T $Γ (inv_sort (inv_eq_t1 $duv)))
-            (τ_T $Γ (inv_sort (inv_eq_t2 $duv)))
-            (τ_T $Γ (inv_sort (inv_eq_t1 $dvw)))
-            (τ $Γ (inv_eq_t1 $duv))
-            (τ $Γ (inv_eq_t2 $duv))
-            (τ $Γ (inv_eq_t1 $dvw))
+  ↪ heq_trans
+       (heq_trans
           (τ_eq $Γ $duv)
           (convert $Γ (inv_eq_t2 $duv) (inv_eq_t1 $dvw)))
        (τ_eq $Γ $dvw)

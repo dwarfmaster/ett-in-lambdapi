@@ -18,6 +18,8 @@ symbol apply_eq {s s' : Sort} {A : U s} {B : ε s A → U s'} {f g : ε _ (P s s
 // Transport
 symbol transport {s : Sort} {T U : U s} (e : ε _ (eq (snext s) (u s) T U)) : ε s T → ε s U ≔
   λ t, J (snext s) s (u s) T (λ X _, X) t U e;
+// Mimics injectivity in the second argument
+unif_rule J (snext $s) $s (u $s) $T (λ X _, X) $x $U $e ≡ J (snext $s) $s (u $s) $T (λ X _, X) $y $U $e ↪ [ $x ≡ $y ];
 
 // Lemmas about transport
 symbol path_comp (s : Sort) (A B C : U s) (p1 : ε _ (eq (snext s) (u s) A B)) (p2 : ε _ (eq (snext s) (u s) B C)) (a : ε _ A) :
