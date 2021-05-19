@@ -14,9 +14,6 @@ symbol eq_prod {s s' : Sort} {A A' : U s} (B : ε s A → U s') (B' : ε s A' �
                (eqB : Π(a : ε s A), ε _ (eq (snext s') (u s') (B a) (B' (transport eqA a))))
                : ε _ (eq (snext (smax s s')) (u (smax s s')) (P s s' A B) (P s s' A' B'));
 
-// Congruences
-// sCong{Prod,Lambda,App,Sum,Pair,Pi1,Pi2,Eq,Refl}
-
 // Product
 symbol cong_prod {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
                  (_ : H A1 A2) (_ : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
