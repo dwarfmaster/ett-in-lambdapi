@@ -15,6 +15,8 @@ with τ_s (ETT.smax $s $s') ↪ smax (τ_s $s) (τ_s $s');
 
 // Translation context
 constant symbol TContext : TYPE;
+symbol Concat : TContext → TContext → TContext;
+symbol PContext : TContext → TContext → TYPE;
 symbol tgetΓ : ETT.DBId → TContext → TContext;
 symbol τ_Γ : TContext → Context;
 rule τ_Γ (tgetΓ $id $Γ) ↪ getΓ (τ_Γ $Γ) $id;
@@ -41,19 +43,20 @@ symbol τ_eqT (Γ : TContext) {s : ETT.Sort} {T1 T2 : ETT.Term} (d : der_eq (τ_
 
 // Conversion of translations
 symbol convert_T (Γ : TContext) {T : ETT.Term} {s : ETT.Sort} (d1 d2 : der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s)) :
-  let S ≔ τ_s s in ε (snext S) (eq (snext S) (u S) (τ_T Γ d1) (τ_T Γ d2));
-symbol convert (Γ : TContext) {s : ETT.Sort} {t T : ETT.Term} (d1 d2 : der (τ_Γ Γ) t T s) :
+  ε (snext (τ_s s)) (eq (snext (τ_s s)) (u (τ_s s)) (τ_T Γ d1) (τ_T Γ d2));
+symbol convert (Γ Γ1 Γ2 : TContext) (h : PContext Γ1 Γ2) {s : ETT.Sort} {t T : ETT.Term}
+               (d1 : der (τ_Γ (Concat Γ Γ1)) t T s)
+               (d2 : der (τ_Γ (Concat Γ Γ2)) t T s) :
   let ds1 ≔ I.inv_sort d1 in
   let ds2 ≔ I.inv_sort d2 in
-  HEq (τ_s s) (τ_T Γ ds1) (τ_T Γ ds2) (τ Γ d1) (τ Γ d2);
+  HEq (τ_s s) (τ_T (Concat Γ Γ1) ds1) (τ_T (Concat Γ Γ2) ds2) (τ (Concat Γ Γ1) d1) (τ (Concat Γ Γ2) d2);
 
 // For things to type, we need to make sure that the translation of a sort is a universe
 rule @τ_T _ (ETT.tsort $s) (ETT.snext $s) _ ↪ u (τ_s $s);
 rule @τ _ (ETT.snext (ETT.snext $s)) (ETT.tsort $s) (ETT.tsort (ETT.snext $s)) _ ↪ u (τ_s $s);
-rule τ_T $Γ $d
-  ↪ τ $Γ $d;
+rule τ_T $Γ $d ↪ τ $Γ $d;
 
-// Translation context
+// Translation context constructors
 constant symbol TEmpty : TContext;
 constant symbol TPush
   (Γ : TContext) (s : ETT.Sort) (A : ETT.Term) (dA : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
@@ -64,9 +67,3 @@ symbol Extend : TContext → TContext → TContext;
 rule τ_Γ TEmpty ↪ Empty
 with τ_Γ (TPush $t $s $A _ _) ↪ Push $A $s (τ_Γ $t)
 with τ_Γ (Extend $Γ1 $Γ2) ↪ Append (τ_Γ $Γ2) (τ_Γ $Γ1);
-
-// Translation context invariant
-symbol well_formed_tcontext (Γ : TContext) : der_context (τ_Γ Γ);
-rule well_formed_tcontext TEmpty ↪ der_context_empty
-with well_formed_tcontext (TPush $Γ $s $A $dA _)
-  ↪ der_context_push (τ_Γ $Γ) $s $A $dA (well_formed_tcontext $Γ);
