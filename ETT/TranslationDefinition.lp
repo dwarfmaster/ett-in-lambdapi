@@ -17,7 +17,7 @@ with τ_s (ETT.smax $s $s') ↪ smax (τ_s $s) (τ_s $s');
 constant symbol TContext : TYPE;
 constant symbol ContextOver : TContext → TYPE;
 symbol Concat : Π(Γ : TContext), ContextOver Γ → TContext;
-symbol PContext : Π(Γ : TContext), ContextOver Γ → ContextOver Γ → TYPE;
+constant symbol PContext : Π(Γ : TContext), ContextOver Γ → ContextOver Γ → TYPE;
 symbol tgetΓ : ETT.DBId → TContext → TContext;
 symbol τ_Γ : TContext → Context;
 rule τ_Γ (tgetΓ $id $Γ) ↪ getΓ (τ_Γ $Γ) $id;
