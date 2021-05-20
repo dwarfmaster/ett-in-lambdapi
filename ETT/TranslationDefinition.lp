@@ -8,15 +8,16 @@ require ETT.Inversions as I;
 require open ETT.HEq;
 
 // Translation of sorts
-injective symbol τ_s : ETT.Sort → Sort;
+symbol τ_s : ETT.Sort → Sort;
 rule τ_s ETT.s0 ↪ s0
 with τ_s (ETT.snext $s) ↪ snext (τ_s $s)
 with τ_s (ETT.smax $s $s') ↪ smax (τ_s $s) (τ_s $s');
 
 // Translation context
 constant symbol TContext : TYPE;
-symbol Concat : TContext → TContext → TContext;
-symbol PContext : TContext → TContext → TYPE;
+constant symbol ContextOver : TContext → TYPE;
+symbol Concat : Π(Γ : TContext), ContextOver Γ → TContext;
+symbol PContext : Π(Γ : TContext), ContextOver Γ → ContextOver Γ → TYPE;
 symbol tgetΓ : ETT.DBId → TContext → TContext;
 symbol τ_Γ : TContext → Context;
 rule τ_Γ (tgetΓ $id $Γ) ↪ getΓ (τ_Γ $Γ) $id;

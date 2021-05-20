@@ -3,9 +3,9 @@ require open ETT.ITT;
 require open ETT.ILemmas;
 require open ETT.HEq;
 
-injective symbol Pack' {s : Sort} (A B : U s) : U _ ≔
+symbol Pack' {s : Sort} (A B : U s) : U _ ≔
   S s _ A (λ a, S s _ B (λ b, HEq' s A B a b));
-injective symbol Pack {s : Sort} (A B : U s) : TYPE ≔ ε _ (Pack' A B);
+symbol Pack {s : Sort} (A B : U s) : TYPE ≔ ε _ (Pack' A B);
 
 symbol projT1 {s : Sort} {A B : U s} (p : Pack A B) : ε s A ≔
   proj1 _ _ _ _ p;

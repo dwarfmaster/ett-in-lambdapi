@@ -4,9 +4,9 @@ require open ETT.ILemmas;
 
 // Intuitionistic heterogeneous equality
 // It is OK to mark them as injective because they are the combination of injective symbols.
-injective symbol HEq' (s : Sort) (A B : U s) (a : ε s A) (b : ε s B) : U _ ≔
+symbol HEq' (s : Sort) (A B : U s) (a : ε s A) (b : ε s B) : U _ ≔
   S _ _ (eq _ (u s) A B) (λ p, eq s B (transport p a) b);
-injective symbol HEq (s : Sort) (A B : U s) (a : ε s A) (b : ε s B) : TYPE ≔
+symbol HEq (s : Sort) (A B : U s) (a : ε s A) (b : ε s B) : TYPE ≔
   ε _ (HEq' s A B a b);
 symbol H' {s : Sort} {A B : U s} (a : ε s A) (b : ε s B) ≔ HEq' s A B a b;
 symbol H {s : Sort} {A B : U s} (a : ε s A) (b : ε s B)  ≔ HEq  s A B a b;
