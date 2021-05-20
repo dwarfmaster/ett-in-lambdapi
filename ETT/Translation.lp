@@ -35,9 +35,8 @@ with τ $Γ (der_type_conv _ _ _ _ _ $du $deq)
      let p ≔ convert_T $Γ (inv_sort $du) (inv_eq_t1 $deq) in
      transport pAB (transport p (τ $Γ $du))
 
-with τ $Γ (der_abs _ $s _ $A _ _ $dA $dB $dt)
-  ↪ λ a, let p ≔ convert_T (TPush $Γ $s $A $dA a) (inv_sort $dt) $dB in
-          transport p (τ (TPush $Γ $s $A $dA a) $dt)
+with τ $Γ (der_abs _ $s _ $A _ _ $dA _ $dt)
+  ↪ λ a, τ (TPush $Γ $s $A $dA a) $dt
 with τ $Γ (der_app _ _ _ _ _ _ _ _ $dB $dt $du)
   ↪ let f ≔ τ_fun $Γ (inv_sort $du) $dB (inv_sort $dt) (τ $Γ $dt) in
      τ_substT $Γ $dB $du (f (τ $Γ $du))
