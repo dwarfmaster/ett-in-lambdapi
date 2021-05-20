@@ -31,6 +31,15 @@ with convertR $Γ $T1 $T2 $H (der_prod _ $s $s' $A $B $dA1 $dB1) (der_prod _ $s 
        (convertR $Γ $T1 $T2 $H $dA1 $dA2)
        (λ p, convertR $Γ (COPush $T1 $dA1 (projT1 p)) (COPush $T2 $dA2 (projT2 p))
                       (PCPush $H $dA1 $dA2 (projHEq p)) $dB1 $dB2)
-// with convert $Γ (der_abs _ $s $s' $A $t $B $dA $dB $dt) (der_abs _ $s $s' $A $t $B $dA' $dB' $dt')
-//   ↪
+with convertR $Γ $T1 $T2 $H (der_abs _ $s $s' $A $t $B $dA1 _ $dt1) (der_abs _ $s $s' $A $t $B $dA2 _ $dt2)
+  ↪ cong_lambda
+       (λ a, τ_T (TPush (Concat $Γ $T1) $s $A $dA1 a) (inv_sort $dt1))
+       (λ a, τ_T (TPush (Concat $Γ $T2) $s $A $dA2 a) (inv_sort $dt2))
+       (λ a, τ (TPush (Concat $Γ $T1) $s $A $dA1 a) $dt1)
+       (λ a, τ (TPush (Concat $Γ $T2) $s $A $dA2 a) $dt2)
+       (convertR $Γ $T1 $T2 $H $dA1 $dA2)
+       (λ p, convertR $Γ (COPush $T1 $dA1 (projT1 p)) (COPush $T2 $dA2 (projT2 p))
+                      (PCPush $H $dA1 $dA2 (projHEq p)) (inv_sort $dt1) (inv_sort $dt2))
+       (λ p, convertR $Γ (COPush $T1 $dA1 (projT1 p)) (COPush $T2 $dA2 (projT2 p))
+                      (PCPush $H $dA1 $dA2 (projHEq p)) $dt1 $dt2)
 ;
