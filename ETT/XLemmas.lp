@@ -17,6 +17,3 @@ symbol der_conv_in_ctx (Γ : Context) (s s' : Sort) (A A' t B : Term)
                        (_ : der_eq Γ (snext s) (tsort s) A A') (_ : der (Push A s Γ) t B s')
                        : der (Push A' s Γ) t B s';
 
-symbol der_extend_context (Γ1 Γ2 : Context) (s : Sort) (t T : Term)
-                          (_ : der_context Γ1) (_ : der Γ2 t T s)
-                          : der (Append Γ2 Γ1) t T s;

@@ -6,6 +6,7 @@ require open ETT.XLemmas;
 require open ETT.ITT;
 require open ETT.TranslationDefinition;
 require open ETT.TranslationLemmas;
+require open ETT.HEq;
 
 symbol tgetS (id : ETT.DBId) (Γ : TContext) : ETT.Sort ≔ getS (τ_Γ Γ) id;
 symbol tgetA (id : ETT.DBId) (Γ : TContext) : ETT.Term ≔ get (τ_Γ Γ) id;
@@ -39,3 +40,24 @@ symbol convert_Γ (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term) (d1 d2 : de
                  (a1 : ε _ (τ_T Γ d1)) (a2 : ε _ (τ_T Γ d2))
                  (dB : der (Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) :
   ε _ (eq _ (u (τ_s s')) (τ_T (TPush Γ s A d1 a1) dB) (τ_T (TPush Γ s A d2 a2) dB));
+
+// Context over
+constant symbol COTail : Π(Γ : TContext), ContextOver Γ;
+constant symbol COPush
+  {Γ : TContext} (T : ContextOver Γ) (s : ETT.Sort) (A : ETT.Term)
+  (dA : der (τ_Γ (Concat Γ T)) A (ETT.tsort s) (ETT.snext s))
+  : ε (τ_s s) (τ_T (Concat Γ T) dA) → ContextOver Γ;
+
+// Concat implementation
+rule Concat $Γ (COTail _) ↪ $Γ
+with Concat $Γ (COPush $T $s $A $dA $a) ↪ TPush (Concat $Γ $T) $s $A $dA $a;
+
+// TContext
+constant symbol PCEmpty (Γ : TContext) : PContext Γ (COTail Γ) (COTail Γ);
+constant symbol PCPush
+  {Γ : TContext} {T1 T2 : ContextOver Γ} {s : ETT.Sort} {A : ETT.Term}
+  (_ : PContext Γ T1 T2)
+  (dA1 : der (τ_Γ (Concat Γ T1)) A (ETT.tsort s) (ETT.snext s))
+  (dA2 : der (τ_Γ (Concat Γ T2)) A (ETT.tsort s) (ETT.snext s))
+  {a1 : ε (τ_s s) (τ_T (Concat Γ T1) dA1)} {a2 : ε (τ_s s) (τ_T (Concat Γ T2) dA2)}
+  : H a1 a2 → PContext Γ (COPush T1 s A dA1 a1) (COPush T2 s A dA2 a2);

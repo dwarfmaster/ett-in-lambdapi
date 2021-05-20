@@ -6,9 +6,6 @@ require open ETT.DeBruijn;
 constant symbol Context : TYPE;
 constant symbol Push : Term → Sort → Context → Context;
 constant symbol Empty : Context;
-symbol Append : Context → Context → Context;
-rule Append (Push $t $s $Γ) $Γ2 ↪ Push $t $s (Append $Γ $Γ2)
-with Append Empty $Γ ↪ $Γ;
 
 symbol get : Context → DBId → Term;
 symbol getS : Context → DBId → Sort;
