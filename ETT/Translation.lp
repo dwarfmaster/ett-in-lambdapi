@@ -41,16 +41,10 @@ with τ $Γ (der_app _ _ _ _ _ _ _ _ $dB $dt $du)
   ↪ let f ≔ τ_fun $Γ (inv_sort $du) $dB (inv_sort $dt) (τ $Γ $dt) in
      τ_substT $Γ $dB $du (f (τ $Γ $du))
 
-with τ $Γ (der_pair _ $s $s' _ $A _ $B $dA $du $dB $dv)
+with τ $Γ (der_pair _ $s $s' _ $A _ _ _ $du $dB $dv)
   ↪ let pv ≔ convert_T $Γ (inv_sort $dv) (substitution $dB $du) in
-     let p ≔ eq_pair (λ (a : ε _ (τ_T $Γ (inv_sort $du))), τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
-                     (λ (a : ε _ (τ_T $Γ $dA)), τ_T (TPush $Γ $s $A $dA a) $dB)
-                     (convert_T $Γ (inv_sort $du) $dA)
-                     (λ (a : ε _ (τ_T $Γ (inv_sort $du))), convert_Γ $Γ $s $s' $A $B (inv_sort $du) $dA a
-                                                                     (transport (convert_T $Γ (inv_sort $du) $dA) a) $dB) in
-     transport p
-       (mkS (τ_s $s) (τ_s $s') (τ_T $Γ (inv_sort $du)) (λ a, τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
-            (τ $Γ $du) (τ_substT' $Γ $dB $du (transport pv (τ $Γ $dv))))
+     mkS (τ_s $s) (τ_s $s') (τ_T $Γ (inv_sort $du)) (λ a, τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
+         (τ $Γ $du) (τ_substT' $Γ $dB $du (transport pv (τ $Γ $dv)))
 with τ $Γ (der_π1 _ $s $s' _ $A _ $dA $dB $dp)
   ↪ let pr ≔ τ_sum $Γ $dA $dB (inv_sort $dp) (τ $Γ $dp) in
      proj1 (τ_s $s) (τ_s $s') (τ_T $Γ $dA) (λ a, τ_T (TPush $Γ $s $A $dA a) $dB) pr

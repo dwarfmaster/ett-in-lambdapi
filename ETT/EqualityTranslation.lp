@@ -55,23 +55,9 @@ with τ_eq $Γ (der_eq_π1 _ $s $s' $u $A $v $B _ $du $dB $dv)
         (τ_sum $Γ (inv_sort $du) $dB (der_sigma (τ_Γ $Γ) $s $s' $A $B (inv_sort $du) $dB)
           (τ $Γ (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)))
         // u = v
-        (trans_eq
-         (eq_of_transport
-           (mkS (τ_s $s) (τ_s $s') (τ_T $Γ (inv_sort $du))
-            (λ(a : ε _ (τ_T $Γ (inv_sort $du))), τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
-            (τ $Γ $du)
-            (τ_substT' $Γ $dB $du
-              (transport (convert_T $Γ (inv_sort $dv) (substitution $dB $du)) (τ $Γ $dv))))
-           (eq_pair
-             (λ (a : ε _ (τ_T $Γ (inv_sort $du))), τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
-             (λ (a : ε _ (τ_T $Γ (inv_sort $du))), τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
-             (convert_T $Γ (inv_sort $du) (inv_sort $du))
-             (λ (a : ε _ (τ_T $Γ (inv_sort $du))),
-                convert_Γ $Γ $s $s' $A $B (inv_sort $du) (inv_sort $du) a
-                          (transport (convert_T $Γ (inv_sort $du) (inv_sort $du)) a) $dB)))
-         (eq_of_transport
+        (eq_of_transport
            (τ $Γ (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv))
-           (τ_sum_eq $Γ (inv_sort $du) $dB (der_sigma (τ_Γ $Γ) $s $s' $A $B (inv_sort $du) $dB))))))
+           (τ_sum_eq $Γ (inv_sort $du) $dB (der_sigma (τ_Γ $Γ) $s $s' $A $B (inv_sort $du) $dB)))))
 
 with τ_eq $Γ (der_eq_π2 _ $s $s' $u $A $v $B _ $du $dB $dv)
   ↪ heq_symm
@@ -99,21 +85,10 @@ with τ_eq $Γ (der_eq_π2 _ $s $s' $u $A $v $B _ $du $dB $dv)
                     (der_sigma (τ_Γ $Γ) $s $s' $A $B (inv_sort $du) $dB)
                     (τ $Γ (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)))
              (heq_to_eq
-               (heq_trans
-                 (heq_of_transport
-                   (mkS (τ_s $s) (τ_s $s') (τ_T $Γ (inv_sort $du)) (λ a, τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
-                        (τ $Γ $du)
-                        (τ_substT' $Γ $dB $du (transport (convert_T $Γ (inv_sort $dv) (substitution $dB $du)) (τ $Γ $dv))))
-                   (eq_pair
-                     (λ a, τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
-                     (λ a, τ_T (TPush $Γ $s $A (inv_sort $du) a) $dB)
-                     (convert_T $Γ (inv_sort $du) (inv_sort $du))
-                     (λ a, convert_Γ $Γ $s $s' $A $B (inv_sort $du) (inv_sort $du) a
-                                     (transport (convert_T $Γ (inv_sort $du) (inv_sort $du)) a) $dB)))
-                 (heq_of_transport
+               (heq_of_transport
                    (τ $Γ (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv))
                    (τ_sum_eq $Γ (inv_sort $du) $dB
-                     (der_sigma (τ_Γ $Γ) $s $s' $A $B (inv_sort $du) $dB))))))
+                     (der_sigma (τ_Γ $Γ) $s $s' $A $B (inv_sort $du) $dB)))))
 
            // Equality between the projection of the transported pair and the converted second element
            (heq_trans

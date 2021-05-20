@@ -33,7 +33,7 @@ rule inv_sort (der_var $Γ $id $dΓ) ↪ der_shift $id $Γ _ _ _ (der_subΓ _ $i
 with inv_sort (der_type_conv _ _ _ _ _ _ $deq) ↪ inv_eq_t2 $deq
 with inv_sort (der_abs $Γ $s $s' $A _ $B $dA _ $dt) ↪ der_prod $Γ $s $s' $A $B $dA (inv_sort $dt)
 with inv_sort (der_app _ _ _ _ _ _ _ _ $dB _ $du) ↪ substitution $dB $du
-with inv_sort (der_pair $Γ $s $s' _ $A _ $B $dA _ $dB _) ↪ der_sigma $Γ $s $s' $A $B $dA $dB
+with inv_sort (der_pair $Γ $s $s' _ $A _ $B _ $du $dB _) ↪ der_sigma $Γ $s $s' $A $B (inv_sort $du) $dB
 with inv_sort (der_π1 _ _ _ _ _ _ $dA _ _) ↪ $dA
 with inv_sort (der_π2 $Γ $s $s' $p $A $B $dA $dB $dp) ↪ substitution $dB (der_π1 $Γ $s $s' $p $A $B $dA $dB $dp)
 with inv_sort (der_refl $Γ $s $u $A $dA $du) ↪ der_prop_type_eq $Γ $s $A $u $u $dA $du $du
