@@ -34,13 +34,6 @@ with tgetShift (dbsucc $id) (TPush $Γ $s $A $dA $a)
         (der_shift $id (τ_Γ $Γ) _ _ _ (tgetD $id $Γ))
         $dA $a (tgetShift $id $Γ);
 
-// Converting in the context
-// TODO this is false ! It is only true if a1 d1~d2 a2
-symbol convert_Γ (Γ : TContext) (s s' : ETT.Sort) (A B : ETT.Term) (d1 d2 : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
-                 (a1 : ε _ (τ_T Γ d1)) (a2 : ε _ (τ_T Γ d2))
-                 (dB : der (Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) :
-  ε _ (eq _ (u (τ_s s')) (τ_T (TPush Γ s A d1 a1) dB) (τ_T (TPush Γ s A d2 a2) dB));
-
 // Context over
 constant symbol COTail : Π(Γ : TContext), ContextOver Γ;
 constant symbol COPush
