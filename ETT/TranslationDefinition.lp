@@ -45,9 +45,9 @@ symbol τ_eqT (Γ : TContext) {s : ETT.Sort} {T1 T2 : ETT.Term} (d : der_eq (τ_
 // Conversion of translations
 symbol convert_T (Γ : TContext) {T : ETT.Term} {s : ETT.Sort} (d1 d2 : der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s)) :
   ε (snext (τ_s s)) (eq (snext (τ_s s)) (u (τ_s s)) (τ_T Γ d1) (τ_T Γ d2));
-symbol convertR (Γ : TContext) (Γ1 Γ2 : ContextOver Γ) (h : PContext Γ Γ1 Γ2) {s : ETT.Sort} {t T : ETT.Term}
-                (d1 : der (τ_Γ (Concat Γ Γ1)) t T s)
-                (d2 : der (τ_Γ (Concat Γ Γ2)) t T s) :
+symbol convertR (Γ : TContext) (Γ1 Γ2 : ContextOver Γ) (h : PContext Γ Γ1 Γ2) {s : ETT.Sort} {t T1 T2 : ETT.Term}
+                (d1 : der (τ_Γ (Concat Γ Γ1)) t T1 s)
+                (d2 : der (τ_Γ (Concat Γ Γ2)) t T2 s) :
   let ds1 ≔ I.inv_sort d1 in
   let ds2 ≔ I.inv_sort d2 in
   HEq (τ_s s) (τ_T (Concat Γ Γ1) ds1) (τ_T (Concat Γ Γ2) ds2) (τ (Concat Γ Γ1) d1) (τ (Concat Γ Γ2) d2);

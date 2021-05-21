@@ -61,3 +61,7 @@ constant symbol PCPush
   (dA2 : der (τ_Γ (Concat Γ T2)) A (ETT.tsort s) (ETT.snext s))
   {a1 : ε (τ_s s) (τ_T (Concat Γ T1) dA1)} {a2 : ε (τ_s s) (τ_T (Concat Γ T2) dA2)}
   : H a1 a2 → PContext Γ (COPush T1 dA1 a1) (COPush T2 dA2 a2);
+
+symbol PCSymm {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} : PContext Γ Γ1 Γ2 → PContext Γ Γ2 Γ1;
+rule PCSymm (PCEmpty $Γ) ↪ PCEmpty $Γ
+with PCSymm (PCPush $P $dA1 $dA2 $H) ↪ PCPush (PCSymm $P) $dA2 $dA1 (heq_symm $H);
