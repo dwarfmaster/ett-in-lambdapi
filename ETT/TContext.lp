@@ -34,66 +34,48 @@ with tgetShift (dbsucc $id) (TPush $Γ $s $A $dA $a)
         (der_shift $id (τ_Γ $Γ) _ _ _ (tgetD $id $Γ))
         $dA $a (tgetShift $id $Γ);
 
-// Context over
-constant symbol COTail : Π(Γ : TContext), ContextOver Γ;
-constant symbol COPush
-  {Γ : TContext} (T : ContextOver Γ) {s : ETT.Sort} {A : ETT.Term}
-  (dA : der (τ_Γ (Concat Γ T)) A (ETT.tsort s) (ETT.snext s))
-  : ε (τ_s s) (τ_T (Concat Γ T) dA) → ContextOver Γ;
-
-// Concat implementation
-rule Concat $Γ (COTail _) ↪ $Γ
-with Concat $Γ (COPush $T $dA $a) ↪ TPush (Concat $Γ $T) _ _ $dA $a;
-
 // Packed Context
-constant symbol PCEmpty (Γ : TContext) : PContext Γ (COTail Γ) (COTail Γ);
+constant symbol PCEmpty (Γ : TContext) : PContext Γ;
 constant symbol PCPush
-  {Γ : TContext} {T1 T2 : ContextOver Γ} {s : ETT.Sort} {A : ETT.Term}
-  (_ : PContext Γ T1 T2)
-  (dA1 : der (τ_Γ (Concat Γ T1)) A (ETT.tsort s) (ETT.snext s))
-  (dA2 : der (τ_Γ (Concat Γ T2)) A (ETT.tsort s) (ETT.snext s))
-  {a1 : ε (τ_s s) (τ_T (Concat Γ T1) dA1)} {a2 : ε (τ_s s) (τ_T (Concat Γ T2) dA2)}
-  : H a1 a2 → PContext Γ (COPush T1 dA1 a1) (COPush T2 dA2 a2);
+  {Γ : TContext} {s : ETT.Sort} {A : ETT.Term} (P : PContext Γ)
+  (dA1 : der (τ_Γ (projΓ1 P)) A (ETT.tsort s) (ETT.snext s))
+  (dA2 : der (τ_Γ (projΓ2 P)) A (ETT.tsort s) (ETT.snext s))
+  {a1 : ε (τ_s s) (τ_T (projΓ1 P) dA1)} {a2 : ε (τ_s s) (τ_T (projΓ2 P) dA2)}
+  : H a1 a2 → PContext Γ;
 
-symbol PCSymm {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} : PContext Γ Γ1 Γ2 → PContext Γ Γ2 Γ1;
-rule PCSymm (PCEmpty $Γ) ↪ PCEmpty $Γ
-with PCSymm (PCPush $P $dA1 $dA2 $H) ↪ PCPush (PCSymm $P) $dA2 $dA1 (heq_symm $H);
+// Necessary to keep confluence of the pgetS and pgetA
+rule τ_Γ (projΓ2 $P) ↪ τ_Γ (projΓ1 $P);
 
-symbol pgetS {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} : ETT.DBId → PContext Γ Γ1 Γ2 → ETT.Sort;
-rule pgetS db0 (@PCPush _ _ _ $s _ _ _ _ _ _ _) ↪ $s
-with pgetS (dbsucc $id) (PCPush $P _ _ _) ↪ pgetS $id $P
-with pgetS $id (PCEmpty $Γ) ↪ tgetS $id $Γ;
-symbol pgetA {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} : ETT.DBId → PContext Γ Γ1 Γ2 → ETT.Term;
-rule pgetA db0 (@PCPush _ _ _ _ $A _ _ _ _ _ _) ↪ $A
-with pgetA (dbsucc $id) (PCPush $P _ _ _) ↪ pgetA $id $P
-with pgetA $id (PCEmpty $Γ) ↪ tgetA $id $Γ;
-symbol pgetΓ1 {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} : ETT.DBId → PContext Γ Γ1 Γ2 → TContext;
-symbol pgetΓ2 {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} : ETT.DBId → PContext Γ Γ1 Γ2 → TContext;
-rule pgetΓ1 db0 (@PCPush $Γ $T1 _ _ _ _ _ _ _ _ _) ↪ Concat $Γ $T1
-with pgetΓ1 (dbsucc $id) (PCPush $P _ _ _) ↪ pgetΓ1 $id $P
-with pgetΓ1 $id (PCEmpty $Γ) ↪ tgetΓ $id $Γ
-with pgetΓ2 db0 (@PCPush $Γ _ $T2 _ _ _ _ _ _ _ _) ↪ Concat $Γ $T2
-with pgetΓ2 (dbsucc $id) (PCPush $P _ _ _) ↪ pgetΓ2 $id $P
-with pgetΓ2 $id (PCEmpty $Γ) ↪ tgetΓ $id $Γ;
+// Implementation of proj1 and proj2
+rule projΓ1 (PCEmpty $Γ) ↪ $Γ
+with projΓ1 (@PCPush _ $s $A $P $dA1 _ $a1 _ _) ↪ TPush (projΓ1 $P) $s $A $dA1 $a1
+with projΓ2 (PCEmpty $Γ) ↪ $Γ
+with projΓ2 (@PCPush _ $s $A $P _ $dA2 _ $a2 _) ↪ TPush (projΓ2 $P) $s $A $dA2 $a2;
 
-symbol pgetD1 {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} (id : ETT.DBId) (HC : PContext Γ Γ1 Γ2)
+symbol pgetS {Γ : TContext} : ETT.DBId → PContext Γ → ETT.Sort;
+rule pgetS $id $P ↪ tgetS $id (projΓ1 $P)
+with pgetS $id $P ↪ tgetS $id (projΓ2 $P);
+symbol pgetA {Γ : TContext} : ETT.DBId → PContext Γ → ETT.Term;
+rule pgetA $id $P ↪ tgetA $id (projΓ1 $P)
+with pgetA $id $P ↪ tgetA $id (projΓ2 $P);
+symbol pgetΓ1 {Γ : TContext} : ETT.DBId → PContext Γ → TContext;
+symbol pgetΓ2 {Γ : TContext} : ETT.DBId → PContext Γ → TContext;
+rule pgetΓ1 $id $P ↪ tgetΓ $id (projΓ1 $P)
+with pgetΓ2 $id $P ↪ tgetΓ $id (projΓ2 $P);
+
+symbol pgetD1 {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ)
               : der (τ_Γ (pgetΓ1 id HC)) (pgetA id HC) (ETT.tsort (pgetS id HC)) (ETT.snext (pgetS id HC));
-symbol pgetD2 {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} (id : ETT.DBId) (HC : PContext Γ Γ1 Γ2)
+symbol pgetD2 {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ)
               : der (τ_Γ (pgetΓ2 id HC)) (pgetA id HC) (ETT.tsort (pgetS id HC)) (ETT.snext (pgetS id HC));
-rule pgetD1 db0 (PCPush _ $dA1 _ _) ↪ $dA1
-with pgetD1 (dbsucc $id) (PCPush $P _ _ _) ↪ pgetD1 $id $P
-with pgetD1 $id (PCEmpty $Γ) ↪ tgetD $id $Γ
-with pgetD2 db0 (PCPush _ _ $dA2 _) ↪ $dA2
-with pgetD2 (dbsucc $id) (PCPush $P _ _ _) ↪ pgetD2 $id $P
-with pgetD2 $id (PCEmpty $Γ) ↪ tgetD $id $Γ;
+rule pgetD1 $id $P ↪ tgetD $id (projΓ1 $P)
+with pgetD2 $id $P ↪ tgetD $id (projΓ2 $P);
 
-symbol pget1 {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} (id : ETT.DBId) (HC : PContext Γ Γ1 Γ2)
-             : ε _ (τ (pgetΓ1 id HC) (pgetD1 id HC));
-symbol pget2 {Γ : TContext} {Γ1 Γ2 : ContextOver Γ} (id : ETT.DBId) (HC : PContext Γ Γ1 Γ2)
-             : ε _ (τ (pgetΓ2 id HC) (pgetD2 id HC));
-rule pget1 db0 (@PCPush _ _ _ _ _ _ _ _ $a1 _ _) ↪ $a1
-with pget1 (dbsucc $id) (PCPush $P _ _ _) ↪ pget1 $id $P
-with pget1 $id (PCEmpty $Γ) ↪ tget $id $Γ
-with pget2 db0 (@PCPush _ _ _ _ _ _ _ _ _ $a2 _) ↪ $a2
-with pget2 (dbsucc $id) (PCPush $P _ _ _) ↪ pget2 $id $P
-with pget2 $id (PCEmpty $Γ) ↪ tget $id $Γ;
+symbol pget1 {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ) : ε _ (τ (pgetΓ1 id HC) (pgetD1 id HC));
+symbol pget2 {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ) : ε _ (τ (pgetΓ2 id HC) (pgetD2 id HC));
+rule pget1 $id $P ↪ tget $id (projΓ1 $P)
+with pget2 $id $P ↪ tget $id (projΓ2 $P);
+
+symbol pgetH {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ) : H (pget1 id HC) (pget2 id HC);
+rule pgetH db0 (PCPush _ _ _ $h) ↪ $h
+with pgetH (dbsucc $id) (PCPush $P _ _ _) ↪ pgetH $id $P
+with pgetH $id (PCEmpty $Γ) ↪ heq_refl _ (tget $id $Γ);

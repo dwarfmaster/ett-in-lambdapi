@@ -15,9 +15,9 @@ with τ_s (ETT.smax $s $s') ↪ smax (τ_s $s) (τ_s $s');
 
 // Translation context
 constant symbol TContext : TYPE;
-constant symbol ContextOver : TContext → TYPE;
-symbol Concat : Π(Γ : TContext), ContextOver Γ → TContext;
-constant symbol PContext : Π(Γ : TContext), ContextOver Γ → ContextOver Γ → TYPE;
+constant symbol PContext : TContext → TYPE;
+symbol projΓ1 {Γ : TContext} : PContext Γ → TContext;
+symbol projΓ2 {Γ : TContext} : PContext Γ → TContext;
 symbol tgetΓ : ETT.DBId → TContext → TContext;
 symbol τ_Γ : TContext → Context;
 rule τ_Γ (tgetΓ $id $Γ) ↪ getΓ (τ_Γ $Γ) $id;
@@ -45,12 +45,12 @@ symbol τ_eqT (Γ : TContext) {s : ETT.Sort} {T1 T2 : ETT.Term} (d : der_eq (τ_
 // Conversion of translations
 symbol convert_T (Γ : TContext) {T : ETT.Term} {s : ETT.Sort} (d1 d2 : der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s)) :
   ε (snext (τ_s s)) (eq (snext (τ_s s)) (u (τ_s s)) (τ_T Γ d1) (τ_T Γ d2));
-symbol convertR (Γ : TContext) (Γ1 Γ2 : ContextOver Γ) (h : PContext Γ Γ1 Γ2) {s : ETT.Sort} {t T1 T2 : ETT.Term}
-                (d1 : der (τ_Γ (Concat Γ Γ1)) t T1 s)
-                (d2 : der (τ_Γ (Concat Γ Γ2)) t T2 s) :
+symbol convertR (Γ : TContext) (h : PContext Γ) {s : ETT.Sort} {t T1 T2 : ETT.Term}
+                (d1 : der (τ_Γ (projΓ1 h)) t T1 s)
+                (d2 : der (τ_Γ (projΓ2 h)) t T2 s) :
   let ds1 ≔ I.inv_sort d1 in
   let ds2 ≔ I.inv_sort d2 in
-  HEq (τ_s s) (τ_T (Concat Γ Γ1) ds1) (τ_T (Concat Γ Γ2) ds2) (τ (Concat Γ Γ1) d1) (τ (Concat Γ Γ2) d2);
+  HEq (τ_s s) (τ_T (projΓ1 h) ds1) (τ_T (projΓ2 h) ds2) (τ (projΓ1 h) d1) (τ (projΓ2 h) d2);
 symbol convert (Γ : TContext) {s : ETT.Sort} {t T : ETT.Term} (d1 d2 : der (τ_Γ Γ) t T s) :
   let ds1 ≔ I.inv_sort d1 in
   let ds2 ≔ I.inv_sort d2 in
