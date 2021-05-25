@@ -114,6 +114,19 @@ with convertR $Γ $H (der_app _ $s $s' $A $t $u $B _ $dB1 $dt1 $du1) (der_app _ 
          (convertR $Γ $H $du1 $du2))
        (τ_substT_eq (projΓ1 $H) $dB1 $du1)
        (τ_substT_eq (projΓ2 $H) $dB2 $du2)
+with convertR $Γ $H (der_pair _ $s $s' $u $A $v $B _ $du1 $dB1 $dv1) (der_pair _ $s $s' $u $A $v $B _ $du2 $dB2 $dv2)
+  ↪ cong_pair
+       (λ a, τ_T (TPush (projΓ1 $H) $s $A (inv_sort $du1) a) $dB1)
+       (λ a, τ_T (TPush (projΓ2 $H) $s $A (inv_sort $du2) a) $dB2)
+       (convertR $Γ $H (inv_sort $du1) (inv_sort $du2))
+       (λ p, convertR $Γ (PCPush $H (inv_sort $du1) (inv_sort $du2) (projHEq p)) $dB1 $dB2)
+       (convertR $Γ $H $du1 $du2)
+       (heq_conj'
+         (heq_conj (convertR $Γ $H $dv1 $dv2)
+           (convert_T (projΓ1 $H) (inv_sort $dv1) (substitution $dB1 $du1))
+           (convert_T (projΓ2 $H) (inv_sort $dv2) (substitution $dB2 $du2)))
+         (τ_substT_eq (projΓ1 $H) $dB1 $du1)
+         (τ_substT_eq (projΓ2 $H) $dB2 $du2))
 
 // Type conversion
 with convertR $Γ $H (der_sort _ $s $dΓ) (der_type_conv _ _ _ _ _ $dX $deq)

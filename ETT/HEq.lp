@@ -73,3 +73,7 @@ symbol heq_conj {s : Sort} {A B C D : U s} {b : ε s B} {c : ε s C} (h : H b c)
   heq_trans
    (heq_symm (heq_of_transport b pBA))
    (heq_trans h (heq_of_transport c pCD));
+symbol heq_conj' {s : Sort} {A B C D : U s} {b : ε s B} {c : ε s C} (h : H b c)
+                 (pAB : ε _ (eq _ (u s) A B)) (pDC : ε _ (eq _ (u s) D C))
+                 : H (transport (inv_eq pAB) b) (transport (inv_eq pDC) c) ≔
+  heq_conj h (inv_eq pAB) (inv_eq pDC);
