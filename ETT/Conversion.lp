@@ -149,6 +149,14 @@ with convertR $Γ $H (der_π2 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π2 _ $s $s
        (τ_substT_eq (projΓ1 $H) $dB1 (der_π1 (projΓX $H) $s $s' $p $A $B $dA1 $dB1 $dp1))
        (τ_substT_eq (projΓ2 $H) $dB2 (der_π1 (projΓX $H) $s $s' $p $A $B $dA2 $dB2 $dp2))
 
+// Equality
+with convertR $Γ $H (der_refl _ $s $u $A $dA1 $du1) (der_refl _ $s $u $A $dA2 $du2)
+  ↪ cong_refl
+       (convertR $Γ $H $dA1 $dA2)
+       (heq_conj (convertR $Γ $H $du1 $du2)
+         (convert_T (projΓ1 $H) (inv_sort $du1) $dA1)
+         (convert_T (projΓ2 $H) (inv_sort $du2) $dA2))
+
 // Type conversion
 with convertR $Γ $H (der_sort _ $s $dΓ) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_sort _ $s $dΓ) $dX $deq
