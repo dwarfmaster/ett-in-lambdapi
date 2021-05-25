@@ -67,4 +67,9 @@ symbol heq_funext {s s' : Sort} (A : U s) (B B' : ε s A → U s')
                   (f : ε _ (P s s' A B)) (g : ε _ (P s s' A B'))
                   (_ : Π a, HEq s' (B a) (B' a) (f a) (g a))
                   : HEq (smax s s') (P s s' A B) (P s s' A B') f g;
-
+symbol heq_conj {s : Sort} {A B C D : U s} {b : ε s B} {c : ε s C} (h : H b c)
+                (pBA : ε _ (eq _ (u s) B A)) (pCD : ε _ (eq _ (u s) C D))
+                : H (transport pBA b) (transport pCD c) ≔
+  heq_trans
+   (heq_symm (heq_of_transport b pBA))
+   (heq_trans h (heq_of_transport c pCD));

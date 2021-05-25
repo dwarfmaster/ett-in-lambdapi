@@ -75,29 +75,19 @@ with convertR $Γ $H (der_sigma _ $s $s' $A $B $dA1 $dB1) (der_sigma _ $s $s' $A
 with convertR $Γ $H (der_prop_type_eq _ $s $A $u $v $dA1 $du1 $dv1) (der_prop_type_eq _ $s $A $u $v $dA2 $du2 $dv2)
   ↪ cong_eq
        (convertR $Γ $H $dA1 $dA2)
-       (heq_trans
-         (heq_symm (heq_of_transport (τ (projΓ1 $H) $du1) (convert_T (projΓ1 $H) (inv_sort $du1) $dA1)))
-         (heq_trans
-           (convertR $Γ $H $du1 $du2)
-           (heq_of_transport (τ (projΓ2 $H) $du2) (convert_T (projΓ2 $H) (inv_sort $du2) $dA2))))
-       (heq_trans
-         (heq_symm (heq_of_transport (τ (projΓ1 $H) $dv1) (convert_T (projΓ1 $H) (inv_sort $dv1) $dA1)))
-         (heq_trans
-           (convertR $Γ $H $dv1 $dv2)
-           (heq_of_transport (τ (projΓ2 $H) $dv2) (convert_T (projΓ2 $H) (inv_sort $dv2) $dA2))))
+       (heq_conj (convertR $Γ $H $du1 $du2)
+         (convert_T (projΓ1 $H) (inv_sort $du1) $dA1)
+         (convert_T (projΓ2 $H) (inv_sort $du2) $dA2))
+       (heq_conj (convertR $Γ $H $dv1 $dv2)
+         (convert_T (projΓ1 $H) (inv_sort $dv1) $dA1)
+         (convert_T (projΓ2 $H) (inv_sort $dv2) $dA2))
 
 // Structural rules
 with convertR _ $H (der_var _ $id $dΓ1) (der_var _ $id $dΓ2)
   ↪ let shift ≔ der_shift $id (projΓX $H) (pgetA $id $H) (ETT.tsort (pgetS $id $H)) (ETT.snext (pgetS $id $H)) in
-     heq_trans
-       (heq_symm (heq_of_transport
-          (pgetShift1 $id $H)
-          (convert_T (projΓ1 $H) (shift (pgetD1 $id $H)) (shift (der_subΓ (projΓX $H) $id $dΓ1)))))
-       (heq_trans
-         (pgetHShift $id $H)
-         (heq_of_transport
-           (pgetShift2 $id $H)
-           (convert_T (projΓ2 $H) (shift (pgetD2 $id $H)) (shift (der_subΓ (projΓX $H) $id $dΓ2)))))
+     heq_conj (pgetHShift $id $H)
+       (convert_T (projΓ1 $H) (shift (pgetD1 $id $H)) (shift (der_subΓ (projΓX $H) $id $dΓ1)))
+       (convert_T (projΓ2 $H) (shift (pgetD2 $id $H)) (shift (der_subΓ (projΓX $H) $id $dΓ2)))
 with convertR $Γ $H (der_type_conv _ $u $A $B $s $du1 $deq1) (der_type_conv _ $u $A $B $s $du2 $deq2)
   ↪ convertTypeConversion $Γ $H (der_type_conv _ $u $A $B $s $du1 $deq1) $du2 $deq2
 

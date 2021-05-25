@@ -94,25 +94,15 @@ with pgetH $id (PCEmpty $Γ) ↪ heq_refl _ (tget $id $Γ);
 
 symbol pgetHShift {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ) : H (pgetShift1 id HC) (pgetShift2 id HC);
 rule pgetHShift db0 (@PCPush _ $s $A $P $dA1 $dA2 $a1 $a2 $h)
-   ↪ heq_trans
-        (heq_symm (heq_of_transport $a1
-          (@τ_shift_eq (projΓ1 $P) $s $s $A $A $dA1 $dA1 $a1)))
-        (heq_trans
-          $h
-          (heq_of_transport $a2
-            (@τ_shift_eq (projΓ2 $P) $s $s $A $A $dA2 $dA2 $a2)))
+   ↪ heq_conj $h
+        (@τ_shift_eq (projΓ1 $P) $s $s $A $A $dA1 $dA1 $a1)
+        (@τ_shift_eq (projΓ2 $P) $s $s $A $A $dA2 $dA2 $a2)
 with pgetHShift (dbsucc $id) (@PCPush _ $s $A $P $dA1 $dA2 $a1 $a2 _)
-   ↪ heq_trans
-        (heq_symm (heq_of_transport
-          (pgetShift1 $id $P)
-          (@τ_shift_eq (projΓ1 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
-              (der_shift $id (τ_Γ (projΓ1 $P)) _ _ _ (pgetD1 $id $P))
-              $dA1 $a1)))
-        (heq_trans
-          (pgetHShift $id $P)
-          (heq_of_transport
-            (pgetShift2 $id $P)
-            (@τ_shift_eq (projΓ2 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
-                (der_shift $id (τ_Γ (projΓ2 $P)) _ _ _ (pgetD2 $id $P))
-                $dA2 $a2)))
+   ↪ heq_conj (pgetHShift $id $P)
+        (@τ_shift_eq (projΓ1 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
+            (der_shift $id (τ_Γ (projΓ1 $P)) _ _ _ (pgetD1 $id $P))
+            $dA1 $a1)
+        (@τ_shift_eq (projΓ2 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
+            (der_shift $id (τ_Γ (projΓ2 $P)) _ _ _ (pgetD2 $id $P))
+            $dA2 $a2)
 with pgetHShift $id (PCEmpty $Γ) ↪ heq_refl _ (tgetShift $id $Γ);
