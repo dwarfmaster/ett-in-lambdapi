@@ -84,19 +84,25 @@ symbol τ_sum' (Γ : TContext) {s s' : ETT.Sort} {A B : ETT.Term}
   transport (inv_eq (τ_sum_eq Γ dA dB dp));
 
 // Translation of equality
-symbol τ_equality_eq (Γ : TContext) {s : ETT.Sort} {A a a' e : ETT.Term}
-                     (de : der (τ_Γ Γ) e (ETT.teq A a a') s) :
+symbol τ_equality_eq (Γ : TContext) {s : ETT.Sort} {A a a' : ETT.Term}
+                     (dA : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
+                     (da : der (τ_Γ Γ) a A s) (da' : der (τ_Γ Γ) a' A s)
+                     (de : der (τ_Γ Γ) (ETT.teq A a a') (ETT.tsort s) (ETT.snext s)) :
   ε _ (eq _ (u (τ_s s))
-        (τ_T Γ (inv_sort de))
-        (eq (τ_s s) (τ_T Γ (inv_teq_sort de))
-            (transport (convert_T Γ (inv_sort (inv_teq_t1 de)) (inv_teq_sort de)) (τ Γ (inv_teq_t1 de)))
-            (transport (convert_T Γ (inv_sort (inv_teq_t2 de)) (inv_teq_sort de)) (τ Γ (inv_teq_t2 de)))));
-symbol τ_equality (Γ : TContext) {s : ETT.Sort} {A a a' e : ETT.Term}
-                  (de : der (τ_Γ Γ) e (ETT.teq A a a') s) ≔
-  transport (τ_equality_eq Γ de);
-symbol τ_equality' (Γ : TContext) {s : ETT.Sort} {A a a' e : ETT.Term}
-                   (de : der (τ_Γ Γ) e (ETT.teq A a a') s) ≔
-  transport (inv_eq (τ_equality_eq Γ de));
+        (τ_T Γ de)
+        (eq (τ_s s) (τ_T Γ dA)
+            (transport (convert_T Γ (inv_sort da)  dA) (τ Γ da))
+            (transport (convert_T Γ (inv_sort da') dA) (τ Γ da'))));
+symbol τ_equality (Γ : TContext) {s : ETT.Sort} {A a a' : ETT.Term}
+                  (dA : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
+                  (da : der (τ_Γ Γ) a A s) (da' : der (τ_Γ Γ) a' A s)
+                  (de : der (τ_Γ Γ) (ETT.teq A a a') (ETT.tsort s) (ETT.snext s)) ≔
+  transport (τ_equality_eq Γ dA da da' de);
+symbol τ_equality' (Γ : TContext) {s : ETT.Sort} {A a a' : ETT.Term}
+                   (dA : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
+                   (da : der (τ_Γ Γ) a A s) (da' : der (τ_Γ Γ) a' A s)
+                   (de : der (τ_Γ Γ) (ETT.teq A a a') (ETT.tsort s) (ETT.snext s)) ≔
+  transport (inv_eq (τ_equality_eq Γ dA da da' de));
 
 // Translation of context conversion
 symbol τ_conv_in_ctx (Γ : TContext) {s s' : ETT.Sort} {A A' t B : ETT.Term}

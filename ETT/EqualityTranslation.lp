@@ -146,7 +146,7 @@ with τ_eq $Γ (der_eq_lift _ _ _ _ _ _ $de)
                      (τ $Γ (inv_teq_t1 $de))
                      (transport (convert_T $Γ (inv_sort (inv_teq_t2 $de)) (inv_teq_sort $de)) (τ $Γ (inv_teq_t2 $de)))
                      (convert_T $Γ (inv_sort (inv_teq_t1 $de)) (inv_teq_sort $de))
-                     (τ_equality $Γ $de (τ $Γ $de)) in
+                     (τ_equality $Γ (inv_teq_sort $de) (inv_teq_t1 $de) (inv_teq_t2 $de) (inv_sort $de) (τ $Γ $de)) in
      heq_extend_R
        (τ $Γ (inv_teq_t1 $de))
        (τ $Γ (inv_teq_t2 $de))
