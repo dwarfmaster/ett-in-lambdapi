@@ -127,6 +127,15 @@ with convertR $Γ $H (der_pair _ $s $s' $u $A $v $B _ $du1 $dB1 $dv1) (der_pair 
            (convert_T (projΓ2 $H) (inv_sort $dv2) (substitution $dB2 $du2)))
          (τ_substT_eq (projΓ1 $H) $dB1 $du1)
          (τ_substT_eq (projΓ2 $H) $dB2 $du2))
+with convertR $Γ $H (der_π1 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π1 _ $s $s' $p $A $B $dA2 $dB2 $dp2)
+  ↪ cong_proj1
+       (λ a, τ_T (TPush (projΓ1 $H) $s $A $dA1 a) $dB1)
+       (λ a, τ_T (TPush (projΓ2 $H) $s $A $dA2 a) $dB2)
+       (convertR $Γ $H $dA1 $dA2)
+       (λ p, convertR $Γ (PCPush $H $dA1 $dA2 (projHEq p)) $dB1 $dB2)
+       (heq_conj (convertR $Γ $H $dp1 $dp2)
+         (τ_sum_eq (projΓ1 $H) $dA1 $dB1 (inv_sort $dp1))
+         (τ_sum_eq (projΓ2 $H) $dA2 $dB2 (inv_sort $dp2)))
 
 // Type conversion
 with convertR $Γ $H (der_sort _ $s $dΓ) (der_type_conv _ _ _ _ _ $dX $deq)
