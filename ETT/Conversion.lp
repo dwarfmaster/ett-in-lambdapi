@@ -87,8 +87,17 @@ with convertR $Γ $H (der_prop_type_eq _ $s $A $u $v $dA1 $du1 $dv1) (der_prop_t
            (heq_of_transport (τ (projΓ2 $H) $dv2) (convert_T (projΓ2 $H) (inv_sort $dv2) $dA2))))
 
 // Structural rules
-//with convertR $Γ $T1 $T2 $H (der_var _ $id $dΓ1) (der_var _ $id $dΓ2)
-//  ↪
+with convertR _ $H (der_var _ $id $dΓ1) (der_var _ $id $dΓ2)
+  ↪ let shift ≔ der_shift $id (projΓX $H) (pgetA $id $H) (ETT.tsort (pgetS $id $H)) (ETT.snext (pgetS $id $H)) in
+     heq_trans
+       (heq_symm (heq_of_transport
+          (pgetShift1 $id $H)
+          (convert_T (projΓ1 $H) (shift (pgetD1 $id $H)) (shift (der_subΓ (projΓX $H) $id $dΓ1)))))
+       (heq_trans
+         (pgetHShift $id $H)
+         (heq_of_transport
+           (pgetShift2 $id $H)
+           (convert_T (projΓ2 $H) (shift (pgetD2 $id $H)) (shift (der_subΓ (projΓX $H) $id $dΓ2)))))
 
 // λ-calculus
 with convertR $Γ $H (der_abs _ $s $s' $A $t $B $dA1 _ $dt1) (der_abs _ $s $s' $A $t $B $dA2 _ $dt2)

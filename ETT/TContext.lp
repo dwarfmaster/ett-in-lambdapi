@@ -46,11 +46,13 @@ constant symbol PCPush
 // Necessary to keep confluence of the pgetS and pgetA
 rule τ_Γ (projΓ2 $P) ↪ τ_Γ (projΓ1 $P);
 
-// Implementation of proj1 and proj2
+// Implementation of projΓ*
+symbol projΓX {Γ : TContext} : PContext Γ → Context;
 rule projΓ1 (PCEmpty $Γ) ↪ $Γ
 with projΓ1 (@PCPush _ $s $A $P $dA1 _ $a1 _ _) ↪ TPush (projΓ1 $P) $s $A $dA1 $a1
 with projΓ2 (PCEmpty $Γ) ↪ $Γ
-with projΓ2 (@PCPush _ $s $A $P _ $dA2 _ $a2 _) ↪ TPush (projΓ2 $P) $s $A $dA2 $a2;
+with projΓ2 (@PCPush _ $s $A $P _ $dA2 _ $a2 _) ↪ TPush (projΓ2 $P) $s $A $dA2 $a2
+with projΓX $H ↪ τ_Γ (projΓ1 $H);
 
 symbol pgetS {Γ : TContext} : ETT.DBId → PContext Γ → ETT.Sort;
 rule pgetS $id $P ↪ tgetS $id (projΓ1 $P)
