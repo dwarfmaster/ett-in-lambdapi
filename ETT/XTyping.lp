@@ -77,12 +77,6 @@ with der : Context → Term → Term → Sort → TYPE ≔
 | der_refl :
   Π(Γ : Context), Π(s : Sort), Π(u A : Term),
   der Γ A (tsort s) (snext s) → der Γ u A s → der Γ (trefl A u) (teq A u u) s
-| der_funext :
-  Π(Γ : Context), Π(s s' : Sort), Π(f g A e B : Term),
-  der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
-  → der Γ f (tfun A B) (smax s s') → der Γ g (tfun A B) (smax s s')
-  → der Γ e (tfun A (teq B (tapp A B f (var db0)) (tapp A B g (var db0)))) (smax s s')
-  → der Γ (funext A B f g e) (teq (tfun A B) f g) (smax s s')
 
 with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
 
@@ -92,6 +86,11 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
   → der (Push A s Γ) t B s' → der Γ u A s
   → der_eq Γ s' (apply1 B u) (tapp A B (tabs A B t) u) (apply1 t u)
+| der_eq_eta :
+  Π(Γ : Context), Π(s s' : Sort), Π(A f B : Term),
+  der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
+  → der Γ f (tfun A B) (smax s s')
+  → der_eq Γ s' (tfun A B) (tabs A B (tapp A B f (var db0))) f
 | der_eq_π1 :
   Π(Γ : Context), Π(s s' : Sort), Π(u A v B : Term),
   der Γ A (tsort s) (snext s) → der Γ u A s → der (Push A s Γ) B (tsort s') (snext s') → der Γ v (apply1 B u) s'
@@ -216,12 +215,6 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   Π(Γ : Context), Π(s : Sort), Π(A A' u u' v v' : Term),
   der_eq Γ (snext s) (tsort s) A A' → der_eq Γ s A u u' → der_eq Γ s A v v'
   → der_eq Γ (snext s) (tsort s) (teq A u v) (teq A' u' v')
-| der_eq_ctx_funext :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' B B' f f' g g' e e' : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der_eq (Push A s Γ) (snext s') (tsort s') B B'
-  → der_eq Γ (smax s s') (tfun A B) f f' → der_eq Γ (smax s s') (tfun A B) g g'
-  → der_eq Γ (smax s s') (tfun A (teq B (tapp A B f (var db0)) (tapp A B g (var db0)))) e e'
-  → der_eq Γ (smax s s') (teq (tfun A B) f g) (funext A B f g e) (funext A' B' f' g' e')
 ;
 
 // Aliases

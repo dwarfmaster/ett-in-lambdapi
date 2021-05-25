@@ -72,12 +72,4 @@ inductive Term : TYPE ≔
   → Term
 | teq
   : Term // Type of the equality
-  → Term → Term → Term
-// Axioms
-| funext
-  : Term // Type of the argument
-  → Term // Type of the result
-  → Term // First function
-  → Term // Second function
-  → Term // Proof of equality point by point
-  → Term;
+  → Term → Term → Term;

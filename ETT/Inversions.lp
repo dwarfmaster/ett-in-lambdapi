@@ -37,8 +37,6 @@ with inv_sort (der_pair $Γ $s $s' _ $A _ $B _ $du $dB _) ↪ der_sigma $Γ $s $
 with inv_sort (der_π1 _ _ _ _ _ _ $dA _ _) ↪ $dA
 with inv_sort (der_π2 $Γ $s $s' $p $A $B $dA $dB $dp) ↪ substitution $dB (der_π1 $Γ $s $s' $p $A $B $dA $dB $dp)
 with inv_sort (der_refl $Γ $s $u $A $dA $du) ↪ der_prop_type_eq $Γ $s $A $u $u $dA $du $du
-with inv_sort (der_funext $Γ $s $s' $f $g $A _ $B $dA $dB $df $dg _)
-  ↪ der_prop_type_eq $Γ (smax $s $s') (tfun $A $B) $f $g (der_prod $Γ $s $s' $A $B $dA $dB) $df $dg
 ;
 
 // Definition of inv_eq*

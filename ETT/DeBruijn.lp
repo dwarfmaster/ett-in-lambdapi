@@ -36,9 +36,7 @@ with shift $i (π1 $A $B $p) ↪ π1 (shift $i $A) (shift (dbsucc $i) $B) (shift
 with shift $i (π2 $A $B $p) ↪ π2 (shift $i $A) (shift (dbsucc $i) $B) (shift $i $p)
 with shift $i (tsum $A $B) ↪ tsum (shift $i $A) (shift (dbsucc $i) $B)
 with shift $i (trefl $A $u) ↪ trefl (shift $i $A) (shift $i $u)
-with shift $i (teq $A $u $v) ↪ teq (shift $i $A) (shift $i $u) (shift $i $v)
-with shift $i (funext $A $B $f $g $ext) ↪ funext (shift $i $A) (shift (dbsucc $i) $B)
-                                                  (shift $i $f) (shift $i $g) (shift $i $ext);
+with shift $i (teq $A $u $v) ↪ teq (shift $i $A) (shift $i $u) (shift $i $v);
 symbol Shift : Term → Term ≔ shift db0;
 symbol ShiftN : DBId → Term → Term;
 rule ShiftN db0 $t ↪ Shift $t
@@ -64,8 +62,6 @@ with subst $i $V (π1 $A $B $p) ↪ π1 (subst $i $V $A) (subst (dbsucc $i) (Shi
 with subst $i $V (π2 $A $B $p) ↪ π2 (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B) (subst $i $V $p)
 with subst $i $V (tsum $A $B) ↪ tsum (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B)
 with subst $i $V (trefl $A $u) ↪ trefl (subst $i $V $A) (subst $i $V $u)
-with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst $i $V $v)
-with subst $i $V (funext $A $B $f $g $ext) ↪ funext (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B)
-                                                     (subst $i $V $f) (subst $i $V $g) (subst $i $V $ext);
+with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst $i $V $v);
 rule subst db0 _ (Shift $t) ↪ $t;
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
