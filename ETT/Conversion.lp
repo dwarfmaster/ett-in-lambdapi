@@ -180,8 +180,6 @@ with convertR $Γ $H (der_π2 _ $s $s' $p $A $B $dA $dB $dp) (der_type_conv _ _ 
   ↪ convertTypeConversion $Γ $H (der_π2 _ $s $s' $p $A $B $dA $dB $dp) $dX $deq
 with convertR $Γ $H (der_refl _ $s $u $A $dA $du) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_refl _ $s $u $A $dA $du) $dX $deq
-with convertR $Γ $H (der_uip _ $s $e1 $e2 $u $v $A $de1 $de2) (der_type_conv _ _ _ _ _ $dX $deq)
-  ↪ convertTypeConversion $Γ $H (der_uip _ $s $e1 $e2 $u $v $A $de1 $de2) $dX $deq
 with convertR $Γ $H (der_funext _ $s $s' $f $g $A $e $B $dA $dB $df $dg $de) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_funext _ $s $s' $f $g $A $e $B $dA $dB $df $dg $de) $dX $deq
 // Symmetric cases
@@ -207,8 +205,6 @@ with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_π2 _ $s $s' $p $A 
   ↪ convertTypeConversion' $Γ $H $dX (der_π2 _ $s $s' $p $A $B $dA $dB $dp) $deq
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_refl _ $s $u $A $dA $du)
   ↪ convertTypeConversion' $Γ $H $dX (der_refl _ $s $u $A $dA $du) $deq
-with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_uip _ $s $e1 $e2 $u $v $A $de1 $de2)
-  ↪ convertTypeConversion' $Γ $H $dX (der_uip _ $s $e1 $e2 $u $v $A $de1 $de2) $deq
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_funext _ $s $s' $f $g $A $e $B $dA $dB $df $dg $de)
   ↪ convertTypeConversion' $Γ $H $dX (der_funext _ $s $s' $f $g $A $e $B $dA $dB $df $dg $de) $deq
 ;

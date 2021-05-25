@@ -48,6 +48,8 @@ with τ $Γ (der_pair _ $s $s' _ $A _ _ _ $du $dB $dv)
 with τ $Γ (der_π1 _ $s $s' _ $A _ $dA $dB $dp)
   ↪ let pr ≔ τ_sum $Γ $dA $dB (inv_sort $dp) (τ $Γ $dp) in
      proj1 (τ_s $s) (τ_s $s') (τ_T $Γ $dA) (λ a, τ_T (TPush $Γ $s $A $dA a) $dB) pr
+
+// Equality
 with τ $Γ (der_refl _ $s _ _ $dA $du)
   ↪ let p ≔ convert_T $Γ (inv_sort $du) $dA in
      refl (τ_s $s) (τ_T $Γ $dA) (transport p (τ $Γ $du))

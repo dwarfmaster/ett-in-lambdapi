@@ -77,9 +77,6 @@ with der : Context → Term → Term → Sort → TYPE ≔
 | der_refl :
   Π(Γ : Context), Π(s : Sort), Π(u A : Term),
   der Γ A (tsort s) (snext s) → der Γ u A s → der Γ (trefl A u) (teq A u u) s
-| der_uip :
-  Π(Γ : Context), Π(s : Sort), Π(e1 e2 u v A : Term),
-  der Γ e1 (teq A u v) s → der Γ e2 (teq A u v) s → der Γ (uip A u v e1 e2) (teq (teq A u v) e1 e2) s
 | der_funext :
   Π(Γ : Context), Π(s s' : Sort), Π(f g A e B : Term),
   der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
@@ -225,11 +222,6 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   → der_eq Γ (smax s s') (tfun A B) f f' → der_eq Γ (smax s s') (tfun A B) g g'
   → der_eq Γ (smax s s') (tfun A (teq B (tapp A B f (var db0)) (tapp A B g (var db0)))) e e'
   → der_eq Γ (smax s s') (teq (tfun A B) f g) (funext A B f g e) (funext A' B' f' g' e')
-| der_eq_ctx_uip :
-  Π(Γ : Context), Π(s : Sort), Π(A A' u u' v v' e1 e1' e2 e2' : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der_eq Γ s A u u' → der_eq Γ s A v v'
-  → der_eq Γ s (teq A u v) e1 e1' → der_eq Γ s (teq A u v) e2 e2'
-  → der_eq Γ s (teq (teq A u v) e1 e2) (uip A u v e1 e2) (uip A' u' v' e1' e2')
 ;
 
 // Aliases

@@ -80,9 +80,4 @@ inductive Term : TYPE ≔
   → Term // First function
   → Term // Second function
   → Term // Proof of equality point by point
-  → Term
-| uip
-  : Term // Type
-  → Term → Term // The two terms
-  → Term → Term // The two equalities
   → Term;
