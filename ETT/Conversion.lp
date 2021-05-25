@@ -136,6 +136,18 @@ with convertR $Γ $H (der_π1 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π1 _ $s $s
        (heq_conj (convertR $Γ $H $dp1 $dp2)
          (τ_sum_eq (projΓ1 $H) $dA1 $dB1 (inv_sort $dp1))
          (τ_sum_eq (projΓ2 $H) $dA2 $dB2 (inv_sort $dp2)))
+with convertR $Γ $H (der_π2 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π2 _ $s $s' $p $A $B $dA2 $dB2 $dp2)
+  ↪ heq_conj
+       (cong_proj2
+         (λ a, τ_T (TPush (projΓ1 $H) $s $A $dA1 a) $dB1)
+         (λ a, τ_T (TPush (projΓ2 $H) $s $A $dA2 a) $dB2)
+         (convertR $Γ $H $dA1 $dA2)
+         (λ p, convertR $Γ (PCPush $H $dA1 $dA2 (projHEq p)) $dB1 $dB2)
+         (heq_conj (convertR $Γ $H $dp1 $dp2)
+           (τ_sum_eq (projΓ1 $H) $dA1 $dB1 (inv_sort $dp1))
+           (τ_sum_eq (projΓ2 $H) $dA2 $dB2 (inv_sort $dp2))))
+       (τ_substT_eq (projΓ1 $H) $dB1 (der_π1 (projΓX $H) $s $s' $p $A $B $dA1 $dB1 $dp1))
+       (τ_substT_eq (projΓ2 $H) $dB2 (der_π1 (projΓX $H) $s $s' $p $A $B $dA2 $dB2 $dp2))
 
 // Type conversion
 with convertR $Γ $H (der_sort _ $s $dΓ) (der_type_conv _ _ _ _ _ $dX $deq)
