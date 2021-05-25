@@ -16,7 +16,7 @@ symbol τ_shift_eq (Γ : TContext) {s s' : ETT.Sort} {T A : ETT.Term}
                   (a : ε _ (τ_T Γ dA)) :
   ε _ (eq _ (u (τ_s s))
       (τ_T Γ dT)
-      (τ_T (TPush Γ s' A dA a) (der_shift1 (Push A s' (τ_Γ Γ)) T (ETT.tsort s) (ETT.snext s) dT)));
+      (τ_T (TPush Γ s' A dA a) (der_shift0 (Push A s' (τ_Γ Γ)) dT)));
 symbol τ_shift (Γ : TContext) {s s' : ETT.Sort} {T A : ETT.Term}
                (dT : der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
                (dA : der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))

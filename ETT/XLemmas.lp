@@ -4,10 +4,11 @@ require open ETT.DeBruijn;
 require open ETT.XTyping;
 
 // Lemmas
-symbol der_shift1 (Γ : Context) (t T : Term) (s : Sort) (_ : der (getΓ Γ db0) t T s) : der Γ (Shift t) (Shift T) s;
+symbol der_shift0 (Γ : Context) {t T : Term} {s : Sort} (_ : der (getΓ Γ db0) t T s) : der Γ (Shift t) (Shift T) s;
+symbol der_shift1 {Γ : Context} {t A T : Term} (B : Term) {s sa : Sort} (sb : Sort) (_ : der (Push A sa Γ) t T s) : der (Push (Shift A) sa (Push B sb Γ)) (Shift1 t) (Shift1 T) s;
 symbol der_shift (id : DBId) (Γ : Context) (t T : Term) (s : Sort) (_ : der (getΓ Γ id) t T s) : der Γ (ShiftN id t) (ShiftN id T) s;
-rule der_shift db0 $Γ $t $T $s $d ↪ der_shift1 $Γ $t $T $s $d
-with der_shift (dbsucc $id) $Γ $t $T $s $d ↪ der_shift1 $Γ _ _ _ (der_shift $id _ $t $T $s $d);
+rule der_shift db0 $Γ $t $T $s $d ↪ @der_shift0 $Γ $t $T $s $d
+with der_shift (dbsucc $id) $Γ $t $T $s $d ↪ der_shift0 $Γ (der_shift $id _ $t $T $s $d);
 
 symbol der_eq_ctx (Γ : Context) (s s' : Sort) (c C t1 t2 T : Term)
                   (_ : der_eq Γ s T t1 t2) (_ : der (Push T s Γ) c C s')
