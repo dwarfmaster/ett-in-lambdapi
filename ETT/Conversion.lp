@@ -98,6 +98,8 @@ with convertR _ $H (der_var _ $id $dΓ1) (der_var _ $id $dΓ2)
          (heq_of_transport
            (pgetShift2 $id $H)
            (convert_T (projΓ2 $H) (shift (pgetD2 $id $H)) (shift (der_subΓ (projΓX $H) $id $dΓ2)))))
+with convertR $Γ $H (der_type_conv _ $u $A $B $s $du1 $deq1) (der_type_conv _ $u $A $B $s $du2 $deq2)
+  ↪ convertTypeConversion $Γ $H (der_type_conv _ $u $A $B $s $du1 $deq1) $du2 $deq2
 
 // λ-calculus
 with convertR $Γ $H (der_abs _ $s $s' $A $t $B $dA1 _ $dt1) (der_abs _ $s $s' $A $t $B $dA2 _ $dt2)
