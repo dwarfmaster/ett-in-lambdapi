@@ -194,23 +194,14 @@ with τ_eq $Γ (der_eq_π2 _ $s $s' $u $A $v $B _ $du $dB $dv)
                         (der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
                                 (der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv) $dB)))))))
 
-// TODO Conversion
-// rule τ_eq $Γ _ _ _ _ (ETT.der_eq_conversion _ $s $t1 $t2 $T1 $T2 $deq $deqT)
-//   ↪ mkHeq
-//        (τ_T $Γ _ _ (I.inv_eq_t2 _ _ _ _ _ $deqT))
-//        (τ_T $Γ _ _ (I.inv_eq_t2 _ _ _ _ _ $deqT))
-//        (τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $deq) $deqT))
-//        (τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $deq) $deqT))
-//        (ITT.trans_eq (ITT.trans_eq (ITT.inv_eq (τ_eqT $Γ _ _ _ $deqT)) (ITT.inv_eq (convert_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $deq)) (I.inv_eq_t1 _ _ _ _ _ $deqT))))
-//                      (ITT.trans_eq (getTeq _ _ _ _ (τ_eq $Γ _ _ _ _ $deq))
-//                                    (ITT.trans_eq (convert_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $deq)) (I.inv_eq_t1 _ _ _ _ _ $deqT)) (τ_eqT $Γ _ _ _ $deqT))))
-//        (magic _
-//          (ITT.eq _ (τ_T $Γ _ _ (I.inv_eq_t2 _ _ _ _ _ $deqT))
-//            (transport _ _ _ (ITT.trans_eq (ITT.trans_eq (ITT.inv_eq (τ_eqT $Γ _ _ _ $deqT)) (ITT.inv_eq (convert_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $deq)) (I.inv_eq_t1 _ _ _ _ _ $deqT))))
-//                                           (ITT.trans_eq (getTeq _ _ _ _ (τ_eq $Γ _ _ _ _ $deq))
-//                                                         (ITT.trans_eq (convert_T $Γ _ _ (I.inv_sort _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $deq)) (I.inv_eq_t1 _ _ _ _ _ $deqT)) (τ_eqT $Γ _ _ _ $deqT))))
-//               (τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ (I.inv_eq_t1 _ _ _ _ _ $deq) $deqT)))
-//            (τ $Γ _ _ _ (ETT.der_type_conv _ _ _ _ _ (I.inv_eq_t2 _ _ _ _ _ $deq) $deqT))))
+with τ_eq $Γ (der_eq_conversion _ _ _ _ _ _ $deq $deqT)
+  ↪ heq_conj
+       (heq_conj
+         (τ_eq $Γ $deq)
+         (convert_T $Γ (inv_sort (inv_eq_t1 $deq)) (inv_eq_t1 $deqT))
+         (convert_T $Γ (inv_sort (inv_eq_t2 $deq)) (inv_eq_t1 $deqT)))
+       (τ_eqT $Γ $deqT)
+       (τ_eqT $Γ $deqT)
 
 with τ_eq $Γ (der_eq_lift _ _ _ _ _ _ $de)
   ↪ let heq ≔ mkHeq (τ_T $Γ (inv_sort (inv_teq_t1 $de))) (τ_T $Γ (inv_teq_sort $de))
