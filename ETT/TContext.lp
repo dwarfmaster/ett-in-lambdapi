@@ -27,10 +27,10 @@ rule tget db0 (TPush _ _ _ _ $a) ↪ $a
 with tget (dbsucc $id) (TPush $t _ _ _ _) ↪ tget $id $t;
 symbol tgetShift (id : ETT.DBId) (Γ : TContext) : ε (τ_s (tgetS id Γ)) (tgetTShift id Γ);
 rule tgetShift db0 (TPush $Γ $s $A $dA $a)
-     ↪ @τ_shift $Γ $s $s $A $A
+     ↪ @τ_shift0T $Γ $s $s $A $A
           $dA $dA $a $a
 with tgetShift (dbsucc $id) (TPush $Γ $s $A $dA $a)
-  ↪ @τ_shift $Γ (tgetS $id $Γ) $s (ShiftN $id (tgetA $id $Γ)) $A
+  ↪ @τ_shift0T $Γ (tgetS $id $Γ) $s (ShiftN $id (tgetA $id $Γ)) $A
         (der_shift $id (τ_Γ $Γ) _ _ _ (tgetD $id $Γ))
         $dA $a (tgetShift $id $Γ);
 
@@ -95,14 +95,14 @@ with pgetH $id (PCEmpty $Γ) ↪ heq_refl _ (tget $id $Γ);
 symbol pgetHShift {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ) : H (pgetShift1 id HC) (pgetShift2 id HC);
 rule pgetHShift db0 (@PCPush _ $s $A $P $dA1 $dA2 $a1 $a2 $h)
    ↪ heq_conj $h
-        (@τ_shift_eq (projΓ1 $P) $s $s $A $A $dA1 $dA1 $a1)
-        (@τ_shift_eq (projΓ2 $P) $s $s $A $A $dA2 $dA2 $a2)
+        (@τ_shift0T_eq (projΓ1 $P) $s $s $A $A $dA1 $dA1 $a1)
+        (@τ_shift0T_eq (projΓ2 $P) $s $s $A $A $dA2 $dA2 $a2)
 with pgetHShift (dbsucc $id) (@PCPush _ $s $A $P $dA1 $dA2 $a1 $a2 _)
    ↪ heq_conj (pgetHShift $id $P)
-        (@τ_shift_eq (projΓ1 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
+        (@τ_shift0T_eq (projΓ1 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
             (der_shift $id (τ_Γ (projΓ1 $P)) _ _ _ (pgetD1 $id $P))
             $dA1 $a1)
-        (@τ_shift_eq (projΓ2 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
+        (@τ_shift0T_eq (projΓ2 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
             (der_shift $id (τ_Γ (projΓ2 $P)) _ _ _ (pgetD2 $id $P))
             $dA2 $a2)
 with pgetHShift $id (PCEmpty $Γ) ↪ heq_refl _ (tgetShift $id $Γ);
