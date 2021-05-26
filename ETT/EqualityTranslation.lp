@@ -227,54 +227,5 @@ with τ_eq $Γ (der_eq_symm _ _ _ _ _ $duv)
   ↪ heq_symm (τ_eq $Γ $duv)
 
 // Context
-// prod
-with τ_eq $Γ (der_eq_ctx_prod_domain _ $s $s' $A $A' $B $deqA $dB)
-  ↪ eq_to_heq (eq_prod
-            (λ a, τ_T (TPush $Γ $s $A  (inv_eq_t1 $deqA) a) $dB)
-            (λ a, τ_T (TPush $Γ $s $A' (inv_eq_t2 $deqA) a) (der_conv_in_ctx (τ_Γ $Γ) $s (ETT.snext $s') $A $A' $B (ETT.tsort $s') $deqA $dB))
-            (τ_eqT $Γ $deqA)
-            (λ a, τ_convT_in_ctx $Γ $deqA $dB a))
-with τ_eq $Γ (der_eq_ctx_prod_codomain _ $s _ $A _ _ $dA $deqB)
-  ↪ eq_to_heq (eq_prod
-            (λ a, τ_T (TPush $Γ $s $A $dA a) (inv_eq_t1 $deqB))
-            (λ a, τ_T (TPush $Γ $s $A $dA a) (inv_eq_t2 $deqB))
-            (refl (snext (τ_s $s)) (u (τ_s $s)) (τ_T $Γ $dA))
-            (λ a, τ_eqT (TPush $Γ $s $A $dA a) $deqB))
-// tabs
-with τ_eq $Γ (der_eq_ctx_tabs_domain _ $s $s' $A $A' $B $t $deqA $dB $dt)
-  ↪ magic (τ_eq_type $Γ (der_eq_ctx_tabs_domain (τ_Γ $Γ) $s $s' $A $A' $B $t $deqA $dB $dt))
-// with τ_eq $Γ (der_eq_ctx_tabs_codomain _ $s $s' $A $B $B' _ $dA $deqB $dt)
-//   ↪ heq_trans
-//        (heq_funext (τ_T $Γ $dA)
-//          (λ a, τ_T (TPush $Γ $s $A $dA a) (inv_eq_t1 $deqB))
-//          (λ a, τ_T (TPush $Γ $s $A $dA a) (inv_eq_t2 $deqB))
-//          (λ(a : ε _ (τ_T $Γ $dA)), transport (convert_T (TPush $Γ $s $A $dA a) (inv_sort $dt) (inv_eq_t1 $deqB)) (τ (TPush $Γ $s $A $dA a) $dt))
-//          (λ(a : ε _ (τ_T $Γ $dA)), transport (convert_T (TPush $Γ $s $A $dA a) (inv_eq_t2 $deqB) (inv_eq_t2 $deqB))
-//                                    (transport (τ_eqT (TPush $Γ $s $A $dA a) $deqB)
-//                                    (transport (convert_T (TPush $Γ $s $A $dA a) (inv_sort $dt) (inv_eq_t1 $deqB))
-//                                    (τ (TPush $Γ $s $A $dA a) $dt))))
-//          (λ a, heq_trans
-//            (heq_of_transport
-//              (transport (convert_T (TPush $Γ $s $A $dA a) (inv_sort $dt) (inv_eq_t1 $deqB)) (τ (TPush $Γ $s $A $dA a) $dt))
-//              (τ_eqT (TPush $Γ $s $A $dA a) $deqB))
-//            (heq_of_transport
-//              (transport (τ_eqT (TPush $Γ $s $A $dA a) $deqB)
-//                         (transport (convert_T (TPush $Γ $s $A $dA a) (inv_sort $dt) (inv_eq_t1 $deqB))
-//                                    (τ (TPush $Γ $s $A $dA a) $dt)))
-//              (convert_T (TPush $Γ $s $A $dA a) (inv_eq_t2 $deqB) (inv_eq_t2 $deqB)))))
-//        (heq_trans
-//          (heq_of_transport
-//            (λ(a : ε _ (τ_T $Γ $dA)), transport (convert_T (TPush $Γ $s $A $dA a) (inv_eq_t2 $deqB) (inv_eq_t2 $deqB))
-//                                      (transport (τ_eqT (TPush $Γ $s $A $dA a) $deqB)
-//                                      (transport (convert_T (TPush $Γ $s $A $dA a) (inv_sort $dt) (inv_eq_t1 $deqB))
-//                                      (τ (TPush $Γ $s $A $dA a) $dt))))
-//            (convert_T $Γ (der_prod (τ_Γ $Γ) $s $s' $A $B' $dA (inv_eq_t2 $deqB)) (der_prod (τ_Γ $Γ) $s $s' $A $B' $dA (inv_eq_t2 $deqB))))
-//          (heq_of_transport
-//            (transport (convert_T $Γ (der_prod (τ_Γ $Γ) $s $s' $A $B' $dA (inv_eq_t2 $deqB)) (der_prod (τ_Γ $Γ) $s $s' $A $B' $dA (inv_eq_t2 $deqB)))
-//              (λ(a : ε _ (τ_T $Γ $dA)), transport (convert_T (TPush $Γ $s $A $dA a) (inv_eq_t2 $deqB) (inv_eq_t2 $deqB))
-//                                        (transport (τ_eqT (TPush $Γ $s $A $dA a) $deqB)
-//                                        (transport (convert_T (TPush $Γ $s $A $dA a) (inv_sort $dt) (inv_eq_t1 $deqB))
-//                                        (τ (TPush $Γ $s $A $dA a) $dt)))))
-//            (τ_eqT $Γ (der_eq_symm (τ_Γ $Γ) (ETT.snext (ETT.smax $s $s')) (ETT.tfun $A $B) (ETT.tfun $A $B') (ETT.tsort (ETT.smax $s $s'))
-//                        (der_eq_ctx_prod_codomain (τ_Γ $Γ) $s $s' $A $B $B' $dA $deqB)))))
+// TODO
 ;

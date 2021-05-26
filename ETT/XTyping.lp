@@ -109,7 +109,7 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   Π(Γ : Context), Π(s : Sort), Π(e u v A : Term),
   der Γ e (teq A u v) s → der_eq Γ s A u v
 
-// Congruence
+// Structure
 | der_eq_refl :
   Π(Γ : Context), Π(s : Sort), Π(u A : Term), der Γ u A s → der_eq Γ s A u u
 | der_eq_trans :
@@ -119,104 +119,66 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   Π(Γ : Context), Π(s : Sort), Π(u v A : Term),
   der_eq Γ s A u v → der_eq Γ s A v u
 
-// Context
-// Prod
-| der_eq_ctx_prod_domain :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' B : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der (Push A s Γ) B (tsort s') (snext s')
-  → der_eq Γ (snext (smax s s')) (tsort (smax s s')) (tfun A B) (tfun A' B)
-| der_eq_ctx_prod_codomain :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B B' : Term),
-  der Γ A (tsort s) (snext s) → der_eq (Push A s Γ) (snext s') (tsort s') B B'
-  → der_eq Γ (snext (smax s s')) (tsort (smax s s')) (tfun A B) (tfun A B')
-// tabs
-| der_eq_ctx_tabs_domain :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' B t : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der (Push A s Γ) B (tsort s') (snext s')
-  → der (Push A s Γ) t B s'
-  → der_eq Γ (smax s s') (tfun A B) (tabs A B t) (tabs A' B t)
-| der_eq_ctx_tabs_codomain :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B B' t : Term),
-  der Γ A (tsort s) (snext s) → der_eq (Push A s Γ) (snext s') (tsort s') B B'
-  → der (Push A s Γ) t B s'
-  → der_eq Γ (smax s s') (tfun A B) (tabs A B t) (tabs A B' t)
-| der_eq_ctx_tabs_body :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B t t' : Term),
-  der Γ A (tsort s) (snext s) → der (Push A s Γ) B  (tsort s') (snext s')
-  → der_eq (Push A s Γ) s' B t t'
-  → der_eq Γ (smax s s') (tfun A B) (tabs A B t) (tabs A B t')
-// App
-| der_eq_ctx_app_domain :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' B f u : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der (Push A s Γ) B (tsort s') (snext s')
-  → der Γ f (tfun A B) (smax s s') → der Γ u A s
-  → der_eq Γ s' (apply1 B u) (tapp A B f u) (tapp A' B f u)
-| der_eq_ctx_app_codomain :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B B' f u : Term),
-  der Γ A (tsort s) (snext s) → der_eq (Push A s Γ) (snext s') (tsort s') B B'
-  → der Γ f (tfun A B) (smax s s') → der Γ u A s
-  → der_eq Γ s' (apply1 B u) (tapp A B f u) (tapp A B' f u)
-| der_eq_ctx_app_fun :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B f f' u : Term),
-  der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
-  → der_eq Γ (smax s s') (tfun A B) f f' → der Γ u A s
-  → der_eq Γ s' (apply1 B u) (tapp A B f u) (tapp A B f' u)
-| der_eq_ctx_app_arg :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B f u u' : Term),
-  der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
-  → der Γ f (tfun A B) (smax s s') → der_eq Γ s A u u'
-  → der_eq Γ s' (apply1 B u) (tapp A B f u) (tapp A B f u')
-// Sum
-| der_eq_ctx_sum1 :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' B : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der (Push A s Γ) B (tsort s') (snext s')
-  → der_eq Γ (snext (smax s s')) (tsort (smax s s')) (tsum A B) (tsum A' B)
-| der_eq_ctx_sum2 :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B B' : Term),
-  der Γ A (tsort s) (snext s) → der_eq (Push A s Γ) (snext s') (tsort s') B B'
-  → der_eq Γ (snext (smax s s')) (tsort (smax s s')) (tsum A B) (tsum A B')
-// Pair
-| der_eq_ctx_pair_t1 :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' B u v : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der (Push A s Γ) B (tsort s') (snext s')
-  → der Γ u A s → der Γ v (apply1 B u) s'
-  → der_eq Γ (smax s s') (tsum A B) (tpair A B u v) (tpair A' B u v)
-| der_eq_ctx_pair_t2 :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B B' u v : Term),
-  der Γ A (tsort s) (snext s) → der_eq (Push A s Γ) (snext s') (tsort s') B B'
-  → der Γ u A s → der Γ v (apply1 B u) s'
-  → der_eq Γ (smax s s') (tsum A B) (tpair A B u v) (tpair A B' u v)
-| der_eq_ctx_pair_π1 :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B u u' v : Term),
-  der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
-  → der_eq Γ s A u u' → der Γ v (apply1 B u) s'
-  → der_eq Γ (smax s s') (tsum A B) (tpair A B u v) (tpair A B u' v)
-| der_eq_ctx_pair_π2 :
-  Π(Γ : Context), Π(s s' : Sort), Π(A B u v v' : Term),
-  der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
-  → der Γ u A s → der_eq Γ s' (apply1 B u) v v'
-  → der_eq Γ (smax s s') (tsum A B) (tpair A B u v) (tpair A B u v')
-// Others
-| der_eq_ctx_π1 :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' B B' p p' : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der_eq (Push A s Γ) (snext s') (tsort s') B B'
-  → der_eq Γ (smax s s') (tsum A B) p p'
-  → der_eq Γ s A (π1 A B p) (π1 A' B' p')
-| der_eq_ctx_π2 :
-  Π(Γ : Context), Π(s s' : Sort), Π(A A' B B' p p' : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der_eq (Push A s Γ) (snext s') (tsort s') B B'
-  → der_eq Γ (smax s s') (tsum A B) p p'
-  → der_eq Γ s' (apply1 B (π1 A B p)) (π2 A B p) (π2 A' B' p')
-| der_eq_ctx_refl :
-  Π(Γ : Context), Π(s : Sort), Π(A A' u u' : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der_eq Γ s A u u'
-  → der_eq Γ s (teq A u u) (trefl A u) (trefl A' u')
-| der_eq_ctx_teq :
-  Π(Γ : Context), Π(s : Sort), Π(A A' u u' v v' : Term),
-  der_eq Γ (snext s) (tsort s) A A' → der_eq Γ s A u u' → der_eq Γ s A v v'
-  → der_eq Γ (snext s) (tsort s) (teq A u v) (teq A' u' v')
+// Congruence
+// Lambda calculus
+| der_eq_cong_tfun :
+  Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2
+  → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
+  → der_eq Γ (snext (smax s s')) (tsort (smax s s')) (tfun A1 B1) (tfun A2 B2)
+| der_eq_cong_tabs :
+  Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 t1 t2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2
+  → der_eq (Push A1 s Γ) s' B1 t1 t2
+  → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
+  → der (Push A1 s Γ) t1 B1 s' → der (Push A2 s Γ) t2 B2 s'
+  → der_eq Γ (smax s s') (tfun A1 B1) (tabs A1 B1 t1) (tabs A2 B2 t2)
+| der_eq_cong_tapp :
+  Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 f1 f2 a1 a2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2
+  → der_eq Γ (smax s s') (tfun A1 A2) f1 f2 → der_eq Γ s A1 a1 a2
+  → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
+  → der Γ f1 (tfun A1 B1) (smax s s') → der Γ f2 (tfun A2 B2) (smax s s')
+  → der Γ a1 A1 s → der Γ a2 A2 s
+  → der_eq Γ s' (apply1 B1 a1) (tapp A1 B1 f1 a1) (tapp A1 B2 f2 a2)
+// Pairs
+| der_eq_cong_tsum :
+  Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2
+  → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
+  → der_eq Γ (snext (smax s s')) (tsort (smax s s')) (tsum A1 B1) (tsum A2 B2)
+| der_eq_cong_tpair :
+  Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 a1 a2 b1 b2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2
+  → der_eq Γ s A1 a1 a2 → der_eq Γ s' (apply1 B1 a1) b1 b2
+  → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
+  → der Γ a1 A1 s → der Γ a2 A2 s
+  → der Γ b1 (apply1 B1 a1) s' → der Γ b2 (apply1 B2 a2) s'
+  → der_eq Γ (smax s s') (tsum A1 B1) (tpair A1 B1 a1 b1) (tpair A2 B2 a2 b2)
+| der_eq_cong_π1 :
+  Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 p1 p2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2
+  → der_eq Γ (smax s s') (tsum A1 B1) p1 p2
+  → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
+  → der Γ p1 (tsum A1 B1) (smax s s') → der Γ p2 (tsum A2 B2) (smax s s')
+  → der_eq Γ s A1 (π1 A1 B1 p1) (π1 A2 B2 p2)
+| der_eq_cong_π2 :
+  Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 p1 p2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2
+  → der_eq Γ (smax s s') (tsum A1 B1) p1 p2
+  → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
+  → der Γ p1 (tsum A1 B1) (smax s s') → der Γ p2 (tsum A2 B2) (smax s s')
+  → der_eq Γ s (apply1 B1 (π1 A1 B1 p1)) (π2 A1 B1 p1) (π2 A2 B2 p2)
+// Equality
+| der_eq_cong_teq :
+  Π(Γ : Context), Π(s : Sort), Π(A1 A2 a1 a2 b1 b2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq Γ s A1 a1 a2 → der_eq Γ s A1 b1 b2
+  → der Γ a1 A1 s → der Γ a2 A2 s
+  → der Γ b1 A1 s → der Γ b2 A2 s
+  → der_eq Γ (snext s) (tsort s) (teq A1 a1 b1) (teq A2 a2 b2)
+| der_eq_cong_trefl :
+  Π(Γ : Context), Π(s : Sort), Π(A1 A2 a1 a2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq Γ s A1 a1 a2
+  → der Γ a1 A1 s → der Γ a2 A2 s
+  → der_eq Γ s (teq A1 a1 a1) (trefl A1 a1) (trefl A2 a2)
 ;
-
-// Aliases
-symbol tarrow : Term → Term → Term
- ≔ λ A B, tfun A (Shift B);

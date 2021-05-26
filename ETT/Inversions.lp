@@ -72,7 +72,7 @@ with inv_eq_t2   (der_eq_conversion $Γ $s _ $t2 $T1 $T2 $deq $deqT) ↪ der_typ
 with inv_eq_sort (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_sort $de
 with inv_eq_t1   (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_t1   $de
 with inv_eq_t2   (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_t2   $de
-// Congruence
+// Structure
 with inv_eq_sort (der_eq_refl _ _ _ _ $du) ↪ inv_sort $du
 with inv_eq_t1   (der_eq_refl _ _ _ _ $du) ↪ $du
 with inv_eq_t2   (der_eq_refl _ _ _ _ $du) ↪ $du
@@ -82,41 +82,15 @@ with inv_eq_t2   (der_eq_trans _ _ _ _ _ _ _ $dvw) ↪ inv_eq_t2 $dvw
 with inv_eq_sort (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_sort $duv
 with inv_eq_t1   (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_t2 $duv
 with inv_eq_t2   (der_eq_symm _ _ _ _ _ $duv) ↪ inv_eq_t1 $duv
-// Context
-// prod
-with inv_eq_sort (der_eq_ctx_prod_domain $Γ $s $s' _  _   _  $deqA _  )
-  ↪ der_sort $Γ (smax $s $s') (inv_eq_context $deqA)
-with inv_eq_t1   (der_eq_ctx_prod_domain $Γ $s $s' $A _   $B $deqA $dB)
-  ↪ der_prod $Γ $s $s' $A $B (inv_eq_t1 $deqA) $dB
-with inv_eq_t2   (der_eq_ctx_prod_domain $Γ $s $s' $A $A' $B $deqA $dB)
-  ↪ der_prod $Γ $s $s' $A' $B (inv_eq_t2 $deqA)
-              (der_conv_in_ctx $Γ $s (snext $s') $A $A' $B (tsort $s') $deqA $dB)
-with inv_eq_sort (der_eq_ctx_prod_codomain $Γ $s $s' _  _  _   $dA _    )
-  ↪ der_sort $Γ (smax $s $s') (inv_context $dA)
-with inv_eq_t1   (der_eq_ctx_prod_codomain $Γ $s $s' $A $B _   $dA $deqB)
-  ↪ der_prod $Γ $s $s' $A $B  $dA (inv_eq_t1 $deqB)
-with inv_eq_t2   (der_eq_ctx_prod_codomain $Γ $s $s' $A _  $B' $dA $deqB)
-  ↪ der_prod $Γ $s $s' $A $B' $dA (inv_eq_t2 $deqB)
-// abs
-with inv_eq_sort (der_eq_ctx_tabs_domain $Γ $s $s' $A _   $B _  $deqA $dB _  )
-  ↪ der_prod $Γ $s $s' $A $B (inv_eq_t1 $deqA) $dB
-with inv_eq_t1   (der_eq_ctx_tabs_domain $Γ $s $s' $A _   $B $t $deqA $dB $dt)
-  ↪ der_abs $Γ $s $s' $A $t $B (inv_eq_t1 $deqA) $dB $dt
-with inv_eq_t2   (der_eq_ctx_tabs_domain $Γ $s $s' $A $A' $B $t $deqA $dB $dt)
-  ↪ der_type_conv $Γ (tabs $A' $B $t) (tfun $A' $B) (tfun $A $B) (smax $s $s')
-      (der_abs $Γ $s $s' $A' $t $B (inv_eq_t2 $deqA)
-             (der_conv_in_ctx $Γ $s (snext $s') $A $A' $B (tsort $s') $deqA $dB)
-             (der_conv_in_ctx $Γ $s $s' $A $A' $t $B $deqA $dt))
-      (der_eq_symm $Γ (snext (smax $s $s')) (tfun $A $B) (tfun $A' $B) (tsort (smax $s $s'))
-                   (der_eq_ctx_prod_domain $Γ $s $s' $A $A' $B $deqA $dB))
-with inv_eq_sort (der_eq_ctx_tabs_codomain $Γ $s $s' $A $B _   _  $dA $deqB _  )
-  ↪ der_prod $Γ $s $s' $A $B $dA (inv_eq_t1 $deqB)
-with inv_eq_t1   (der_eq_ctx_tabs_codomain $Γ $s $s' $A $B _   $t $dA $deqB $dt)
-  ↪ der_abs $Γ $s $s' $A $t $B $dA (inv_eq_t1 $deqB) $dt
-with inv_eq_t2   (der_eq_ctx_tabs_codomain $Γ $s $s' $A $B $B' $t $dA $deqB $dt)
-  ↪ der_type_conv $Γ (tabs $A $B' $t) (tfun $A $B') (tfun $A $B) (smax $s $s')
-      (der_abs $Γ $s $s' $A $t $B' $dA (inv_eq_t2 $deqB)
-        (der_type_conv (Push $A $s $Γ) $t $B $B' $s' $dt $deqB))
-      (der_eq_symm $Γ (snext (smax $s $s')) (tfun $A $B) (tfun $A $B') (tsort (smax $s $s'))
-                   (der_eq_ctx_prod_codomain $Γ $s $s' $A $B $B' $dA $deqB))
+// Congruence
+// Lambda-calculus
+with inv_eq_sort (der_eq_cong_tfun $Γ $s $s' _   _   _   _   $deqA _ _    _   ) ↪ der_sort $Γ (smax $s $s') (inv_eq_context $deqA)
+with inv_eq_t1   (der_eq_cong_tfun $Γ $s $s' $A1 _   $B1 _   $deqA _ $dB1 _   ) ↪ der_prod $Γ $s $s' $A1 $B1 (inv_eq_t1 $deqA) $dB1
+with inv_eq_t2   (der_eq_cong_tfun $Γ $s $s' _   $A2 _   $B2 $deqA _ _    $dB2) ↪ der_prod $Γ $s $s' $A2 $B2 (inv_eq_t2 $deqA) $dB2
+with inv_eq_sort (der_eq_cong_tabs $Γ $s $s' $A1 _   $B1 _   _   _   $deqA _     _ $dB1 _    _    _   ) ↪ der_prod $Γ $s $s' $A1 $B1 (inv_eq_t1 $deqA) $dB1
+with inv_eq_t1   (der_eq_cong_tabs $Γ $s $s' $A1 _   $B1 _   $t1 _   $deqA _     _ $dB1 _    $dt1 _   ) ↪ der_abs $Γ $s $s' $A1 $t1 $B1 (inv_eq_t1 $deqA) $dB1 $dt1
+with inv_eq_t2   (der_eq_cong_tabs $Γ $s $s' $A1 $A2 $B1 $B2 _   $t2 $deqA $deqB _ $dB1 $dB2 _    $dt2)
+   ↪ der_type_conv $Γ (tabs $A2 $B2 $t2) (tfun $A2 $B2) (tfun $A1 $B1) (smax $s $s')
+                    (der_abs $Γ $s $s' $A2 $t2 $B2 (inv_eq_t2 $deqA) $dB2 $dt2)
+                    (der_eq_symm _ _ _ _ _ (der_eq_cong_tfun $Γ $s $s' $A1 $A2 $B1 $B2 $deqA $deqB $dB1 $dB2))
 ;
