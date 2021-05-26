@@ -47,14 +47,6 @@ symbol lift_to_heq {s s' : Sort} {A : U s} {B : ε s A → U s'}
 symbol heq_to_eq {s : Sort} {T : U s} {t u : ε s T} : HEq s T T t u → ε s (eq s T t u);
 
 // Extend heterogeneous equality with transports to the left and to the right
-symbol heq_extend_R {s : Sort} {A B C : U s} (a : ε s A) (c : ε s C)
-                    (p : ε _ (eq _ (u s) C B))
-                    (_ : HEq s A B a (transport p c)) :
-                    HEq s A C a c;
-symbol heq_extend_L {s : Sort} {A B C : U s} (b : ε s B) (c : ε s C)
-                    (p : ε _ (eq _ (u s) B A))
-                    (_ : HEq s B C b c) :
-                    HEq s A C (transport p b) c;
 symbol heq_of_transport {s : Sort} {A B : U s} (a : ε s A)
                         (p : ε _ (eq _ (u s) A B)) :
                         HEq s A B a (transport p a) ≔
@@ -77,3 +69,13 @@ symbol heq_conj' {s : Sort} {A B C D : U s} {b : ε s B} {c : ε s C} (h : H b c
                  (pAB : ε _ (eq _ (u s) A B)) (pDC : ε _ (eq _ (u s) D C))
                  : H (transport (inv_eq pAB) b) (transport (inv_eq pDC) c) ≔
   heq_conj h (inv_eq pAB) (inv_eq pDC);
+symbol heq_extend_R {s : Sort} {A B C : U s} (a : ε s A) (c : ε s C)
+                    (p : ε _ (eq _ (u s) C B))
+                    (h : HEq s A B a (transport p c)) :
+                    HEq s A C a c ≔
+  heq_trans h (heq_symm (heq_of_transport c p));
+symbol heq_extend_L {s : Sort} {A B C : U s} (b : ε s B) (c : ε s C)
+                    (p : ε _ (eq _ (u s) B A))
+                    (h : HEq s B C b c) :
+                    HEq s A C (transport p b) c ≔
+  heq_trans (heq_symm (heq_of_transport b p)) h;
