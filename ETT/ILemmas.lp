@@ -32,3 +32,8 @@ symbol path_comp (s : Sort) (A B C : U s) (p1 : ε _ (eq (snext s) (u s) A B)) (
 symbol homotopy (s : Sort) (T U : U s) (p1 p2 : ε _ (eq _ (u s) T U)) (p : ε _ (eq _ (eq _ (u s) T U) p1 p2)) (t : ε _ T) :
   ε _ (eq s U (transport p1 t) (transport p2 t)) ≔
   lift_eq (λ (p : ε _ (eq _ (u s) T U)), transport p t) p1 p2 p;
+
+// Eta-reduction is propositionaly acceptable, due to funext
+symbol η_exp {s s' : Sort} {A : U s} {B : ε s A → U s'} (f : Π(a : ε s A), ε s' (B a))
+             : ε _ (eq (smax s s') (P s s' A B) f (λ a, f a)) ≔
+  funext s s' A B f (λ a, f a) (λ a, refl s' (B a) (f a));

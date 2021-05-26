@@ -90,7 +90,7 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   Π(Γ : Context), Π(s s' : Sort), Π(A f B : Term),
   der Γ A (tsort s) (snext s) → der (Push A s Γ) B (tsort s') (snext s')
   → der Γ f (tfun A B) (smax s s')
-  → der_eq Γ (smax s s') (tfun A B) (tabs A B (tapp (Shift A) (Shift1 B) (Shift f) (var db0))) f
+  → der_eq Γ (smax s s') (tfun A B) f (tabs A B (tapp (Shift A) (Shift1 B) (Shift f) (var db0)))
 | der_eq_π1 :
   Π(Γ : Context), Π(s s' : Sort), Π(u A v B : Term),
   der Γ A (tsort s) (snext s) → der Γ u A s → der (Push A s Γ) B (tsort s') (snext s') → der Γ v (apply1 B u) s'

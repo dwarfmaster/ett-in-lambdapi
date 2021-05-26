@@ -2,10 +2,12 @@
 require ETT.XAst as ETT;
 require open ETT.XTyping;
 require open ETT.XLemmas;
+require open ETT.DeBruijn;
 require open ETT.ITT;
 require open ETT.ILemmas;
 require open ETT.Inversions;
 require open ETT.HEq;
+require open ETT.Packing;
 require open ETT.TranslationDefinition;
 require open ETT.TranslationLemmas;
 require open ETT.Congruences;
@@ -38,6 +40,75 @@ rule τ_eq $Γ (der_eq_beta _ $s $s' _ $A $t $B _ _ $dt $du)
                   (τ $Γ (der_abs (τ_Γ $Γ) $s $s' $A $t $B (inv_sort $du) (inv_sort $dt) $dt))
                   (τ $Γ $du))
            (τ_substT_eq $Γ (inv_sort $dt) $du))))
+
+with τ_eq $Γ (der_eq_eta _ $s $s' $A $f $B $dA $dB $df)
+  ↪ heq_trans
+       (heq_of_transport (τ $Γ $df)
+         (τ_fun_eq $Γ $dA $dB (inv_sort $df)))
+       (cong_lambda
+         (λ a, τ_T (TPush $Γ $s $A $dA a) $dB)
+         (λ a, τ_T (TPush $Γ $s $A $dA a)
+                   (substitution (der_shift1 $A $s $dB)
+                                 (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))
+         (τ_fun $Γ $dA $dB (inv_sort $df) (τ $Γ $df))
+         (τ $Γ (inv_eq_t2 (der_eq_eta (τ_Γ $Γ) $s $s' $A $f $B $dA $dB $df)))
+         (heq_refl (u (τ_s $s)) (τ_T $Γ $dA))
+         (λ p, convertR $Γ (PCPush (PCEmpty $Γ) $dA $dA (projHEq p)) $dB
+                 (substitution (der_shift1 $A $s $dB) (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))
+
+         (λ p, heq_trans
+           (@cong_app _ _
+             (τ_T $Γ $dA)
+             (τ_T (TPush $Γ $s $A $dA (projT2 p)) (inv_sort (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))
+             (λ a, τ_T (TPush $Γ $s $A $dA a) $dB)
+             (λ a, τ_T (TPush (TPush $Γ $s $A $dA (projT2 p)) $s (Shift $A)
+                              (inv_sort (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))) a)
+                       (der_shift1 $A $s $dB))
+             (τ_fun $Γ $dA $dB (inv_sort $df) (τ $Γ $df))
+             (τ_fun (TPush $Γ $s $A $dA (projT2 p))
+                    (inv_sort (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df))))
+                    (der_shift1 $A $s $dB)
+                    (inv_sort (der_shift0 (Push $A $s (τ_Γ $Γ)) $df))
+                    (τ (TPush $Γ $s $A $dA (projT2 p)) (der_shift0 (Push $A $s (τ_Γ $Γ)) $df)))
+             (projT1 p)
+             (τ (TPush $Γ $s $A $dA (projT2 p)) (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df))))
+             (eq_to_heq (τ_shift0T_eq $Γ $dA $dA (projT2 p)))
+             (λ p', heq_trans
+               (eq_to_heq (τ_shift1T_eq $Γ $dB $dA $dA (projT1 p') (projT2 p)))
+               (convertR (TPush $Γ $s $A $dA (projT2 p))
+                         (PCPush (PCEmpty (TPush $Γ $s $A $dA (projT2 p)))
+                                 (der_shift0 (Push $A $s (τ_Γ $Γ)) $dA)
+                                 (inv_sort (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df))))
+                                 (heq_extend_L (projT1 p') (projT2 p')
+                                   (τ_shift0T_eq $Γ $dA $dA (projT2 p)) (projHEq p')))
+                         (der_shift1 $A $s $dB)
+                         (der_shift1 $A $s $dB)))
+             (heq_conj
+               (τ_shift0_eq $Γ $df $dA (projT2 p))
+               (τ_fun_eq $Γ $dA $dB (inv_sort $df))
+               (τ_fun_eq (TPush $Γ $s $A $dA (projT2 p))
+                                (inv_sort (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df))))
+                                (der_shift1 $A $s $dB)
+                                (inv_sort (der_shift0 (Push $A $s (τ_Γ $Γ)) $df))))
+             (heq_trans
+               (projHEq p)
+               (heq_trans
+                 (heq_of_transport (projT2 p)
+                   (τ_shift0T_eq $Γ $dA $dA (projT2 p)))
+                 (heq_of_transport (τ_shift0T $Γ $dA $dA (projT2 p) (projT2 p))
+                   (convert_T (TPush $Γ $s $A $dA (projT2 p))
+                              (der_shift db0 (Push $A $s (τ_Γ $Γ)) $A (ETT.tsort $s) (ETT.snext $s) $dA)
+                              (der_shift db0 (Push $A $s (τ_Γ $Γ)) $A (ETT.tsort $s) (ETT.snext $s)
+                                         (der_subΓ (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))))))
+           (heq_of_transport
+             (τ_fun (TPush $Γ $s $A $dA (projT2 p))
+                    (inv_sort (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df))))
+                    (der_shift1 $A $s $dB)
+                    (inv_sort (der_shift0 (Push $A $s (τ_Γ $Γ)) $df))
+                    (τ (TPush $Γ $s $A $dA (projT2 p)) (der_shift0 (Push $A $s (τ_Γ $Γ)) $df))
+                    (τ (TPush $Γ $s $A $dA (projT2 p)) (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))
+             (τ_substT_eq (TPush $Γ $s $A $dA (projT2 p)) (der_shift1 $A $s $dB)
+               (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))))
 
 with τ_eq $Γ (der_eq_π1 _ $s $s' $u $A $v $B _ $du $dB $dv)
   ↪ eq_to_heq (inv_eq
