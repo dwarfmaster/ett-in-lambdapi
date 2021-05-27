@@ -136,7 +136,7 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
 | der_eq_cong_tapp :
   Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 f1 f2 a1 a2 : Term),
   der_eq Γ (snext s) (tsort s) A1 A2 → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2
-  → der_eq Γ (smax s s') (tfun A1 A2) f1 f2 → der_eq Γ s A1 a1 a2
+  → der_eq Γ (smax s s') (tfun A1 B1) f1 f2 → der_eq Γ s A1 a1 a2
   → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
   → der Γ f1 (tfun A1 B1) (smax s s') → der Γ f2 (tfun A2 B2) (smax s s')
   → der Γ a1 A1 s → der Γ a2 A2 s
@@ -168,7 +168,7 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   → der_eq Γ (smax s s') (tsum A1 B1) p1 p2
   → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
   → der Γ p1 (tsum A1 B1) (smax s s') → der Γ p2 (tsum A2 B2) (smax s s')
-  → der_eq Γ s (apply1 B1 (π1 A1 B1 p1)) (π2 A1 B1 p1) (π2 A2 B2 p2)
+  → der_eq Γ s' (apply1 B1 (π1 A1 B1 p1)) (π2 A1 B1 p1) (π2 A2 B2 p2)
 // Equality
 | der_eq_cong_teq :
   Π(Γ : Context), Π(s : Sort), Π(A1 A2 a1 a2 b1 b2 : Term),

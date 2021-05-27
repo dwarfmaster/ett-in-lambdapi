@@ -99,4 +99,31 @@ with inv_eq_t2   (der_eq_cong_tapp $Γ $s $s' _   $A2 $B1 $B2 _   $f2 $a1 $a2 $d
    ↪ der_type_conv $Γ (tapp $A2 $B2 $f2 $a2) (apply1 $B2 $a2) (apply1 $B1 $a1) $s'
                     (der_app $Γ $s $s' $A2 $f2 $a2 $B2 (inv_eq_t2 $deqA) $dB2 $df2 $da2)
                     (der_eq_symm _ _ _ _ _ (der_eq_cong_apply $Γ $deqA $deqB $deqa $dB1 $dB2 $da1 $da2))
+// Pairs
+with inv_eq_sort (der_eq_cong_tsum $Γ $s $s' _   _   _   _   $deqA _ _    _   ) ↪ der_sort $Γ (smax $s $s') (inv_eq_context $deqA)
+with inv_eq_t1   (der_eq_cong_tsum $Γ $s $s' $A1 _   $B1 _   $deqA _ $dB1 _   ) ↪ der_sigma $Γ $s $s' $A1 $B1 (inv_eq_t1 $deqA) $dB1
+with inv_eq_t2   (der_eq_cong_tsum $Γ $s $s' _   $A2 _   $B2 $deqA _ _    $dB2) ↪ der_sigma $Γ $s $s' $A2 $B2 (inv_eq_t2 $deqA) $dB2
+with inv_eq_sort (der_eq_cong_tpair $Γ $s $s' $A1 _   $B1 _   _   _   _   _   $deqA _     _ _ $dB1 _    _    _    _    _   ) ↪ der_sigma $Γ $s $s' $A1 $B1 (inv_eq_t1 $deqA) $dB1
+with inv_eq_t1   (der_eq_cong_tpair $Γ $s $s' $A1 _   $B1 _   $a1 _   $b1 _   $deqA _     _ _ $dB1 _    $da1 _    $db1 _   ) ↪ der_pair $Γ $s $s' $a1 $A1 $b1 $B1 (inv_eq_t1 $deqA) $da1 $dB1 $db1
+with inv_eq_t2   (der_eq_cong_tpair $Γ $s $s' $A1 $A2 $B1 $B2 _   $a2 _   $b2 $deqA $deqB _ _ $dB1 $dB2 _    $da2 _    $db2)
+   ↪ der_type_conv $Γ (tpair $A2 $B2 $a2 $b2) (tsum $A2 $B2) (tsum $A1 $B1) (smax $s $s')
+                    (der_pair $Γ $s $s' $a2 $A2 $b2 $B2 (inv_eq_t2 $deqA) $da2 $dB2 $db2)
+                    (der_eq_symm _ _ _ _ _ (der_eq_cong_tsum $Γ $s $s' $A1 $A2 $B1 $B2 $deqA $deqB $dB1 $dB2))
+with inv_eq_sort (der_eq_cong_π1 _  _  _   _   _   _   _   _   _   $deqA _ _ _    _    _    _   ) ↪ inv_eq_t1 $deqA
+with inv_eq_t1   (der_eq_cong_π1 $Γ $s $s' $A1 _   $B1 _   $p1 _   $deqA _ _ $dB1 _    $dp1 _   ) ↪ der_π1 $Γ $s $s' $p1 $A1 $B1 (inv_eq_t1 $deqA) $dB1 $dp1
+with inv_eq_t2   (der_eq_cong_π1 $Γ $s $s' $A1 $A2 _   $B2 _   $p2 $deqA _ _ _    $dB2 _    $dp2)
+   ↪ der_type_conv $Γ (π1 $A2 $B2 $p2) $A2 $A1 $s
+                    (der_π1 $Γ $s $s' $p2 $A2 $B2 (inv_eq_t2 $deqA) $dB2 $dp2)
+                    (der_eq_symm _ _ _ _ _ $deqA)
+with inv_eq_sort (der_eq_cong_π2 $Γ $s $s' $A1 _   $B1 _   $p1 _   $deqA _     _     $dB1 _    $dp1 _   ) ↪ substitution $dB1 (der_π1 $Γ $s $s' $p1 $A1 $B1 (inv_eq_t1 $deqA) $dB1 $dp1)
+with inv_eq_t1   (der_eq_cong_π2 $Γ $s $s' $A1 _   $B1 _   $p1 _   $deqA _     _     $dB1 _    $dp1 _   ) ↪ der_π2 $Γ $s $s' $p1 $A1 $B1 (inv_eq_t1 $deqA) $dB1 $dp1
+with inv_eq_t2   (der_eq_cong_π2 $Γ $s $s' $A1 $A2 $B1 $B2 $p1 $p2 $deqA $deqB $deqp $dB1 $dB2 $dp1 $dp2)
+   ↪ der_type_conv $Γ (π2 $A2 $B2 $p2) (apply1 $B2 (π1 $A2 $B2 $p2)) (apply1 $B1 (π1 $A1 $B1 $p1)) $s'
+                    (der_π2 $Γ $s $s' $p2 $A2 $B2 (inv_eq_t2 $deqA) $dB2 $dp2)
+                    (der_eq_symm _ _ _ _ _
+                     (der_eq_cong_apply $Γ $deqA $deqB
+                      (der_eq_cong_π1 $Γ $s $s' $A1 $A2 $B1 $B2 $p1 $p2 $deqA $deqB $deqp $dB1 $dB2 $dp1 $dp2)
+                      $dB1 $dB2
+                      (der_π1 $Γ $s $s' $p1 $A1 $B1 (inv_eq_t1 $deqA) $dB1 $dp1)
+                      (der_π1 $Γ $s $s' $p2 $A2 $B2 (inv_eq_t2 $deqA) $dB2 $dp2)))
 ;
