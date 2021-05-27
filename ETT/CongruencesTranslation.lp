@@ -24,6 +24,7 @@ symbol heq_of_conversion (Γ : TContext) {s : ETT.Sort} {a A B : ETT.Term}
    (heq_of_transport (τ Γ da) (convert_T Γ (inv_sort da) (inv_eq_t1 deq)))
    (heq_of_transport (transport (convert_T Γ (inv_sort da) (inv_eq_t1 deq)) (τ Γ da)) (τ_eqT Γ deq));
 
+// Lambda calculus
 rule τ_eq $Γ (der_eq_cong_tfun _ $s _ $A1 $A2 _ _ $deqA $deqB $dB1 $dB2)
   ↪ cong_prod
        (λ a, τ (TPush $Γ $s $A1 (inv_eq_t1 $deqA) a) $dB1)
@@ -89,4 +90,16 @@ with τ_eq $Γ (der_eq_cong_tapp _ $s $s' $A1 $A2 _ $B2 _ $f2 _ $a2 $deqA $deqB 
        (heq_of_conversion $Γ
          (der_app (τ_Γ $Γ) $s $s' $A2 $f2 $a2 $B2 (inv_eq_t2 $deqA) $dB2 $df2 $da2)
          (der_eq_symm _ _ _ _ _ (der_eq_cong_apply (τ_Γ $Γ) $deqA $deqB $deqa $dB1 $dB2 $da1 $da2)))
+
+// Pairs
+with τ_eq $Γ (der_eq_cong_tsum _ $s _ $A1 $A2 _ _ $deqA $deqB $dB1 $dB2)
+  ↪ cong_sum
+       (λ a, τ (TPush $Γ $s $A1 (inv_eq_t1 $deqA) a) $dB1)
+       (λ a, τ (TPush $Γ $s $A2 (inv_eq_t2 $deqA) a) $dB2)
+       (τ_eq $Γ $deqA)
+       (λ p, heq_trans
+         (convert (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $dB1 (inv_eq_t1 $deqB))
+         (heq_trans
+           (τ_eq (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $deqB)
+           (convertR $Γ (PCPush (PCEmpty $Γ) (inv_eq_t1 $deqA) (inv_eq_t2 $deqA) (projHEq p)) (inv_eq_t2 $deqB) $dB2)))
 ;
