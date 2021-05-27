@@ -93,4 +93,10 @@ with inv_eq_t2   (der_eq_cong_tabs $Γ $s $s' $A1 $A2 $B1 $B2 _   $t2 $deqA $deq
    ↪ der_type_conv $Γ (tabs $A2 $B2 $t2) (tfun $A2 $B2) (tfun $A1 $B1) (smax $s $s')
                     (der_abs $Γ $s $s' $A2 $t2 $B2 (inv_eq_t2 $deqA) $dB2 $dt2)
                     (der_eq_symm _ _ _ _ _ (der_eq_cong_tfun $Γ $s $s' $A1 $A2 $B1 $B2 $deqA $deqB $dB1 $dB2))
+with inv_eq_sort (der_eq_cong_tapp _  _  _   _   _   _   _   _   _   _   _   _     _     _ _     $dB1 _    _    _    $da1 _   ) ↪ substitution $dB1 $da1
+with inv_eq_t1   (der_eq_cong_tapp $Γ $s $s' $A1 _   $B1 _   $f1 _   $a1 _   $deqA _     _ _     $dB1 _    $df1 _    $da1 _   ) ↪ der_app $Γ $s $s' $A1 $f1 $a1 $B1 (inv_eq_t1 $deqA) $dB1 $df1 $da1
+with inv_eq_t2   (der_eq_cong_tapp $Γ $s $s' _   $A2 $B1 $B2 _   $f2 $a1 $a2 $deqA $deqB _ $deqa $dB1 $dB2 _    $df2 $da1 $da2)
+   ↪ der_type_conv $Γ (tapp $A2 $B2 $f2 $a2) (apply1 $B2 $a2) (apply1 $B1 $a1) $s'
+                    (der_app $Γ $s $s' $A2 $f2 $a2 $B2 (inv_eq_t2 $deqA) $dB2 $df2 $da2)
+                    (der_eq_symm _ _ _ _ _ (der_eq_cong_apply $Γ $deqA $deqB $deqa $dB1 $dB2 $da1 $da2))
 ;

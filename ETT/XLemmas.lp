@@ -18,3 +18,9 @@ symbol der_conv_in_ctx (Γ : Context) (s s' : Sort) (A A' t B : Term)
                        (_ : der_eq Γ (snext s) (tsort s) A A') (_ : der (Push A s Γ) t B s')
                        : der (Push A' s Γ) t B s';
 
+symbol der_eq_cong_apply (Γ : Context) {s s' : Sort} {A1 A2 B1 B2 t1 t2 : Term}
+                         (_ : der_eq Γ (snext s) (tsort s) A1 A2) (_ : der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2)
+                         (_ : der_eq Γ s A1 t1 t2)
+                         (_ : der (Push A1 s Γ) B1 (tsort s') (snext s')) (_ : der (Push A2 s Γ) B2 (tsort s') (snext s'))
+                         (_ : der Γ t1 A1 s) (_ : der Γ t2 A2 s)
+                         : der_eq Γ (snext s') (tsort s') (apply1 B1 t1) (apply1 B2 t2);

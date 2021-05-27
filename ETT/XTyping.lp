@@ -140,7 +140,7 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   → der (Push A1 s Γ) B1 (tsort s') (snext s') → der (Push A2 s Γ) B2 (tsort s') (snext s')
   → der Γ f1 (tfun A1 B1) (smax s s') → der Γ f2 (tfun A2 B2) (smax s s')
   → der Γ a1 A1 s → der Γ a2 A2 s
-  → der_eq Γ s' (apply1 B1 a1) (tapp A1 B1 f1 a1) (tapp A1 B2 f2 a2)
+  → der_eq Γ s' (apply1 B1 a1) (tapp A1 B1 f1 a1) (tapp A2 B2 f2 a2)
 // Pairs
 | der_eq_cong_tsum :
   Π(Γ : Context), Π(s s' : Sort), Π(A1 A2 B1 B2 : Term),
