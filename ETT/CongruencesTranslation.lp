@@ -102,4 +102,38 @@ with τ_eq $Γ (der_eq_cong_tsum _ $s _ $A1 $A2 _ _ $deqA $deqB $dB1 $dB2)
          (heq_trans
            (τ_eq (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $deqB)
            (convertR $Γ (PCPush (PCEmpty $Γ) (inv_eq_t1 $deqA) (inv_eq_t2 $deqA) (projHEq p)) (inv_eq_t2 $deqB) $dB2)))
+with τ_eq $Γ (der_eq_cong_tpair _ $s $s' $A1 $A2 $B1 $B2 _ $a2 _ $b2 $deqA $deqB $deqa $deqb $dB1 $dB2 $da1 $da2 $db1 $db2)
+  ↪ heq_trans
+         (cong_pair
+           (λ a, τ (TPush $Γ $s $A1 (inv_sort $da1) a) $dB1)
+           (λ a, τ (TPush $Γ $s $A2 (inv_sort $da2) a) $dB2)
+           (heq_trans
+             (convert $Γ (inv_sort $da1) (inv_eq_t1 $deqA))
+             (heq_trans
+               (τ_eq $Γ $deqA)
+               (convert $Γ (inv_eq_t2 $deqA) (inv_sort $da2))))
+           (λ p, heq_trans
+             (convert (TPush $Γ $s $A1 (inv_sort $da1) (projT1 p)) $dB1 (inv_eq_t1 $deqB))
+             (heq_trans
+               (τ_eq (TPush $Γ $s $A1 (inv_sort $da1) (projT1 p)) $deqB)
+               (convertR $Γ (PCPush (PCEmpty $Γ) (inv_sort $da1) (inv_sort $da2) (projHEq p)) (inv_eq_t2 $deqB) $dB2)))
+           (heq_trans
+             (convert $Γ $da1 (inv_eq_t1 $deqa))
+             (heq_trans
+               (τ_eq $Γ $deqa)
+               (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqa) $da2)))
+           (heq_conj
+             (heq_conj
+               (heq_trans
+                 (convert $Γ $db1 (inv_eq_t1 $deqb))
+                 (heq_trans
+                   (τ_eq $Γ $deqb)
+                   (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqb) $db2)))
+               (convert_T $Γ (inv_sort $db1) (substitution $dB1 $da1))
+               (convert_T $Γ (inv_sort $db2) (substitution $dB2 $da2)))
+             (inv_eq (τ_substT_eq $Γ $dB1 $da1))
+             (inv_eq (τ_substT_eq $Γ $dB2 $da2))))
+         (heq_of_conversion $Γ
+           (der_pair (τ_Γ $Γ) $s $s' $a2 $A2 $b2 $B2 (inv_eq_t2 $deqA) $da2 $dB2 $db2)
+           (der_eq_symm _ _ _ _ _ (der_eq_cong_tsum (τ_Γ $Γ) $s $s' $A1 $A2 $B1 $B2 $deqA $deqB $dB1 $dB2)))
 ;
