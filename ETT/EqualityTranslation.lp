@@ -214,7 +214,7 @@ with τ_eq $Γ (der_eq_lift _ _ _ _ _ _ $de)
        (τ $Γ (inv_teq_t2 $de))
        (convert_T $Γ (inv_sort (inv_teq_t2 $de)) (inv_teq_sort $de)) heq
 
-// Congruence
+// Structural
 with τ_eq $Γ (der_eq_refl _ _ _ _ $du)
   ↪ heq_refl (τ_T $Γ (inv_sort $du)) (τ $Γ $du)
 with τ_eq $Γ (der_eq_trans _ _ _ _ _ _ $duv $dvw)
@@ -225,7 +225,4 @@ with τ_eq $Γ (der_eq_trans _ _ _ _ _ _ $duv $dvw)
        (τ_eq $Γ $dvw)
 with τ_eq $Γ (der_eq_symm _ _ _ _ _ $duv)
   ↪ heq_symm (τ_eq $Γ $duv)
-
-// Context
-// TODO
 ;
