@@ -37,38 +37,37 @@ with tgetShift (dbsucc $id) (TPush $Γ $s $A $dA $a)
 // Packed Context
 constant symbol PCEmpty (Γ : TContext) : PContext Γ;
 constant symbol PCPush
-  {Γ : TContext} {s : ETT.Sort} {A : ETT.Term} (P : PContext Γ)
-  (dA1 : der (τ_Γ (projΓ1 P)) A (ETT.tsort s) (ETT.snext s))
-  (dA2 : der (τ_Γ (projΓ2 P)) A (ETT.tsort s) (ETT.snext s))
+  {Γ : TContext} {s : ETT.Sort} {A1 A2 : ETT.Term} (P : PContext Γ)
+  (dA1 : der (τ_Γ (projΓ1 P)) A1 (ETT.tsort s) (ETT.snext s))
+  (dA2 : der (τ_Γ (projΓ2 P)) A2 (ETT.tsort s) (ETT.snext s))
   {a1 : ε (τ_s s) (τ_T (projΓ1 P) dA1)} {a2 : ε (τ_s s) (τ_T (projΓ2 P) dA2)}
   : H a1 a2 → PContext Γ;
 
-// Necessary to keep confluence of the pgetS and pgetA
-rule τ_Γ (projΓ2 $P) ↪ τ_Γ (projΓ1 $P);
+// Necessary to keep confluence of pgetS
+rule getS (τ_Γ (projΓ2 $P)) ↪ getS (τ_Γ (projΓ1 $P));
 
 // Implementation of projΓ*
-symbol projΓX {Γ : TContext} : PContext Γ → Context;
 rule projΓ1 (PCEmpty $Γ) ↪ $Γ
-with projΓ1 (@PCPush _ $s $A $P $dA1 _ $a1 _ _) ↪ TPush (projΓ1 $P) $s $A $dA1 $a1
+with projΓ1 (@PCPush _ $s $A1 _ $P $dA1 _ $a1 _ _) ↪ TPush (projΓ1 $P) $s $A1 $dA1 $a1
 with projΓ2 (PCEmpty $Γ) ↪ $Γ
-with projΓ2 (@PCPush _ $s $A $P _ $dA2 _ $a2 _) ↪ TPush (projΓ2 $P) $s $A $dA2 $a2
-with projΓX $H ↪ τ_Γ (projΓ1 $H);
+with projΓ2 (@PCPush _ $s _ $A2 $P _ $dA2 _ $a2 _) ↪ TPush (projΓ2 $P) $s $A2 $dA2 $a2;
 
 symbol pgetS {Γ : TContext} : ETT.DBId → PContext Γ → ETT.Sort;
 rule pgetS $id $P ↪ tgetS $id (projΓ1 $P)
 with pgetS $id $P ↪ tgetS $id (projΓ2 $P);
-symbol pgetA {Γ : TContext} : ETT.DBId → PContext Γ → ETT.Term;
-rule pgetA $id $P ↪ tgetA $id (projΓ1 $P)
-with pgetA $id $P ↪ tgetA $id (projΓ2 $P);
+symbol pgetA1 {Γ : TContext} : ETT.DBId → PContext Γ → ETT.Term;
+symbol pgetA2 {Γ : TContext} : ETT.DBId → PContext Γ → ETT.Term;
+rule pgetA1 $id $P ↪ tgetA $id (projΓ1 $P)
+with pgetA2 $id $P ↪ tgetA $id (projΓ2 $P);
 symbol pgetΓ1 {Γ : TContext} : ETT.DBId → PContext Γ → TContext;
 symbol pgetΓ2 {Γ : TContext} : ETT.DBId → PContext Γ → TContext;
 rule pgetΓ1 $id $P ↪ tgetΓ $id (projΓ1 $P)
 with pgetΓ2 $id $P ↪ tgetΓ $id (projΓ2 $P);
 
 symbol pgetD1 {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ)
-              : der (τ_Γ (pgetΓ1 id HC)) (pgetA id HC) (ETT.tsort (pgetS id HC)) (ETT.snext (pgetS id HC));
+              : der (τ_Γ (pgetΓ1 id HC)) (pgetA1 id HC) (ETT.tsort (pgetS id HC)) (ETT.snext (pgetS id HC));
 symbol pgetD2 {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ)
-              : der (τ_Γ (pgetΓ2 id HC)) (pgetA id HC) (ETT.tsort (pgetS id HC)) (ETT.snext (pgetS id HC));
+              : der (τ_Γ (pgetΓ2 id HC)) (pgetA2 id HC) (ETT.tsort (pgetS id HC)) (ETT.snext (pgetS id HC));
 rule pgetD1 $id $P ↪ tgetD $id (projΓ1 $P)
 with pgetD2 $id $P ↪ tgetD $id (projΓ2 $P);
 
@@ -93,16 +92,16 @@ with pgetH (dbsucc $id) (PCPush $P _ _ _) ↪ pgetH $id $P
 with pgetH $id (PCEmpty $Γ) ↪ heq_refl _ (tget $id $Γ);
 
 symbol pgetHShift {Γ : TContext} (id : ETT.DBId) (HC : PContext Γ) : H (pgetShift1 id HC) (pgetShift2 id HC);
-rule pgetHShift db0 (@PCPush _ $s $A $P $dA1 $dA2 $a1 $a2 $h)
+rule pgetHShift db0 (@PCPush _ $s $A1 $A2 $P $dA1 $dA2 $a1 $a2 $h)
    ↪ heq_conj $h
-        (@τ_shift0T_eq (projΓ1 $P) $s $s $A $A $dA1 $dA1 $a1)
-        (@τ_shift0T_eq (projΓ2 $P) $s $s $A $A $dA2 $dA2 $a2)
-with pgetHShift (dbsucc $id) (@PCPush _ $s $A $P $dA1 $dA2 $a1 $a2 _)
+        (@τ_shift0T_eq (projΓ1 $P) $s $s $A1 $A1 $dA1 $dA1 $a1)
+        (@τ_shift0T_eq (projΓ2 $P) $s $s $A2 $A2 $dA2 $dA2 $a2)
+with pgetHShift (dbsucc $id) (@PCPush _ $s $A1 $A2 $P $dA1 $dA2 $a1 $a2 _)
    ↪ heq_conj (pgetHShift $id $P)
-        (@τ_shift0T_eq (projΓ1 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
+        (@τ_shift0T_eq (projΓ1 $P) (pgetS $id $P) $s (ShiftN $id (pgetA1 $id $P)) $A1
             (der_shift $id (τ_Γ (projΓ1 $P)) _ _ _ (pgetD1 $id $P))
             $dA1 $a1)
-        (@τ_shift0T_eq (projΓ2 $P) (pgetS $id $P) $s (ShiftN $id (pgetA $id $P)) $A
+        (@τ_shift0T_eq (projΓ2 $P) (pgetS $id $P) $s (ShiftN $id (pgetA2 $id $P)) $A2
             (der_shift $id (τ_Γ (projΓ2 $P)) _ _ _ (pgetD2 $id $P))
             $dA2 $a2)
 with pgetHShift $id (PCEmpty $Γ) ↪ heq_refl _ (tgetShift $id $Γ);
