@@ -126,4 +126,14 @@ with inv_eq_t2   (der_eq_cong_π2 $Γ $s $s' $A1 $A2 $B1 $B2 $p1 $p2 $deqA $deqB
                       $dB1 $dB2
                       (der_π1 $Γ $s $s' $p1 $A1 $B1 (inv_eq_t1 $deqA) $dB1 $dp1)
                       (der_π1 $Γ $s $s' $p2 $A2 $B2 (inv_eq_t2 $deqA) $dB2 $dp2)))
+// Equalities
+with inv_eq_sort (der_eq_cong_teq $Γ $s _   _   _   _   _   _   $deqA _ _ _    _    _    _   ) ↪ der_sort $Γ $s (inv_eq_context $deqA)
+with inv_eq_t1   (der_eq_cong_teq $Γ $s $A1 _   $a1 _   $b1 _   $deqA _ _ $da1 _    $db1 _   ) ↪ der_prop_type_eq $Γ $s $A1 $a1 $b1 (inv_eq_t1 $deqA) $da1 $db1
+with inv_eq_t2   (der_eq_cong_teq $Γ $s _   $A2 _   $a2 _   $b2 $deqA _ _ _    $da2 _    $db2) ↪ der_prop_type_eq $Γ $s $A2 $a2 $b2 (inv_eq_t2 $deqA) $da2 $db2
+with inv_eq_sort (der_eq_cong_trefl $Γ $s $A1 _   $a1 _   $deqA _     $da1 _   ) ↪ der_prop_type_eq $Γ $s $A1 $a1 $a1 (inv_eq_t1 $deqA) $da1 $da1
+with inv_eq_t1   (der_eq_cong_trefl $Γ $s $A1 _   $a1 _   $deqA _     $da1 _   ) ↪ der_refl $Γ $s $a1 $A1 (inv_eq_t1 $deqA) $da1
+with inv_eq_t2   (der_eq_cong_trefl $Γ $s $A1 $A2 $a1 $a2 $deqA $deqa $da1 $da2)
+   ↪ der_type_conv $Γ (trefl $A2 $a2) (teq $A2 $a2 $a2) (teq $A1 $a1 $a1) $s
+                    (der_refl $Γ $s $a2 $A2 (inv_eq_t2 $deqA) $da2)
+                    (der_eq_symm _ _ _ _ _ (der_eq_cong_teq $Γ $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2))
 ;
