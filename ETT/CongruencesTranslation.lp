@@ -55,4 +55,38 @@ with τ_eq $Γ (der_eq_cong_tabs _ $s $s' $A1 $A2 $B1 $B2 _ $t2 $deqA $deqB $deq
        (heq_of_conversion $Γ
          (der_abs (τ_Γ $Γ) $s $s' $A2 $t2 $B2 (inv_eq_t2 $deqA) $dB2 $dt2)
          (der_eq_symm _ _ _ _ _ (der_eq_cong_tfun (τ_Γ $Γ) $s $s' $A1 $A2 $B1 $B2 $deqA $deqB $dB1 $dB2)))
+with τ_eq $Γ (der_eq_cong_tapp _ $s $s' $A1 $A2 _ $B2 _ $f2 _ $a2 $deqA $deqB $deqf $deqa $dB1 $dB2 $df1 $df2 $da1 $da2)
+  ↪ heq_trans
+       (heq_conj
+         (cong_app
+           (λ a, τ (TPush $Γ $s $A1 (inv_sort $da1) a) $dB1)
+           (λ a, τ (TPush $Γ $s $A2 (inv_sort $da2) a) $dB2)
+           (heq_trans
+             (convert $Γ (inv_sort $da1) (inv_eq_t1 $deqA))
+             (heq_trans
+               (τ_eq $Γ $deqA)
+               (convert $Γ (inv_eq_t2 $deqA) (inv_sort $da2))))
+           (λ p, heq_trans
+             (convert (TPush $Γ $s $A1 (inv_sort $da1) (projT1 p)) $dB1 (inv_eq_t1 $deqB))
+             (heq_trans
+               (τ_eq (TPush $Γ $s $A1 (inv_sort $da1) (projT1 p)) $deqB)
+               (convertR $Γ (PCPush (PCEmpty $Γ) (inv_sort $da1) (inv_sort $da2) (projHEq p)) (inv_eq_t2 $deqB) $dB2)))
+           (heq_conj
+             (heq_trans
+               (convert $Γ $df1 (inv_eq_t1 $deqf))
+               (heq_trans
+                 (τ_eq $Γ $deqf)
+                 (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqf) $df2)))
+             (τ_fun_eq $Γ (inv_sort $da1) $dB1 (inv_sort $df1))
+             (τ_fun_eq $Γ (inv_sort $da2) $dB2 (inv_sort $df2)))
+           (heq_trans
+             (convert $Γ $da1 (inv_eq_t1 $deqa))
+             (heq_trans
+               (τ_eq $Γ $deqa)
+               (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqa) $da2))))
+         (τ_substT_eq $Γ $dB1 $da1)
+         (τ_substT_eq $Γ $dB2 $da2))
+       (heq_of_conversion $Γ
+         (der_app (τ_Γ $Γ) $s $s' $A2 $f2 $a2 $B2 (inv_eq_t2 $deqA) $dB2 $df2 $da2)
+         (der_eq_symm _ _ _ _ _ (der_eq_cong_apply (τ_Γ $Γ) $deqA $deqB $deqa $dB1 $dB2 $da1 $da2)))
 ;
