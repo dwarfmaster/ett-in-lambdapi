@@ -18,6 +18,7 @@ Progress:
 [-] TranslationLemmas.lp
 [X] Translation.lp
 [X] Conversion.lp
+[X] EqualityTranslationLemmas.lp
 [X] EqualityTranslation.lp
 [X] CongruencesTranslation.lp
 [ ] main.lp
