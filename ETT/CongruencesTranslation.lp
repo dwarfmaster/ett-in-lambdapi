@@ -203,4 +203,19 @@ with τ_eq $Γ (der_eq_cong_teq _ _ _ _ _ _ _ _ $deqA $deqa $deqb $da1 $da2 $db1
              (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqb) $db2)))
          (convert_T $Γ (inv_sort $db1) (inv_eq_t1 $deqA))
          (convert_T $Γ (inv_sort $db2) (inv_eq_t2 $deqA)))
+with τ_eq $Γ (der_eq_cong_trefl _ $s $A1 $A2 $a1 $a2 $deqA $deqa $da1 $da2)
+  ↪ heq_trans
+       (cong_refl
+         (τ_eq $Γ $deqA)
+         (heq_conj
+           (heq_trans
+             (convert $Γ $da1 (inv_eq_t1 $deqa))
+             (heq_trans
+               (τ_eq $Γ $deqa)
+               (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqa) $da2)))
+           (convert_T $Γ (inv_sort $da1) (inv_eq_t1 $deqA))
+           (convert_T $Γ (inv_sort $da2) (inv_eq_t2 $deqA))))
+       (heq_of_conversion $Γ
+         (der_refl (τ_Γ $Γ) $s $a2 $A2 (inv_eq_t2 $deqA) $da2)
+         (der_eq_symm _ _ _ _ _ (der_eq_cong_teq (τ_Γ $Γ) $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2)))
 ;
