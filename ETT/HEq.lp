@@ -43,6 +43,7 @@ symbol lift_to_heq {s s' : Sort} {A : U s} {B : ε s A → U s'}
   J s _ A u (λ v _, HEq' s' (B u) (B v) (f u) (f v)) (heq_refl (B u) (f u)) v p;
 
 // Proved using uip
+// TODO heq_to_eq
 symbol heq_to_eq {s : Sort} {T : U s} {t u : ε s T} : HEq s T T t u → ε s (eq s T t u);
 
 // Extend heterogeneous equality with transports to the left and to the right
@@ -54,6 +55,7 @@ symbol eq_of_transport {s : Sort} {A : U s} (a : ε s A)
                        (p : ε _ (eq _ (u s) A A)) :
                        ε _ (eq s A a (transport p a)) ≔
   heq_to_eq (heq_of_transport a p);
+// TODO heq_funext
 symbol heq_funext {s s' : Sort} (A : U s) (B B' : ε s A → U s')
                   (f : ε _ (P s s' A B)) (g : ε _ (P s s' A B'))
                   (_ : Π a, HEq s' (B a) (B' a) (f a) (g a))

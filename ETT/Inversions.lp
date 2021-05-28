@@ -6,17 +6,23 @@ require open ETT.XLemmas;
 require ETT.ITT as ITT;
 
 // Lemmas
+// TODO substitution
 symbol substitution {Γ : Context} {s s' : Sort} {A B C : Term} :
   der (Push A s Γ) C B s' → Π{u : Term}, der Γ u A s → der Γ (apply1 C u) (apply1 B u) s';
+// TODO inv_context
 symbol inv_context {Γ : Context} {s : Sort} {t T : Term} : der Γ t T s → der_context Γ;
+// TODO inv_eq_context
 symbol inv_eq_context {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der_context Γ;
 symbol inv_sort {Γ : Context} {s : Sort} {t T : Term} : der Γ t T s → der Γ T (tsort s) (snext s);
 symbol inv_eq_sort {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der Γ T (tsort s) (snext s);
 symbol inv_eq_t2   {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der Γ t2 T s;
 symbol inv_eq_t1   {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der Γ t1 T s;
 
+// TODO inv_teq_sort
 symbol inv_teq_sort {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq T t1 t2) s → der Γ T (tsort s) (snext s);
+// TODO inv_teq_t1
 symbol inv_teq_t1   {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq T t1 t2) s → der Γ t1 T s;
+// TODO inv_teq_t2
 symbol inv_teq_t2   {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq T t1 t2) s → der Γ t2 T s;
 
 // Helpers
@@ -29,6 +35,7 @@ symbol pushΓ {Γ : Context} {s : Sort} {T : Term} (d : der Γ T (tsort s) (snex
 
 
 // Definition of inv_sort
+// TODO finish inv_sort
 rule inv_sort (der_var $Γ $id $dΓ) ↪ der_shift $id $Γ _ _ _ (der_subΓ _ $id $dΓ)
 with inv_sort (der_type_conv _ _ _ _ _ _ $deq) ↪ inv_eq_t2 $deq
 with inv_sort (der_abs $Γ $s $s' $A _ $B $dA _ $dt) ↪ der_prod $Γ $s $s' $A $B $dA (inv_sort $dt)
