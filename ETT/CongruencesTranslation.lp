@@ -14,8 +14,6 @@ require open ETT.Congruences;
 require open ETT.TContext;
 require open ETT.Translation;
 
-symbol magic {s : Sort} (A : U s) : ε s A;
-
 // Helper
 symbol heq_of_conversion (Γ : TContext) {s : ETT.Sort} {a A B : ETT.Term}
                          (da : der (τ_Γ Γ) a A s) (deq : der_eq (τ_Γ Γ) (ETT.snext s) (ETT.tsort s) A B)
@@ -136,14 +134,17 @@ with τ_eq $Γ (der_eq_cong_tpair _ $s $s' $A1 $A2 $B1 $B2 _ $a2 _ $b2 $deqA $de
          (heq_of_conversion $Γ
            (der_pair (τ_Γ $Γ) $s $s' $a2 $A2 $b2 $B2 (inv_eq_t2 $deqA) $da2 $dB2 $db2)
            (der_eq_symm _ _ _ _ _ (der_eq_cong_tsum (τ_Γ $Γ) $s $s' $A1 $A2 $B1 $B2 $deqA $deqB $dB1 $dB2)))
-with τ_eq $Γ (der_eq_cong_π1 _ $s $s' $A1 $A2 _ $B2 _ $p2 $deqA _ $deqp $dB1 $dB2 $dp1 $dp2)
+with τ_eq $Γ (der_eq_cong_π1 _ $s $s' $A1 $A2 _ $B2 _ $p2 $deqA $deqB $deqp $dB1 $dB2 $dp1 $dp2)
   ↪ heq_trans
        (cong_proj1
          (λ a, τ (TPush $Γ $s $A1 (inv_eq_t1 $deqA) a) $dB1)
          (λ a, τ (TPush $Γ $s $A2 (inv_eq_t2 $deqA) a) $dB2)
          (τ_eq $Γ $deqA)
-         (λ p, magic (H' (τ (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $dB1)
-                         (τ (TPush $Γ $s $A2 (inv_eq_t2 $deqA) (projT2 p)) $dB2)))
+         (λ p, heq_trans
+           (convert (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $dB1 (inv_eq_t1 $deqB))
+           (heq_trans
+             (τ_eq (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $deqB)
+             (convertR $Γ (PCPush (PCEmpty $Γ) (inv_eq_t1 $deqA) (inv_eq_t2 $deqA) (projHEq p)) (inv_eq_t2 $deqB) $dB2)))
          (heq_conj
            (heq_trans
              (convert $Γ $dp1 (inv_eq_t1 $deqp))
@@ -162,8 +163,11 @@ with τ_eq $Γ (der_eq_cong_π2 _ $s $s' $A1 $A2 $B1 $B2 $p1 $p2 $deqA $deqB $de
            (λ a, τ (TPush $Γ $s $A1 (inv_eq_t1 $deqA) a) $dB1)
            (λ a, τ (TPush $Γ $s $A2 (inv_eq_t2 $deqA) a) $dB2)
            (τ_eq $Γ $deqA)
-           (λ p, magic (H' (τ (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $dB1)
-                           (τ (TPush $Γ $s $A2 (inv_eq_t2 $deqA) (projT2 p)) $dB2)))
+           (λ p, heq_trans
+             (convert (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $dB1 (inv_eq_t1 $deqB))
+             (heq_trans
+               (τ_eq (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $deqB)
+               (convertR $Γ (PCPush (PCEmpty $Γ) (inv_eq_t1 $deqA) (inv_eq_t2 $deqA) (projHEq p)) (inv_eq_t2 $deqB) $dB2)))
            (heq_conj
              (heq_trans
                (convert $Γ $dp1 (inv_eq_t1 $deqp))
