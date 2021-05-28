@@ -62,7 +62,6 @@ protected constant symbol ShiftContext : Context → DBId → TYPE;
 protected symbol sc_to_ctx {Γ : Context} {id : DBId} : ShiftContext Γ id → Context;
 protected symbol sc_to_sctx {Γ : Context} {id : DBId} {s : Sort} {A : Term} : der Γ A (tsort s) (snext s) → ShiftContext Γ id → Context;
 protected symbol sc_to_dctx {Γ : Context} {id : DBId} (sc : ShiftContext Γ id) : der_context (sc_to_ctx sc);
-// TODO sc_to_dsctx
 protected symbol sc_to_dsctx {Γ : Context} {id : DBId} {s : Sort} {A : Term} (dA : der Γ A (tsort s) (snext s)) (sc : ShiftContext Γ id) : der_context (sc_to_sctx dA sc);
 protected constant symbol SC0 {Γ : Context} : der_context Γ → ShiftContext Γ db0;
 protected constant symbol SCSucc {Γ : Context} {s : Sort} {A : Term} {id : DBId} (sc : ShiftContext Γ id) : der (sc_to_ctx sc) A (tsort s) (snext s) → ShiftContext Γ (dbsucc id);
@@ -77,6 +76,10 @@ protected symbol der_shift_n {Γ : Context} {sa s : Sort} {A t T : Term} (id : D
                            (sc : ShiftContext Γ id) (dA : der Γ A (tsort sa) (snext sa))
                            (d : der (sc_to_ctx sc) t T s)
                            : der (sc_to_sctx dA sc) (shift id t) (shift id T) s;
+
+rule sc_to_dsctx $d (SC0 $dΓ) ↪ der_context_push _ _ _ $d $dΓ
+with sc_to_dsctx $d (SCSucc $sc $dA) ↪ der_context_push _ _ _ (der_shift_n _ $sc $d $dA) (sc_to_dsctx $d $sc);
+
 rule der_shift_n _   $sc $d (der_sort _ $s _) ↪ der_sort _ $s (sc_to_dsctx $d $sc)
 with der_shift_n $id $sc $d (der_prod _ $s $s' $A $B $dA $dB) ↪ der_prod _ $s $s' (shift $id $A) (shift (dbsucc $id) $B)
                                                                           (der_shift_n $id $sc $d $dA)
