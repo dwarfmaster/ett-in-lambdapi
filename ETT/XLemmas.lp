@@ -4,10 +4,39 @@ require open ETT.DeBruijn;
 require open ETT.XTyping;
 
 // Access context
-// TODO inv_context
 symbol inv_context {Γ : Context} {s : Sort} {t T : Term} : der Γ t T s → der_context Γ;
-// TODO inv_eq_context
 symbol inv_eq_context {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der_context Γ;
+
+rule inv_context (der_sort _ _ $dΓ) ↪ $dΓ
+with inv_context (der_prod _ _ _ _ _ $dA _) ↪ inv_context $dA
+with inv_context (der_sigma _ _ _ _ _ $dA _) ↪ inv_context $dA
+with inv_context (der_prop_type_eq _ _ _ _ _ $dA _ _) ↪ inv_context $dA
+with inv_context (der_var _ _ $dΓ) ↪ $dΓ
+with inv_context (der_abs _ _ _ _ _ _ $dA _ _) ↪ inv_context $dA
+with inv_context (der_app _ _ _ _ _ _ _ $dA _ _ _) ↪ inv_context $dA
+with inv_context (der_pair _ _ _ _ _ _ _ $dA _ _ _) ↪ inv_context $dA
+with inv_context (der_π1 _ _ _ _ _ _ $dA _ _) ↪ inv_context $dA
+with inv_context (der_π2 _ _ _ _ _ _ $dA _ _) ↪ inv_context $dA
+with inv_context (der_refl _ _ _ _ $dA _) ↪ inv_context $dA
+with inv_eq_context (der_eq_beta _ _ _ _ _ _ _ $dA _ _ _) ↪ inv_context $dA
+with inv_eq_context (der_eq_eta _ _ _ _ _ _ $dA _ _) ↪ inv_context $dA
+with inv_eq_context (der_eq_π1 _ _ _ _ _ _ _ $dA _ _ _) ↪ inv_context $dA
+with inv_eq_context (der_eq_π2 _ _ _ _ _ _ _ $dA _ _ _) ↪ inv_context $dA
+with inv_eq_context (der_eq_conversion _ _ _ _ _ _ $deq _) ↪ inv_eq_context $deq
+with inv_eq_context (der_eq_lift _ _ _ _ _ _ $d) ↪ inv_context $d
+with inv_eq_context (der_eq_refl _ _ _ _ $du) ↪ inv_context $du
+with inv_eq_context (der_eq_trans _ _ _ _ _ _ $duv _) ↪ inv_eq_context $duv
+with inv_eq_context (der_eq_symm _ _ _ _ _ $d) ↪ inv_eq_context $d
+with inv_eq_context (der_eq_cong_tfun _ _ _ _ _ _ _ $deqA _ _ _) ↪ inv_eq_context $deqA
+with inv_eq_context (der_eq_cong_tabs _ _ _ _ _ _ _ _ _ $deqA _ _ _ _ _ _) ↪ inv_eq_context $deqA
+with inv_eq_context (der_eq_cong_tapp _ _ _ _ _ _ _ _ _ _ _ $deqA _ _ _ _ _ _ _ _ _) ↪ inv_eq_context $deqA
+with inv_eq_context (der_eq_cong_tsum _ _ _ _ _ _ _ $deqA _ _ _) ↪ inv_eq_context $deqA
+with inv_eq_context (der_eq_cong_tpair _ _ _ _ _ _ _ _ _ _ _ $deqA _ _ _ _ _ _ _ _ _) ↪ inv_eq_context $deqA
+with inv_eq_context (der_eq_cong_π1 _ _ _ _ _ _ _ _ _ $deqA _ _ _ _ _ _) ↪ inv_eq_context $deqA
+with inv_eq_context (der_eq_cong_π2 _ _ _ _ _ _ _ _ _ $deqA _ _ _ _ _ _) ↪ inv_eq_context $deqA
+with inv_eq_context (der_eq_cong_teq _ _ _ _ _ _ _ _ $deqA _ _ _ _ _ _) ↪ inv_eq_context $deqA
+with inv_eq_context (der_eq_cong_trefl _ _ _ _ _ _ $deqA _ _ _) ↪ inv_eq_context $deqA
+;
 
 // der_context accessors
 symbol der_getΓ {Γ : Context} (id : DBId) (_ : der_context Γ) : der (getΓ Γ id) (get Γ id) (tsort (getS Γ id)) (snext (getS Γ id));
