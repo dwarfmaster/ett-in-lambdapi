@@ -136,4 +136,23 @@ with τ_eq $Γ (der_eq_cong_tpair _ $s $s' $A1 $A2 $B1 $B2 _ $a2 _ $b2 $deqA $de
          (heq_of_conversion $Γ
            (der_pair (τ_Γ $Γ) $s $s' $a2 $A2 $b2 $B2 (inv_eq_t2 $deqA) $da2 $dB2 $db2)
            (der_eq_symm _ _ _ _ _ (der_eq_cong_tsum (τ_Γ $Γ) $s $s' $A1 $A2 $B1 $B2 $deqA $deqB $dB1 $dB2)))
+with τ_eq $Γ (der_eq_cong_π1 _ $s $s' $A1 $A2 _ $B2 _ $p2 $deqA _ $deqp $dB1 $dB2 $dp1 $dp2)
+  ↪ heq_trans
+       (cong_proj1
+         (λ a, τ (TPush $Γ $s $A1 (inv_eq_t1 $deqA) a) $dB1)
+         (λ a, τ (TPush $Γ $s $A2 (inv_eq_t2 $deqA) a) $dB2)
+         (τ_eq $Γ $deqA)
+         (λ p, magic (H' (τ (TPush $Γ $s $A1 (inv_eq_t1 $deqA) (projT1 p)) $dB1)
+                         (τ (TPush $Γ $s $A2 (inv_eq_t2 $deqA) (projT2 p)) $dB2)))
+         (heq_conj
+           (heq_trans
+             (convert $Γ $dp1 (inv_eq_t1 $deqp))
+             (heq_trans
+               (τ_eq $Γ $deqp)
+               (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqp) $dp2)))
+           (τ_sum_eq $Γ (inv_eq_t1 $deqA) $dB1 (inv_sort $dp1))
+           (τ_sum_eq $Γ (inv_eq_t2 $deqA) $dB2 (inv_sort $dp2))))
+       (heq_of_conversion $Γ
+         (der_π1 (τ_Γ $Γ) $s $s' $p2 $A2 $B2 (inv_eq_t2 $deqA) $dB2 $dp2)
+         (der_eq_symm _ _ _ _ _ $deqA))
 ;
