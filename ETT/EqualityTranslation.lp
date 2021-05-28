@@ -13,6 +13,7 @@ require open ETT.TranslationLemmas;
 require open ETT.Congruences;
 require open ETT.TContext;
 require open ETT.Translation;
+require open ETT.EqualityTranslationLemmas;
 
 // Computation
 rule τ_eq $Γ (der_eq_beta _ $s $s' _ $A $t $B _ _ $dt $du)
@@ -169,27 +170,16 @@ with τ_eq $Γ (der_eq_π2 _ $s $s' $u $A $v $B _ $du $dB $dv)
                  (der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (inv_sort $du) $dB
                          (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv))))
              // Type conversion
-             (heq_trans
-               (heq_of_transport
-                 (τ $Γ (der_π2 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (inv_sort $du) $dB
-                          (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)))
-                 (convert_T $Γ
-                   (substitution $dB (der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (inv_sort $du) $dB
-                                       (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)))
-                   (inv_eq_t1 (der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
-                                 (der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv) $dB))))
-               (heq_of_transport
-                 (transport
-                   (convert_T $Γ
-                     (substitution $dB (der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (inv_sort $du) $dB
-                                         (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)))
-                     (inv_eq_t1 (der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
-                                   (der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv) $dB)))
-                   (τ $Γ (der_π2 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (inv_sort $du) $dB
-                                 (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv))))
-                 (τ_eqT $Γ
-                        (der_eq_ctx (τ_Γ $Γ) $s (ETT.snext $s') $B (ETT.tsort $s') (ETT.π1 $A $B (ETT.tpair $A $B $u $v)) $u $A
-                                (der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv) $dB)))))))
+             (heq_of_conversion $Γ
+               (der_π2 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (inv_sort $du) $dB
+                 (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv))
+               (der_eq_cong_apply (τ_Γ $Γ)
+                 (der_eq_refl (τ_Γ $Γ) (ETT.snext $s) $A (ETT.tsort $s) (inv_sort $du))
+                 (der_eq_refl (Push $A $s (τ_Γ $Γ)) (ETT.snext $s') $B (ETT.tsort $s') $dB)
+                 (der_eq_π1 (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)
+                 $dB $dB
+                 (der_π1 (τ_Γ $Γ) $s $s' (ETT.tpair $A $B $u $v) $A $B (inv_sort $du) $dB
+                   (der_pair (τ_Γ $Γ) $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)) $du)))))
 
 with τ_eq $Γ (der_eq_conversion _ _ _ _ _ _ $deq $deqT)
   ↪ heq_conj

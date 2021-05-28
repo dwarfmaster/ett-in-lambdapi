@@ -12,11 +12,6 @@ symbol der_shift (id : DBId) (Γ : Context) (t T : Term) (s : Sort) (_ : der (ge
 rule der_shift db0 $Γ $t $T $s $d ↪ @der_shift0 $Γ $t $T $s $d
 with der_shift (dbsucc $id) $Γ $t $T $s $d ↪ der_shift0 $Γ (der_shift $id _ $t $T $s $d);
 
-// TODO remove der_eq_ctx, replace by der_eq_cong_apply
-symbol der_eq_ctx (Γ : Context) (s s' : Sort) (c C t1 t2 T : Term)
-                  (_ : der_eq Γ s T t1 t2) (_ : der (Push T s Γ) c C s')
-                  : der_eq Γ s' (apply1 C t1) (apply1 c t1) (apply1 c t2);
-
 // TODO der_eq_cong_apply
 symbol der_eq_cong_apply (Γ : Context) {s s' : Sort} {A1 A2 B1 B2 t1 t2 : Term}
                          (_ : der_eq Γ (snext s) (tsort s) A1 A2) (_ : der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2)

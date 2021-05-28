@@ -69,8 +69,13 @@ with inv_eq_sort (der_eq_π2 _  _  _   _  _  _  _  _ _   _   $dv) ↪ inv_sort $
 with inv_eq_t1   (der_eq_π2 $Γ $s $s' $u $A $v $B _ $du $dB $dv) ↪ der_type_conv $Γ (π2 $A $B (tpair $A $B $u $v)) (apply1 $B (π1 $A $B (tpair $A $B $u $v))) (apply1 $B $u) $s'
                                                                         (der_π2 $Γ $s $s' (tpair $A $B $u $v) $A $B (inv_sort $du) $dB
                                                                           (der_pair $Γ $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv))
-                                                                        (der_eq_ctx $Γ $s (snext $s') $B (tsort $s') (π1 $A $B (tpair $A $B $u $v)) $u $A
-                                                                          (der_eq_π1 $Γ $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv) $dB)
+                                                                        (der_eq_cong_apply $Γ
+                                                                          (der_eq_refl $Γ (snext $s) $A (tsort $s) (inv_sort $du))
+                                                                          (der_eq_refl (Push $A $s $Γ) (snext $s') $B (tsort $s') $dB)
+                                                                          (der_eq_π1 $Γ $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)
+                                                                          $dB $dB
+                                                                          (der_π1 $Γ $s $s' (tpair $A $B $u $v) $A $B (inv_sort $du) $dB
+                                                                            (der_pair $Γ $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)) $du)
 with inv_eq_t2   (der_eq_π2 _  _  _   _  _  _  _  _ _   _   $dv) ↪ $dv
 // Conversion
 with inv_eq_sort (der_eq_conversion _ _ _ _ _ _ _ $deqT) ↪ inv_eq_t2 $deqT
