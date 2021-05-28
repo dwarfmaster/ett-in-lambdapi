@@ -66,4 +66,5 @@ with subst $i $V (trefl $A $u) ↪ trefl (subst $i $V $A) (subst $i $V $u)
 with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst $i $V $v);
 rule subst db0 _ (Shift $t) ↪ $t
 with subst $id (var $id) (shift (dbsucc $id) $t) ↪ $t;
+rule shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id) $t);
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
