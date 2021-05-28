@@ -182,4 +182,25 @@ with τ_eq $Γ (der_eq_cong_π2 _ $s $s' $A1 $A2 $B1 $B2 $p1 $p2 $deqA $deqB $de
            $dB1 $dB2
            (der_π1 (τ_Γ $Γ) $s $s' $p1 $A1 $B1 (inv_eq_t1 $deqA) $dB1 $dp1)
            (der_π1 (τ_Γ $Γ) $s $s' $p2 $A2 $B2 (inv_eq_t2 $deqA) $dB2 $dp2))))
+
+// Equalities
+with τ_eq $Γ (der_eq_cong_teq _ _ _ _ _ _ _ _ $deqA $deqa $deqb $da1 $da2 $db1 $db2)
+  ↪ cong_eq
+       (τ_eq $Γ $deqA)
+       (heq_conj
+         (heq_trans
+           (convert $Γ $da1 (inv_eq_t1 $deqa))
+           (heq_trans
+             (τ_eq $Γ $deqa)
+             (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqa) $da2)))
+         (convert_T $Γ (inv_sort $da1) (inv_eq_t1 $deqA))
+         (convert_T $Γ (inv_sort $da2) (inv_eq_t2 $deqA)))
+       (heq_conj
+         (heq_trans
+           (convert $Γ $db1 (inv_eq_t1 $deqb))
+           (heq_trans
+             (τ_eq $Γ $deqb)
+             (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 $deqb) $db2)))
+         (convert_T $Γ (inv_sort $db1) (inv_eq_t1 $deqA))
+         (convert_T $Γ (inv_sort $db2) (inv_eq_t2 $deqA)))
 ;
