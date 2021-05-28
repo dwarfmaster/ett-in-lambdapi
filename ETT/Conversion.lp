@@ -14,8 +14,6 @@ require open ETT.Congruences;
 require open ETT.TContext;
 require open ETT.Translation;
 
-symbol magic {s : Sort} (A : U s) : ε s A;
-
 // convert wrapper for types
 rule convert_T $Γ $d1 $d2
   ↪ heq_to_eq (convert $Γ $d1 $d2);

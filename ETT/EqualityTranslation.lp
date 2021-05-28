@@ -14,9 +14,6 @@ require open ETT.Congruences;
 require open ETT.TContext;
 require open ETT.Translation;
 
-// Cheater helper
-symbol magic {s : Sort} (A : U s) : ε s A;
-
 // Computation
 rule τ_eq $Γ (der_eq_beta _ $s $s' _ $A $t $B _ _ $dt $du)
   ↪ let IA : U (τ_s $s) ≔ τ_T $Γ (inv_sort $du) in
