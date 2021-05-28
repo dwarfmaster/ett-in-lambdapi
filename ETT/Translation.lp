@@ -27,8 +27,7 @@ with τ $Γ (der_prop_type_eq _ $s _ _ _ $dA $du $dv)
 
 // Translation of terms
 rule τ $Γ (der_var _ $id $dΓ)
-  ↪ let shift ≔ der_shift $id (τ_Γ $Γ) (tgetA $id $Γ) (ETT.tsort (tgetS $id $Γ)) (ETT.snext (tgetS $id $Γ)) in
-     let p ≔ convert_T $Γ (shift (tgetD $id $Γ)) (shift (der_subΓ (τ_Γ $Γ) $id $dΓ)) in
+  ↪ let p ≔ convert_T $Γ (der_shift $id (τ_dΓ $Γ) (tgetD $id $Γ)) (der_shift $id $dΓ (der_getΓ $id $dΓ)) in
      transport p (tgetShift $id $Γ)
 with τ $Γ (der_type_conv _ _ _ _ _ $du $deq)
   ↪ let pAB ≔ τ_eqT $Γ $deq in

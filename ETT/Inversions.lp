@@ -6,13 +6,6 @@ require open ETT.XLemmas;
 require ETT.ITT as ITT;
 
 // Lemmas
-// TODO substitution
-symbol substitution {Γ : Context} {s s' : Sort} {A B C : Term} :
-  der (Push A s Γ) C B s' → Π{u : Term}, der Γ u A s → der Γ (apply1 C u) (apply1 B u) s';
-// TODO inv_context
-symbol inv_context {Γ : Context} {s : Sort} {t T : Term} : der Γ t T s → der_context Γ;
-// TODO inv_eq_context
-symbol inv_eq_context {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der_context Γ;
 symbol inv_sort {Γ : Context} {s : Sort} {t T : Term} : der Γ t T s → der Γ T (tsort s) (snext s);
 symbol inv_eq_sort {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der Γ T (tsort s) (snext s);
 symbol inv_eq_t2   {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der Γ t2 T s;
@@ -26,17 +19,10 @@ symbol inv_teq_t1   {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq
 symbol inv_teq_t2   {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq T t1 t2) s → der Γ t2 T s;
 
 // Helpers
-symbol der_subΓ (Γ : Context) (id : DBId) (_ : der_context Γ): der (getΓ Γ id) (get Γ id) (tsort (getS Γ id)) (snext (getS Γ id));
-rule der_subΓ _ db0 (der_context_push _ _ _ $dA _) ↪ $dA
-with der_subΓ _ (dbsucc $id) (der_context_push _ _ _ _ $dt) ↪ der_subΓ _ $id $dt;
-
-symbol pushΓ {Γ : Context} {s : Sort} {T : Term} (d : der Γ T (tsort s) (snext s)) : der_context (Push T s Γ) ≔
-  der_context_push Γ s T d (inv_context d);
-
 
 // Definition of inv_sort
 // TODO finish inv_sort
-rule inv_sort (der_var $Γ $id $dΓ) ↪ der_shift $id $Γ _ _ _ (der_subΓ _ $id $dΓ)
+rule inv_sort (der_var _ $id $dΓ) ↪ der_shift $id $dΓ (der_getΓ $id $dΓ)
 with inv_sort (der_type_conv _ _ _ _ _ _ $deq) ↪ inv_eq_t2 $deq
 with inv_sort (der_abs $Γ $s $s' $A _ $B $dA _ $dt) ↪ der_prod $Γ $s $s' $A $B $dA (inv_sort $dt)
 with inv_sort (der_app _ _ _ _ _ _ _ _ $dB _ $du) ↪ substitution $dB $du
@@ -56,9 +42,9 @@ with inv_eq_sort (der_eq_eta  $Γ $s $s' $A _  $B $dA $dB _  ) ↪ der_prod $Γ 
 with inv_eq_t1   (der_eq_eta  _  _  _   _  _  _  _   _   $df) ↪ $df
 with inv_eq_t2   (der_eq_eta  $Γ $s $s' $A $f $B $dA $dB $df) ↪ der_abs $Γ $s $s' $A (tapp (Shift $A) (Shift1 $B) (Shift $f) (var db0)) $B $dA $dB
                                                                    (der_app (Push $A $s $Γ) $s $s' (Shift $A) (Shift $f) (var db0) (Shift1 $B)
-                                                                     (der_shift0 (Push $A $s $Γ) $dA)
-                                                                     (der_shift1 $A $s $dB)
-                                                                     (der_shift0 (Push $A $s $Γ) $df)
+                                                                     (der_shift0 $dA $dA)
+                                                                     (der_shift1 $dA $dB)
+                                                                     (der_shift0 $dA $df)
                                                                      (der_var (Push $A $s $Γ) db0
                                                                        (der_context_push $Γ $s $A $dA (inv_context $df))))
 with inv_eq_sort (der_eq_π1 _  _  _   _  _  _  _  _ $du _   _  ) ↪ inv_sort $du

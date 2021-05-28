@@ -8,6 +8,10 @@ require open ETT.TranslationDefinition;
 require open ETT.TranslationLemmas;
 require open ETT.HEq;
 
+symbol τ_dΓ (Γ : TContext) : der_context (τ_Γ Γ);
+rule τ_dΓ (TPush $Γ $s $A $dA _) ↪ der_context_push (τ_Γ $Γ) $s $A $dA (τ_dΓ $Γ)
+with τ_dΓ TEmpty ↪ der_context_empty;
+
 symbol tgetS (id : ETT.DBId) (Γ : TContext) : ETT.Sort ≔ getS (τ_Γ Γ) id;
 symbol tgetA (id : ETT.DBId) (Γ : TContext) : ETT.Term ≔ get (τ_Γ Γ) id;
 
@@ -20,7 +24,7 @@ with tgetD (dbsucc $id) (TPush $t _ _ _ _) ↪ tgetD $id $t;
 symbol tgetT (id : ETT.DBId) (Γ : TContext) : U (τ_s (tgetS id Γ)) ≔
   @τ_T (tgetΓ id Γ) (tgetA id Γ) (tgetS id Γ) (tgetD id Γ);
 symbol tgetTShift (id : ETT.DBId) (Γ : TContext) : U (τ_s (tgetS id Γ)) ≔
-  @τ_T Γ (ShiftN id (tgetA id Γ)) (tgetS id Γ) (der_shift id (τ_Γ Γ) _ _ _ (tgetD id Γ));
+  @τ_T Γ (ShiftN id (tgetA id Γ)) (tgetS id Γ) (der_shift id (τ_dΓ Γ) (tgetD id Γ));
 
 symbol tget (id : ETT.DBId) (Γ : TContext) : ε (τ_s (tgetS id Γ)) (tgetT id Γ);
 rule tget db0 (TPush _ _ _ _ $a) ↪ $a
@@ -31,7 +35,7 @@ rule tgetShift db0 (TPush $Γ $s $A $dA $a)
           $dA $dA $a $a
 with tgetShift (dbsucc $id) (TPush $Γ $s $A $dA $a)
   ↪ @τ_shift0T $Γ (tgetS $id $Γ) $s (ShiftN $id (tgetA $id $Γ)) $A
-        (der_shift $id (τ_Γ $Γ) _ _ _ (tgetD $id $Γ))
+        (der_shift $id (τ_dΓ $Γ) (tgetD $id $Γ))
         $dA $a (tgetShift $id $Γ);
 
 // Packed Context
@@ -99,9 +103,9 @@ rule pgetHShift db0 (@PCPush _ $s $A1 $A2 $P $dA1 $dA2 $a1 $a2 $h)
 with pgetHShift (dbsucc $id) (@PCPush _ $s $A1 $A2 $P $dA1 $dA2 $a1 $a2 _)
    ↪ heq_conj (pgetHShift $id $P)
         (@τ_shift0T_eq (projΓ1 $P) (pgetS $id $P) $s (ShiftN $id (pgetA1 $id $P)) $A1
-            (der_shift $id (τ_Γ (projΓ1 $P)) _ _ _ (pgetD1 $id $P))
+            (der_shift $id (τ_dΓ (projΓ1 $P)) (pgetD1 $id $P))
             $dA1 $a1)
         (@τ_shift0T_eq (projΓ2 $P) (pgetS $id $P) $s (ShiftN $id (pgetA2 $id $P)) $A2
-            (der_shift $id (τ_Γ (projΓ2 $P)) _ _ _ (pgetD2 $id $P))
+            (der_shift $id (τ_dΓ (projΓ2 $P)) (pgetD2 $id $P))
             $dA2 $a2)
 with pgetHShift $id (PCEmpty $Γ) ↪ heq_refl _ (tgetShift $id $Γ);

@@ -82,11 +82,9 @@ with convertR $Γ $H (der_prop_type_eq _ $s $A $u $v $dA1 $du1 $dv1) (der_prop_t
 
 // Structural rules
 with convertR _ $H (der_var _ $id $dΓ1) (der_var _ $id $dΓ2)
-  ↪ let shift1 ≔ der_shift $id (τ_Γ (projΓ1 $H)) (pgetA1 $id $H) (ETT.tsort (pgetS $id $H)) (ETT.snext (pgetS $id $H)) in
-     let shift2 ≔ der_shift $id (τ_Γ (projΓ2 $H)) (pgetA2 $id $H) (ETT.tsort (pgetS $id $H)) (ETT.snext (pgetS $id $H)) in
-     heq_conj (pgetHShift $id $H)
-       (convert_T (projΓ1 $H) (shift1 (pgetD1 $id $H)) (shift1 (der_subΓ (τ_Γ (projΓ1 $H)) $id $dΓ1)))
-       (convert_T (projΓ2 $H) (shift2 (pgetD2 $id $H)) (shift2 (der_subΓ (τ_Γ (projΓ2 $H)) $id $dΓ2)))
+  ↪ heq_conj (pgetHShift $id $H)
+       (convert_T (projΓ1 $H) (der_shift $id (τ_dΓ (projΓ1 $H)) (pgetD1 $id $H)) (der_shift $id $dΓ1 (der_getΓ $id $dΓ1)))
+       (convert_T (projΓ2 $H) (der_shift $id (τ_dΓ (projΓ2 $H)) (pgetD2 $id $H)) (der_shift $id $dΓ2 (der_getΓ $id $dΓ2)))
 with convertR $Γ $H (der_type_conv _ $u $A $B $s $du1 $deq1) (der_type_conv _ $u $A $B $s $du2 $deq2)
   ↪ convertTypeConversion $Γ $H (der_type_conv _ $u $A $B $s $du1 $deq1) $du2 $deq2
 
