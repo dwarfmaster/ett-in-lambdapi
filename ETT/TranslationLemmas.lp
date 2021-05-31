@@ -12,7 +12,6 @@ require open ETT.TranslationDefinition;
 // Compatibility with operations on derivations
 
 // Translation of shifting
-// TODO τ_shift0T_eq
 symbol τ_shift0T_eq (Γ : TContext) {s s' : ETT.Sort} {T A : ETT.Term}
                     (dT : der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
                     (dA : der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
@@ -31,7 +30,6 @@ symbol τ_shift0T' (Γ : TContext) {s s' : ETT.Sort} {T A : ETT.Term}
                   (a : ε _ (τ_T Γ dA)) ≔
   transport (inv_eq (τ_shift0T_eq Γ dT dA a));
 
-// TODO τ_shift0_eq
 symbol τ_shift0_eq (Γ : TContext) {s s' : ETT.Sort} {t T A : ETT.Term}
                    (dt : der (τ_Γ Γ) t T s)
                    (dA : der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
@@ -61,7 +59,6 @@ symbol τ_shift1T' (Γ : TContext) {s sa sb : ETT.Sort} {T A B : ETT.Term}
   transport (inv_eq (τ_shift1T_eq Γ dT dA dB a b));
 
 // Translation of substitution
-// TODO τ_substT_eq
 symbol τ_substT_eq (Γ : TContext) {s s' : ETT.Sort} {A B a : ETT.Term}
                    (dB : der (Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) (da : der (τ_Γ Γ) a A s) :
   ε _ (eq _ (u (τ_s s'))
@@ -74,7 +71,6 @@ symbol τ_substT' (Γ : TContext) {s s' : ETT.Sort} {A B a : ETT.Term}
                  (dB : der (Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) (da : der (τ_Γ Γ) a A s) ≔
   transport (inv_eq (τ_substT_eq Γ dB da));
 
-// TODO τ_subst_eq
 symbol τ_subst_eq (Γ : TContext) {s s' : ETT.Sort} {A B b a : ETT.Term}
                   (db : der (Push A s (τ_Γ Γ)) b B s')
                   (da : der (τ_Γ Γ) a A s) :

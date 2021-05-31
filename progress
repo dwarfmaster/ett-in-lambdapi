@@ -9,16 +9,19 @@ Progress:
 [X] XAst.lp
 [X] DeBruijn.lp
 [X] XTyping.lp
-[-] XLemmas.lp
+[X] XLemmas.lp
 [X] Inversions.lp
 [X] HEq.lp
 [X] Packing.lp
 [X] TranslationDefinition.lp
 [X] TContext.lp
-[-] TranslationLemmas.lp
+[X] TranslationLemmas.lp
 [X] Translation.lp
 [X] Conversion.lp
 [X] EqualityTranslationLemmas.lp
 [X] EqualityTranslation.lp
 [X] CongruencesTranslation.lp
+[X] HeadCompatibility.lp
+[-] Shifting.lp
+[-] Substitution.lp
 [ ] main.lp
