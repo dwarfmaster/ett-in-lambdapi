@@ -21,8 +21,11 @@ symbol inv_teq_t2   {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq
 // Helpers
 
 // Definition of inv_sort
-// TODO finish inv_sort
-rule inv_sort (der_var _ $id $dΓ) ↪ der_shift $id $dΓ (der_getΓ $id $dΓ)
+rule inv_sort (der_sort $Γ $s $dΓ) ↪ der_sort $Γ (snext $s) $dΓ
+with inv_sort (der_prod $Γ $s $s' _ _ $dA _) ↪ der_sort $Γ (smax $s $s') (inv_context $dA)
+with inv_sort (der_sigma $Γ $s $s' _ _ $dA _) ↪ der_sort $Γ (smax $s $s') (inv_context $dA)
+with inv_sort (der_prop_type_eq $Γ $s _ _ _ $dA _ _) ↪ der_sort $Γ $s (inv_context $dA)
+with inv_sort (der_var _ $id $dΓ) ↪ der_shift $id $dΓ (der_getΓ $id $dΓ)
 with inv_sort (der_type_conv _ _ _ _ _ _ $deq) ↪ inv_eq_t2 $deq
 with inv_sort (der_abs $Γ $s $s' $A _ $B $dA _ $dt) ↪ der_prod $Γ $s $s' $A $B $dA (inv_sort $dt)
 with inv_sort (der_app _ _ _ _ _ _ _ _ $dB _ $du) ↪ substitution $dB $du
