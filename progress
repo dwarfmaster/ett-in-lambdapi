@@ -11,7 +11,7 @@ Progress:
 [X] XTyping.lp
 [-] XLemmas.lp
 [X] Inversions.lp
-[-] HEq.lp
+[X] HEq.lp
 [X] Packing.lp
 [X] TranslationDefinition.lp
 [X] TContext.lp
