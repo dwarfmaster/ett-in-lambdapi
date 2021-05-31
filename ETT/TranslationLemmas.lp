@@ -103,7 +103,6 @@ symbol τ_fun' (Γ : TContext) {s s' : ETT.Sort} {A B : ETT.Term}
   transport (inv_eq (τ_fun_eq Γ dA dB df));
 
 // Translation of pairs
-// TODO τ_sum_eq
 symbol τ_sum_eq (Γ : TContext) {s s' : ETT.Sort} {A B : ETT.Term}
                 (dA : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s)) (dB : der (Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s'))
                 (dp : der (τ_Γ Γ) (ETT.tsum A B) (ETT.tsort (ETT.smax s s')) (ETT.snext (ETT.smax s s'))) :
