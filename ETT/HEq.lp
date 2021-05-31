@@ -16,7 +16,7 @@ symbol mkHeq {s : Sort} (A B : U s) (a : ε s A) (b : ε s B) (p : ε _ (eq _ (u
 symbol getTeq {s : Sort} {A B : U s} {a : ε s A} {b : ε s B} (heq : HEq s A B a b) : ε _ (eq _ (u s) A B) ≔
   proj1 _ _ (eq (snext s) (u s) A B) (λ p, eq s B (transport p a) b) heq;
 symbol getEq {s : Sort} {A B : U s} {a : ε s A} {b : ε s B} (heq : HEq s A B a b) :
-  ε _ (eq s B (transport (@getTeq s A B a b heq) a) b) ≔
+  ε _ (eq s B (transport (getTeq heq) a) b) ≔
   proj2 _ _ (eq (snext s) (u s) A B) (λ p, eq s B (transport p a) b) heq;
 
 symbol eq_to_heq {s : Sort} {A : U s} {a b : ε s A} (p : ε _ (eq s A a b)) : HEq s A A a b ≔
@@ -43,8 +43,10 @@ symbol lift_to_heq {s s' : Sort} {A : U s} {B : ε s A → U s'}
   J s _ A u (λ v _, HEq' s' (B u) (B v) (f u) (f v)) (heq_refl (B u) (f u)) v p;
 
 // Proved using uip
-// TODO heq_to_eq
-symbol heq_to_eq {s : Sort} {T : U s} {t u : ε s T} : HEq s T T t u → ε s (eq s T t u);
+symbol heq_to_eq {s : Sort} {A : U s} {a b : ε s A} (h : HEq s A A a b) : ε s (eq s A a b) ≔
+  J (snext s) s (eq (snext s) (u s) A A) (getTeq h)
+    (λ p _, eq s A (transport p a) b) (getEq h)
+    (refl (snext s) (u s) A) (uip (snext s) (u s) A A (getTeq h) (refl (snext s) (u s) A));
 
 // Extend heterogeneous equality with transports to the left and to the right
 symbol heq_of_transport {s : Sort} {A B : U s} (a : ε s A)
