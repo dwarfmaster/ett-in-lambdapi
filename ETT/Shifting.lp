@@ -24,11 +24,19 @@ with @sc_to_sctx _ _ $sa $A _ (@SC0 $Γ _) ↪ Push $A $sa $Γ
 with sc_to_sctx $d (@SCSucc _ $s $A $id $sc _) ↪ Push (shift $id $A) $s (sc_to_sctx $d $sc);
 rule sc_to_dctx (SC0 $dΓ) ↪ $dΓ
 with sc_to_dctx (SCSucc $sc $d) ↪ der_context_push _ _ _ $d (sc_to_dctx $sc);
-// TODO der_shift_n
-protected symbol der_shift_n {Γ : Context} {sa s : Sort} {A t T : Term} (id : DBId)
-                             (sc : ShiftContext Γ id) (dA : der Γ A (tsort sa) (snext sa))
-                             (d : der (sc_to_ctx sc) t T s)
-                             : der (sc_to_sctx dA sc) (shift id t) (shift id T) s;
+symbol der_shift_n {Γ : Context} {sa s : Sort} {A t T : Term} (id : DBId)
+                   (sc : ShiftContext Γ id) (dA : der Γ A (tsort sa) (snext sa))
+                   (d : der (sc_to_ctx sc) t T s)
+                   : der (sc_to_sctx dA sc) (shift id t) (shift id T) s;
+// TODO der_eq_shift_n
+symbol der_eq_shift_n {Γ : Context} {sa s : Sort} {A T t1 t2 : Term} (id : DBId)
+                      (sc : ShiftContext Γ id) (dA : der Γ A (tsort sa) (snext sa))
+                      (deq : der_eq (sc_to_ctx sc) s T t1 t2)
+                      : der_eq (sc_to_sctx dA sc) s (shift id T) (shift id t1) (shift id t2);
+// TODO der_context_shift_n
+symbol der_context_shift_n {Γ : Context} {sa : Sort} {A : Term} (id i : DBId)
+                           (sc : ShiftContext Γ id) (dA : der Γ A (tsort sa) (snext sa))
+                           : der (sc_to_sctx dA sc) (var (dbshift id i)) (shift id (ShiftN i (get (sc_to_ctx sc) i))) (getS (sc_to_ctx sc) i);
 
 rule sc_to_dsctx $d (SC0 $dΓ) ↪ der_context_push _ _ _ $d $dΓ
 with sc_to_dsctx $d (SCSucc $sc $dA) ↪ der_context_push _ _ _ (der_shift_n _ $sc $d $dA) (sc_to_dsctx $d $sc);
@@ -43,7 +51,11 @@ with der_shift_n $id $sc $d (der_sigma _ $s $s' $A $B $dA $dB) ↪ der_sigma _ $
 with der_shift_n $id $sc $d (der_prop_type_eq _ $s $A $u $v $dA $du $dv)
   ↪ der_prop_type_eq _ $s (shift $id $A) (shift $id $u) (shift $id $v)
                       (der_shift_n $id $sc $d $dA) (der_shift_n $id $sc $d $du) (der_shift_n $id $sc $d $dv)
-// TODO der_var and der_type_conv
+with der_shift_n $id $sc $d (der_var _ $i _)
+  ↪ der_context_shift_n $id $i $sc $d
+with der_shift_n $id $sc $d (der_type_conv _ $u $A $B $s $du $deq)
+  ↪ der_type_conv _ (shift $id $u) (shift $id $A) (shift $id $B) $s
+                   (der_shift_n $id $sc $d $du) (der_eq_shift_n $id $sc $d $deq)
 with der_shift_n $id $sc $d (der_abs _ $s $s' $A $t $B $dA $dB $dt)
   ↪ der_abs _ $s $s' (shift $id $A) (shift (dbsucc $id) $t) (shift (dbsucc $id) $B)
              (der_shift_n $id $sc $d $dA) (der_shift_n (dbsucc $id) (SCSucc $sc $dA) $d $dB)
