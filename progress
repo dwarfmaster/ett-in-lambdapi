@@ -10,7 +10,7 @@ Progress:
 [X] DeBruijn.lp
 [X] XTyping.lp
 [-] XLemmas.lp
-[-] Inversions.lp
+[X] Inversions.lp
 [-] HEq.lp
 [X] Packing.lp
 [X] TranslationDefinition.lp

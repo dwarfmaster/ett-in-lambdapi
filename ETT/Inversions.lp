@@ -11,12 +11,9 @@ symbol inv_eq_sort {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1
 symbol inv_eq_t2   {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der Γ t2 T s;
 symbol inv_eq_t1   {Γ : Context} {s : Sort} {T t1 t2 : Term} : der_eq Γ s T t1 t2 → der Γ t1 T s;
 
-// TODO inv_teq_sort
-symbol inv_teq_sort {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq T t1 t2) s → der Γ T (tsort s) (snext s);
-// TODO inv_teq_t1
-symbol inv_teq_t1   {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq T t1 t2) s → der Γ t1 T s;
-// TODO inv_teq_t2
-symbol inv_teq_t2   {Γ : Context} {s : Sort} {T t1 t2 e : Term} : der Γ e (teq T t1 t2) s → der Γ t2 T s;
+symbol inv_teq_sort {Γ : Context} {s : Sort} {T S t1 t2 : Term} : der Γ (teq T t1 t2) S (snext s) → der Γ T (tsort s) (snext s);
+symbol inv_teq_t1   {Γ : Context} {s : Sort} {T S t1 t2 : Term} : der Γ (teq T t1 t2) S (snext s) → der Γ t1 T s;
+symbol inv_teq_t2   {Γ : Context} {s : Sort} {T S t1 t2 : Term} : der Γ (teq T t1 t2) S (snext s) → der Γ t2 T s;
 
 // Helpers
 
@@ -70,9 +67,9 @@ with inv_eq_t2   (der_eq_π2 _  _  _   _  _  _  _  _ _   _   $dv) ↪ $dv
 with inv_eq_sort (der_eq_conversion _ _ _ _ _ _ _ $deqT) ↪ inv_eq_t2 $deqT
 with inv_eq_t1   (der_eq_conversion $Γ $s $t1 _ $T1 $T2 $deq $deqT) ↪ der_type_conv $Γ $t1 $T1 $T2 $s (inv_eq_t1 $deq) $deqT
 with inv_eq_t2   (der_eq_conversion $Γ $s _ $t2 $T1 $T2 $deq $deqT) ↪ der_type_conv $Γ $t2 $T1 $T2 $s (inv_eq_t2 $deq) $deqT
-with inv_eq_sort (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_sort $de
-with inv_eq_t1   (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_t1   $de
-with inv_eq_t2   (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_t2   $de
+with inv_eq_sort (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_sort (inv_sort $de)
+with inv_eq_t1   (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_t1   (inv_sort $de)
+with inv_eq_t2   (der_eq_lift _ _ _ _ _ _ $de) ↪ inv_teq_t2   (inv_sort $de)
 // Structure
 with inv_eq_sort (der_eq_refl _ _ _ _ $du) ↪ inv_sort $du
 with inv_eq_t1   (der_eq_refl _ _ _ _ $du) ↪ $du
@@ -137,4 +134,13 @@ with inv_eq_t2   (der_eq_cong_trefl $Γ $s $A1 $A2 $a1 $a2 $deqA $deqa $da1 $da2
    ↪ der_type_conv $Γ (trefl $A2 $a2) (teq $A2 $a2 $a2) (teq $A1 $a1 $a1) $s
                     (der_refl $Γ $s $a2 $A2 (inv_eq_t2 $deqA) $da2)
                     (der_eq_symm _ _ _ _ _ (der_eq_cong_teq $Γ $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2))
+;
+
+// Propositional equality inversion
+rule inv_teq_sort (der_prop_type_eq _ _ _ _ _ $dA _    _   ) ↪ $dA
+with inv_teq_t1   (der_prop_type_eq _ _ _ _ _ _   $da1 _   ) ↪ $da1
+with inv_teq_t2   (der_prop_type_eq _ _ _ _ _ _   _    $da2) ↪ $da2
+with inv_teq_sort (der_type_conv _ (teq _ _ _) _ _ _ $du _) ↪ inv_teq_sort $du
+with inv_teq_t1   (der_type_conv _ (teq _ _ _) _ _ _ $du _) ↪ inv_teq_t1   $du
+with inv_teq_t2   (der_type_conv _ (teq _ _ _) _ _ _ $du _) ↪ inv_teq_t2   $du
 ;

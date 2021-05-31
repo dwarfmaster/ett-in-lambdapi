@@ -190,15 +190,15 @@ with τ_eq $Γ (der_eq_conversion _ _ _ _ _ _ $deq $deqT)
        (τ_eqT $Γ $deqT)
 
 with τ_eq $Γ (der_eq_lift _ _ _ _ _ _ $de)
-  ↪ let heq ≔ mkHeq (τ_T $Γ (inv_sort (inv_teq_t1 $de))) (τ_T $Γ (inv_teq_sort $de))
-                     (τ $Γ (inv_teq_t1 $de))
-                     (transport (convert_T $Γ (inv_sort (inv_teq_t2 $de)) (inv_teq_sort $de)) (τ $Γ (inv_teq_t2 $de)))
-                     (convert_T $Γ (inv_sort (inv_teq_t1 $de)) (inv_teq_sort $de))
-                     (τ_equality $Γ (inv_teq_sort $de) (inv_teq_t1 $de) (inv_teq_t2 $de) (inv_sort $de) (τ $Γ $de)) in
+  ↪ let heq ≔ mkHeq (τ_T $Γ (inv_sort (inv_teq_t1 (inv_sort $de)))) (τ_T $Γ (inv_teq_sort (inv_sort $de)))
+                     (τ $Γ (inv_teq_t1 (inv_sort $de)))
+                     (transport (convert_T $Γ (inv_sort (inv_teq_t2 (inv_sort $de))) (inv_teq_sort (inv_sort $de))) (τ $Γ (inv_teq_t2 (inv_sort $de))))
+                     (convert_T $Γ (inv_sort (inv_teq_t1 (inv_sort $de))) (inv_teq_sort (inv_sort $de)))
+                     (τ_equality $Γ (inv_teq_sort (inv_sort $de)) (inv_teq_t1 (inv_sort $de)) (inv_teq_t2 (inv_sort $de)) (inv_sort $de) (τ $Γ $de)) in
      heq_extend_R
-       (τ $Γ (inv_teq_t1 $de))
-       (τ $Γ (inv_teq_t2 $de))
-       (convert_T $Γ (inv_sort (inv_teq_t2 $de)) (inv_teq_sort $de)) heq
+       (τ $Γ (inv_teq_t1 (inv_sort $de)))
+       (τ $Γ (inv_teq_t2 (inv_sort $de)))
+       (convert_T $Γ (inv_sort (inv_teq_t2 (inv_sort $de))) (inv_teq_sort (inv_sort $de))) heq
 
 // Structural
 with τ_eq $Γ (der_eq_refl _ _ _ _ $du)
