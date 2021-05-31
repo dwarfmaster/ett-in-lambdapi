@@ -33,7 +33,6 @@ symbol der_eq_shift_n {Γ : Context} {sa s : Sort} {A T t1 t2 : Term} (id : DBId
                       (sc : ShiftContext Γ id) (dA : der Γ A (tsort sa) (snext sa))
                       (deq : der_eq (sc_to_ctx sc) s T t1 t2)
                       : der_eq (sc_to_sctx dA sc) s (shift id T) (shift id t1) (shift id t2);
-// TODO der_context_shift_n
 symbol der_context_shift_n {Γ : Context} {sa : Sort} {A : Term} (id i : DBId)
                            (sc : ShiftContext Γ id) (dA : der Γ A (tsort sa) (snext sa))
                            : der (sc_to_sctx dA sc) (var (dbshift id i)) (shift id (ShiftN i (get (sc_to_ctx sc) i))) (getS (sc_to_ctx sc) i);
@@ -79,6 +78,12 @@ with der_shift_n $id $sc $d (der_π2 _ $s $s' $p $A $B $dA $dB $dp)
 with der_shift_n $id $sc $d (der_refl _ $s $u $A $dA $du)
   ↪ der_refl _ $s (shift $id $u) (shift $id $A)
               (der_shift_n $id $sc $d $dA) (der_shift_n $id $sc $d $du)
+with der_context_shift_n db0 $i (SC0 $dΓ) $d
+  ↪ der_var _ (dbsucc $i) (der_context_push _ _ _ $d $dΓ)
+with der_context_shift_n (dbsucc _) db0 (SCSucc $sc $dA) $d
+  ↪ der_var _ db0 (sc_to_dsctx $d (SCSucc $sc $dA))
+with der_context_shift_n (dbsucc $id) (dbsucc $i) (SCSucc $sc $dA) $d
+  ↪ der_shift0 (der_shift_n _ $sc $d $dA) (der_context_shift_n $id $i $sc $d)
 ;
 
 // Implementation of der_shift{0,1}

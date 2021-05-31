@@ -44,6 +44,9 @@ rule ShiftN db0 $t ↪ Shift $t
 with ShiftN (dbsucc $n) $t ↪ Shift (ShiftN $n $t)
 with ShiftN _ (tsort $s) ↪ tsort $s;
 
+// Some confluent commutations
+rule shift db0 (shift $i $t) ↪ shift (dbsucc $i) (shift db0 $t);
+
 // Select a term depending on whether two indices are equal, the first one is greater, or lower
 symbol dbselect : DBId → DBId → Term → Term → Term → Term;
 rule dbselect db0 db0 $eq _ _ ↪ $eq
