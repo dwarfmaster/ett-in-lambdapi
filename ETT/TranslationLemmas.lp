@@ -119,7 +119,6 @@ symbol τ_sum' (Γ : TContext) {s s' : ETT.Sort} {A B : ETT.Term}
   transport (inv_eq (τ_sum_eq Γ dA dB dp));
 
 // Translation of equality
-// TODO τ_equality_eq
 symbol τ_equality_eq (Γ : TContext) {s : ETT.Sort} {A a a' : ETT.Term}
                      (dA : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
                      (da : der (τ_Γ Γ) a A s) (da' : der (τ_Γ Γ) a' A s)

@@ -65,3 +65,33 @@ with τ_sum_heq $Γ $s $s' $A $B $T $dA $dB (der_type_conv _ (ETT.tsum $A $B) $U
            (transport (convert_T $Γ (inv_sort $du) (inv_eq_t1 $deq)) (τ $Γ $du))
            (τ_eqT $Γ $deq))))
        (τ_sum_heq $Γ $s $s' $A $B $U $dA $dB $du);
+
+// Translation of equality
+symbol τ_equality_heq (Γ : TContext) (s : ETT.Sort) (A a a' T : ETT.Term)
+                      (dA : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
+                      (da : der (τ_Γ Γ) a A s) (da' : der (τ_Γ Γ) a' A s)
+                      (de : der (τ_Γ Γ) (ETT.teq A a a') T (ETT.snext s))
+                      : H (τ Γ de)
+                          (eq (τ_s s) (τ Γ dA)
+                              (transport (convert_T Γ (inv_sort da ) dA) (τ Γ da))
+                              (transport (convert_T Γ (inv_sort da') dA) (τ Γ da')));
+rule @τ_equality_eq $Γ $s $A $a $a' $dA $da $da' $de
+  ↪ heq_to_eq (τ_equality_heq $Γ $s $A $a $a' (ETT.tsort $s) $dA $da $da' $de);
+
+rule τ_equality_heq $Γ $s $A $a1 $a2 _ $dA $da1 $da2 (der_prop_type_eq _ $s $A $a1 $a2 $dA' $da1' $da2')
+  ↪ cong_eq
+       (convert $Γ $dA' $dA)
+       (heq_conj (convert $Γ $da1' $da1)
+         (convert_T $Γ (inv_sort $da1') $dA')
+         (convert_T $Γ (inv_sort $da1 ) $dA))
+       (heq_conj (convert $Γ $da2' $da2)
+         (convert_T $Γ (inv_sort $da2') $dA')
+         (convert_T $Γ (inv_sort $da2 ) $dA))
+with τ_equality_heq $Γ $s $A $a1 $a2 $T $dA $da1 $da2 (der_type_conv _ (ETT.teq $A $a1 $a2) $U $T (ETT.snext $s) $du $deq)
+  ↪ heq_trans
+       (heq_symm (heq_trans
+         (heq_of_transport (τ $Γ $du) (convert_T $Γ (inv_sort $du) (inv_eq_t1 $deq)))
+         (heq_of_transport
+           (transport (convert_T $Γ (inv_sort $du) (inv_eq_t1 $deq)) (τ $Γ $du))
+           (τ_eqT $Γ $deq))))
+       (τ_equality_heq $Γ $s $A $a1 $a2 $U $dA $da1 $da2 $du);
