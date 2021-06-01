@@ -55,7 +55,10 @@ symbol pushΓ {Γ : Context} {s : Sort} {T : Term} (d : der Γ T (tsort s) (snex
 symbol der_shift0 {Γ : Context} {t A T : Term} {s s' : Sort}
                   (_ : der Γ A (tsort s') (snext s')) (_ : der Γ t T s) :
   der (Push A s' Γ) (Shift t) (Shift T) s;
-symbol der_shift1 {Γ : Context} {t A T B : Term} {s sa sb : Sort} (_ : der Γ B (tsort sb) (snext sb)) (_ : der (Push A sa Γ) t T s) : der (Push (Shift A) sa (Push B sb Γ)) (Shift1 t) (Shift1 T) s;
+symbol der_shift1 {Γ : Context} {t A T B : Term} {s sa sb : Sort}
+                  (_ : der Γ A (tsort sa) (snext sa))
+                  (_ : der Γ B (tsort sb) (snext sb))
+                  (_ : der (Push A sa Γ) t T s) : der (Push (Shift A) sa (Push B sb Γ)) (Shift1 t) (Shift1 T) s;
 
 // Iterated shifting
 symbol der_shift (id : DBId) {Γ : Context} (_ : der_context Γ) {t T : Term} {s : Sort} (_ : der (getΓ Γ id) t T s) : der Γ (ShiftN id t) (ShiftN id T) s;
