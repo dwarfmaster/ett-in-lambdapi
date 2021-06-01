@@ -9,6 +9,7 @@ require open ETT.Inversions;
 require open ETT.HEq;
 require open ETT.Packing;
 require open ETT.TranslationDefinition;
+require open ETT.TContext;
 require open ETT.TranslationLemmas;
 require open ETT.Translation;
 
@@ -171,9 +172,55 @@ with der_eq_shift_n $id $sc $d (der_eq_cong_trefl _ $s $A1 $A2 $a1 $a2 $deqA $de
 
 // Implementation of der_shift{0,1}
 rule der_shift0 $dA $dt ↪ der_shift_n db0 (SC0 (inv_context $dA)) $dA $dt
-with der_shift1 $dA $dt ↪ der_shift_n db1 (SCSucc (SC0 (inv_context $dA)) (der_getΓ db0 (inv_context $dt))) $dA $dt;
+with der_shift1 $dA $dB $dt ↪ der_shift_n db1 (SCSucc (SC0 (inv_context $dB)) $dA) $dB $dt;
 
 // Compatibility of translation with shifting
-rule τ_shift0T_eq $Γ $dT $dA $a ↪ heq_to_eq (τ_shift0_eq $Γ $dT $dA $a);
+constant symbol ShiftTContext : TContext → DBId → TYPE;
+symbol tsc_to_sc {Γ : TContext} {id : DBId} : ShiftTContext Γ id → ShiftContext (τ_Γ Γ) id;
+symbol tsc_to_tc {Γ : TContext} {id : DBId} : ShiftTContext Γ id → TContext;
+symbol tsc_to_ctx {Γ : TContext} {id : DBId} : ShiftTContext Γ id → Context;
+rule tsc_to_ctx $sc ↪ sc_to_ctx (tsc_to_sc $sc)
+with τ_Γ (tsc_to_tc $sc) ↪ sc_to_ctx (tsc_to_sc $sc);
+symbol tsc_to_stc {Γ : TContext} {id : DBId} {s : Sort} {A : Term}
+                  (dA : der (τ_Γ Γ) A (tsort s) (snext s))
+                  : ITT.ε _ (τ Γ dA) → ShiftTContext Γ id → TContext;
+symbol tsc_to_sctx {Γ : TContext} {id : DBId} {s : Sort} {A : Term}
+                   : der (τ_Γ Γ) A (tsort s) (snext s) → ShiftTContext Γ id → Context;
+rule tsc_to_sctx $dA $sc ↪ sc_to_sctx $dA (tsc_to_sc $sc)
+with τ_Γ (tsc_to_stc $dA _ $sc) ↪ sc_to_sctx $dA (tsc_to_sc $sc);
 
-// TODO τ_shift0_eq
+constant symbol TSC0 (Γ : TContext) : der_context (τ_Γ Γ) → ShiftTContext Γ db0;
+constant symbol TSCSucc {Γ : TContext} {s : Sort} {A : Term} {id : DBId}
+                        (sc : ShiftTContext Γ id) (dA : der (tsc_to_ctx sc) A (tsort s) (snext s))
+                        : ITT.ε _ (τ (tsc_to_tc sc) dA) → ShiftTContext Γ (dbsucc id);
+rule tsc_to_sc (TSC0 _ $dΓ) ↪ SC0 $dΓ
+with tsc_to_sc (TSCSucc $sc $dA _) ↪ SCSucc (tsc_to_sc $sc) $dA
+with tsc_to_tc (TSC0 $Γ _) ↪ $Γ
+with tsc_to_tc (TSCSucc $sc $dA $a) ↪ TPush (tsc_to_tc $sc) _ _ $dA $a;
+
+// TODO τ_shift_n
+symbol τ_shift_n {Γ : TContext} {s s' : Sort} {t T A : Term} (id : DBId)
+                 (sc : ShiftTContext Γ id) (dt : der (tsc_to_ctx sc) t T s)
+                 (dA : der (τ_Γ Γ) A (tsort s') (snext s'))
+                 (a : ITT.ε _ (τ Γ dA)) :
+  H (τ (tsc_to_tc sc) dt)
+    (τ (tsc_to_stc dA a sc) (der_shift_n id (tsc_to_sc sc) dA dt));
+symbol τ_shiftT_n {Γ : TContext} {s s' : Sort} {T A : Term} (id : DBId)
+                  (sc : ShiftTContext Γ id) (dT : der (tsc_to_ctx sc) T (tsort s) (snext s))
+                  (dA : der (τ_Γ Γ) A (tsort s') (snext s'))
+                  (a : ITT.ε _ (τ Γ dA)) :
+  ITT.ε _ (ITT.eq _ (ITT.u (τ_s s))
+    (τ (tsc_to_tc sc) dT)
+    (τ (tsc_to_stc dA a sc) (der_shift_n id (tsc_to_sc sc) dA dT))) ≔
+  heq_to_eq (τ_shift_n id sc dT dA a);
+
+rule tsc_to_stc $d $x (TSC0 $Γ _) ↪ TPush $Γ _ _ $d $x
+with tsc_to_stc $d $x (TSCSucc $sc $dA $a)
+  ↪ TPush (tsc_to_stc $d $x $sc) _ _
+           (der_shift_n _ (tsc_to_sc $sc) $d $dA)
+           (transport (τ_shiftT_n _ $sc $dA $d $x) $a);
+
+rule τ_shift0T_eq $Γ $dT $dA $a ↪ τ_shiftT_n db0 (TSC0 $Γ (inv_context $dA)) $dT $dA $a
+with τ_shift0_eq $Γ $dt $dA $a ↪ τ_shift_n db0 (TSC0 $Γ (inv_context $dA)) $dt $dA $a;
+rule τ_shift1T_eq $Γ $dT $dA $dB $a $b ↪ τ_shiftT_n db1 (TSCSucc (TSC0 $Γ (inv_context $dB)) $dA $a) $dT $dB $b;
+
