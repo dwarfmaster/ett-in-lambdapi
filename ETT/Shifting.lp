@@ -7,7 +7,9 @@ require ETT.ITT as ITT;
 require open ETT.ILemmas;
 require open ETT.Inversions;
 require open ETT.HEq;
+require open ETT.Packing;
 require open ETT.TranslationDefinition;
+require open ETT.TranslationLemmas;
 require open ETT.Translation;
 
 // Generic der_shift
@@ -172,5 +174,6 @@ rule der_shift0 $dA $dt ↪ der_shift_n db0 (SC0 (inv_context $dA)) $dA $dt
 with der_shift1 $dA $dt ↪ der_shift_n db1 (SCSucc (SC0 (inv_context $dA)) (der_getΓ db0 (inv_context $dt))) $dA $dt;
 
 // Compatibility of translation with shifting
-// TODO τ_shift0T_eq
+rule τ_shift0T_eq $Γ $dT $dA $a ↪ heq_to_eq (τ_shift0_eq $Γ $dT $dA $a);
+
 // TODO τ_shift0_eq
