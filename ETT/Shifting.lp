@@ -199,7 +199,6 @@ with tsc_to_sc (TSCSucc $sc $dA _) ↪ SCSucc (tsc_to_sc $sc) $dA
 with tsc_to_tc (TSC0 $Γ _) ↪ $Γ
 with tsc_to_tc (TSCSucc $sc $dA $a) ↪ TPush (tsc_to_tc $sc) _ _ $dA $a;
 
-// TODO τ_shift_n
 symbol τ_shift_n {Γ : TContext} {s s' : Sort} {t T A : Term} (id : DBId)
                  (sc : ShiftTContext Γ id) (dt : der (tsc_to_ctx sc) t T s)
                  (dA : der (τ_Γ Γ) A (tsort s') (snext s'))
@@ -214,6 +213,12 @@ symbol τ_shiftT_n {Γ : TContext} {s s' : Sort} {T A : Term} (id : DBId)
     (τ (tsc_to_tc sc) dT)
     (τ (tsc_to_stc dA a sc) (der_shift_n id (tsc_to_sc sc) dA dT))) ≔
   heq_to_eq (τ_shift_n id sc dT dA a);
+// TODO τ_context_shift_n
+symbol τ_context_shift_n {Γ : TContext} {sa : Sort} {A : Term} (id i : DBId)
+                         (sc : ShiftTContext Γ id) (dA : der (τ_Γ Γ) A (tsort sa) (snext sa))
+                         (a : ITT.ε _ (τ Γ dA)) :
+  H (tgetShift i (tsc_to_tc sc))
+    (τ (tsc_to_stc dA a sc) (der_context_shift_n id i (tsc_to_sc sc) dA));
 
 rule tsc_to_stc $d $x (TSC0 $Γ _) ↪ TPush $Γ _ _ $d $x
 with tsc_to_stc $d $x (TSCSucc $sc $dA $a)
@@ -264,7 +269,12 @@ with τ_shift_n $id $sc (der_prop_type_eq _ _ _ _ _ $dA $da1 $da2) $d $x
          (τ_shift_n $id $sc $da2 $d $x)
          (convert_T (tsc_to_tc $sc) (inv_sort $da2) $dA)
          (convert_T (tsc_to_stc $d $x $sc) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $da2)) (der_shift_n $id (tsc_to_sc $sc) $d $dA)))
-// TODO der_var
+with τ_shift_n $id $sc (der_var _ $i $dΓ) $d $x
+  ↪ heq_trans
+       (heq_symm (heq_of_transport
+         (tgetShift $i (tsc_to_tc $sc))
+         (convert_T (tsc_to_tc $sc) (der_shift $i (τ_dΓ (tsc_to_tc $sc)) (tgetD $i (tsc_to_tc $sc))) (der_shift $i $dΓ (der_getΓ $i $dΓ)))))
+       (τ_context_shift_n $id $i $sc $d $x)
 with τ_shift_n $id $sc (der_type_conv _ _ _ _ _ $du $deq) $d $x
   ↪ heq_conj
        (heq_conj
