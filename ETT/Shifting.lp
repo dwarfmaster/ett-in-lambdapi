@@ -43,8 +43,6 @@ symbol der_context_shift_n {Γ : Context} {sa : Sort} {A : Term} (id i : DBId)
 rule sc_to_dsctx $d (SC0 $dΓ) ↪ der_context_push _ _ _ $d $dΓ
 with sc_to_dsctx $d (SCSucc $sc $dA) ↪ der_context_push _ _ _ (der_shift_n _ $sc $d $dA) (sc_to_dsctx $d $sc);
 
-symbol magic_eq (Γ : Context) (s : Sort) (T t1 t2 : Term) : der_eq Γ s T t1 t2;
-
 // der_shift_n
 rule der_shift_n _   $sc $d (der_sort _ $s _) ↪ der_sort _ $s (sc_to_dsctx $d $sc)
 with der_shift_n $id $sc $d (der_prod _ $s $s' $A $B $dA $dB) ↪ der_prod _ $s $s' (shift $id $A) (shift (dbsucc $id) $B)
@@ -213,7 +211,6 @@ symbol τ_shiftT_n {Γ : TContext} {s s' : Sort} {T A : Term} (id : DBId)
     (τ (tsc_to_tc sc) dT)
     (τ (tsc_to_stc dA a sc) (der_shift_n id (tsc_to_sc sc) dA dT))) ≔
   heq_to_eq (τ_shift_n id sc dT dA a);
-// TODO τ_context_shift_n
 symbol τ_context_shift_n {Γ : TContext} {sa : Sort} {A : Term} (id i : DBId)
                          (sc : ShiftTContext Γ id) (dA : der (τ_Γ Γ) A (tsort sa) (snext sa))
                          (a : ITT.ε _ (τ Γ dA)) :
@@ -230,8 +227,7 @@ rule τ_shift0T_eq $Γ $dT $dA $a ↪ τ_shiftT_n db0 (TSC0 $Γ (inv_context $dA
 with τ_shift0_eq $Γ $dt $dA $a ↪ τ_shift_n db0 (TSC0 $Γ (inv_context $dA)) $dt $dA $a;
 rule τ_shift1T_eq $Γ $dT $dA $dB $a $b ↪ τ_shiftT_n db1 (TSCSucc (TSC0 $Γ (inv_context $dB)) $dA $a) $dT $dB $b;
 
-symbol magic {s : ITT.Sort} (A : ITT.U s) : ITT.ε s A;
-
+// τ_shift_n
 rule τ_shift_n _ _ (der_sort _ $s _) _ _
   ↪ heq_refl _ (ITT.u (τ_s $s))
 with τ_shift_n $id $sc (der_prod _ $s _ $A _ $dA $dB) $d $x
@@ -414,4 +410,43 @@ with τ_shift_n $id $sc (der_refl _ _ _ _ $dA $du) $d $x
          (convert_T (tsc_to_stc $d $x $sc)
            (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du))
            (der_shift_n $id (tsc_to_sc $sc) $d $dA)))
+// τ_context_shift_n
+with τ_context_shift_n db0 $i (TSC0 $Γ $dΓ) $d $x
+  ↪ heq_trans
+       (heq_of_transport
+         (tgetShift $i $Γ)
+         (τ_shift0T_eq $Γ (der_shift $i (τ_dΓ $Γ) (tgetD $i $Γ)) $d $x))
+       (heq_of_transport
+         (tgetShift (dbsucc $i) (TPush $Γ _ _ $d $x))
+         (convert_T (TPush $Γ _ _ $d $x)
+                    (der_shift (dbsucc $i) (τ_dΓ (TPush $Γ _ _ $d $x)) (tgetD (dbsucc $i) (TPush $Γ _ _ $d $x)))
+                    (der_shift (dbsucc $i) (der_context_push _ _ _ $d $dΓ) (der_getΓ (dbsucc $i) (der_context_push _ _ _ $d $dΓ)))))
+with τ_context_shift_n (dbsucc _) db0 (TSCSucc $sc $dA $a) $d $x
+  ↪ heq_trans
+       (heq_conj
+         (heq_of_transport $a
+           (τ_shiftT_n _ $sc $dA $d $x))
+         (τ_shift0T_eq (tsc_to_tc $sc) $dA $dA $a)
+         (τ_shift0T_eq (tsc_to_stc $d $x $sc)
+                       (der_shift_n _ (tsc_to_sc $sc) $d $dA)
+                       (der_shift_n _ (tsc_to_sc $sc) $d $dA)
+                       (transport (τ_shiftT_n _ $sc $dA $d $x) $a)))
+       (heq_of_transport
+         (tgetShift db0 (tsc_to_stc $d $x (TSCSucc $sc $dA $a)))
+         (convert_T (tsc_to_stc $d $x (TSCSucc $sc $dA $a))
+                    (der_shift db0 (τ_dΓ (tsc_to_stc $d $x (TSCSucc $sc $dA $a))) (tgetD db0 (tsc_to_stc $d $x (TSCSucc $sc $dA $a))))
+                    (der_shift db0 (sc_to_dsctx $d (SCSucc (tsc_to_sc $sc) $dA)) (der_getΓ db0 (sc_to_dsctx $d (SCSucc (tsc_to_sc $sc) $dA))))))
+with τ_context_shift_n (dbsucc $id) (dbsucc $i) (TSCSucc $sc $dA $a) $d $x
+  ↪ heq_trans
+       (heq_symm (heq_of_transport
+         (tgetShift $i (tsc_to_tc $sc))
+         (τ_shift0T_eq (tsc_to_tc $sc)
+           (der_shift $i (τ_dΓ (tsc_to_tc $sc)) (tgetD $i (tsc_to_tc $sc)))
+           $dA $a)))
+       (heq_trans
+         (τ_context_shift_n $id $i $sc $d $x)
+         (τ_shift0_eq (tsc_to_stc $d $x $sc)
+           (der_context_shift_n $id $i (tsc_to_sc $sc) $d)
+           (der_shift_n _ (tsc_to_sc $sc) $d $dA)
+           (transport (τ_shiftT_n _ $sc $dA $d $x) $a)))
 ;

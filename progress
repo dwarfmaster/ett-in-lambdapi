@@ -22,6 +22,6 @@ Progress:
 [X] EqualityTranslation.lp
 [X] CongruencesTranslation.lp
 [X] HeadCompatibility.lp
-[-] Shifting.lp
+[X] Shifting.lp
 [-] Substitution.lp
 [ ] main.lp
