@@ -264,4 +264,144 @@ with τ_shift_n $id $sc (der_prop_type_eq _ _ _ _ _ $dA $da1 $da2) $d $x
          (τ_shift_n $id $sc $da2 $d $x)
          (convert_T (tsc_to_tc $sc) (inv_sort $da2) $dA)
          (convert_T (tsc_to_stc $d $x $sc) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $da2)) (der_shift_n $id (tsc_to_sc $sc) $d $dA)))
+// TODO der_var
+with τ_shift_n $id $sc (der_type_conv _ _ _ _ _ $du $deq) $d $x
+  ↪ heq_conj
+       (heq_conj
+         (τ_shift_n $id $sc $du $d $x)
+         (convert_T (tsc_to_tc $sc) (inv_sort $du) (inv_eq_t1 $deq))
+         (convert_T (tsc_to_stc $d $x $sc)
+                    (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du))
+                    (inv_eq_t1 (der_eq_shift_n $id (tsc_to_sc $sc) $d $deq))))
+       (τ_eqT (tsc_to_tc $sc) $deq)
+       (τ_eqT (tsc_to_stc $d $x $sc) (der_eq_shift_n $id (tsc_to_sc $sc) $d $deq))
+with τ_shift_n $id $sc (der_abs _ $s _ $A _ _ $dA _ $dt) $d $x
+  ↪ cong_lambda
+       (λ a, τ (TPush (tsc_to_tc $sc) $s $A $dA a) (inv_sort $dt))
+       (λ a, τ (TPush (tsc_to_stc $d $x $sc) $s (shift $id $A) (der_shift_n $id (tsc_to_sc $sc) $d $dA) a)
+               (inv_sort (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dt)))
+       (λ a, τ (TPush (tsc_to_tc $sc) $s $A $dA a) $dt)
+       (λ a, τ (TPush (tsc_to_stc $d $x $sc) $s (shift $id $A) (der_shift_n $id (tsc_to_sc $sc) $d $dA) a)
+               (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dt))
+       (τ_shift_n $id $sc $dA $d $x)
+       (λ p, heq_trans
+          (τ_shift_n _ (TSCSucc $sc $dA (projT1 p)) (inv_sort $dt) $d $x)
+          (convertR _ (PCPush (PCEmpty (tsc_to_stc $d $x $sc)) (der_shift_n $id (tsc_to_sc $sc) $d $dA) (der_shift_n $id (tsc_to_sc $sc) $d $dA)
+                              (heq_trans (heq_symm (heq_of_transport (projT1 p) (τ_shiftT_n _ $sc $dA $d $x))) (projHEq p)))
+                    (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d (inv_sort $dt))
+                    (inv_sort (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dt))))
+       (λ p, heq_trans
+          (τ_shift_n _ (TSCSucc $sc $dA (projT1 p)) $dt $d $x)
+          (convertR _ (PCPush (PCEmpty (tsc_to_stc $d $x $sc)) (der_shift_n $id (tsc_to_sc $sc) $d $dA) (der_shift_n $id (tsc_to_sc $sc) $d $dA)
+                              (heq_trans (heq_symm (heq_of_transport (projT1 p) (τ_shiftT_n _ $sc $dA $d $x))) (projHEq p)))
+                    (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dt)
+                    (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dt)))
+with τ_shift_n $id $sc (der_app _ $s _ $A _ _ _ $dA $dB $df $du) $d $x
+  ↪ heq_conj
+       (cong_app
+         (λ a, τ (TPush (tsc_to_tc $sc) $s $A (inv_sort $du) a) $dB)
+         (λ a, τ (TPush (tsc_to_stc $d $x $sc) $s (shift $id $A) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du)) a)
+                 (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB))
+         (heq_trans
+           (τ_shift_n $id $sc (inv_sort $du) $d $x)
+           (convert (tsc_to_stc $d $x $sc) (der_shift_n $id (tsc_to_sc $sc) $d (inv_sort $du)) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du))))
+         (λ p, heq_trans
+            (τ_shift_n _ (TSCSucc $sc (inv_sort $du) (projT1 p)) $dB $d $x)
+            (convertR _ (PCPush (PCEmpty (tsc_to_stc $d $x $sc)) (der_shift_n $id (tsc_to_sc $sc) $d (inv_sort $du)) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du))
+                                (heq_trans (heq_symm (heq_of_transport (projT1 p) (τ_shiftT_n _ $sc (inv_sort $du) $d $x))) (projHEq p)))
+                      (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) (inv_sort $du)) $d $dB)
+                      (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)))
+         (heq_conj
+           (τ_shift_n $id $sc $df $d $x)
+           (τ_fun_eq (tsc_to_tc $sc) (inv_sort $du) $dB (inv_sort $df))
+           (τ_fun_eq (tsc_to_stc $d $x $sc)
+                     (inv_sort (der_shift_n _ (tsc_to_sc $sc) $d $du))
+                     (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+                     (inv_sort (der_shift_n _ (tsc_to_sc $sc) $d $df))))
+         (τ_shift_n $id $sc $du $d $x))
+       (τ_substT_eq (tsc_to_tc $sc) $dB $du)
+       (τ_substT_eq (tsc_to_stc $d $x $sc) (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+                                           (der_shift_n _ (tsc_to_sc $sc)              $d $du))
+with τ_shift_n $id $sc (der_pair _ $s _ _ $A _ _ $dA $du $dB $dv) $d $x
+  ↪ cong_pair
+       (λ a, τ (TPush (tsc_to_tc $sc) $s $A (inv_sort $du) a) $dB)
+       (λ a, τ (TPush (tsc_to_stc $d $x $sc) $s (shift $id $A) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du)) a)
+               (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dB))
+       (heq_trans
+         (τ_shift_n $id $sc (inv_sort $du) $d $x)
+         (convert (tsc_to_stc $d $x $sc) (der_shift_n $id (tsc_to_sc $sc) $d (inv_sort $du)) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du))))
+       (λ p, heq_trans
+          (τ_shift_n _ (TSCSucc $sc (inv_sort $du) (projT1 p)) $dB $d $x)
+          (convertR _ (PCPush (PCEmpty (tsc_to_stc $d $x $sc)) (der_shift_n $id (tsc_to_sc $sc) $d (inv_sort $du)) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du))
+                              (heq_trans (heq_symm (heq_of_transport (projT1 p) (τ_shiftT_n _ $sc (inv_sort $du) $d $x))) (projHEq p)))
+                    (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) (inv_sort $du)) $d $dB)
+                    (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)))
+       (τ_shift_n $id $sc $du $d $x)
+       (heq_conj
+         (heq_conj
+           (τ_shift_n $id $sc $dv $d $x)
+           (convert_T (tsc_to_tc $sc) (inv_sort $dv) (substitution $dB $du))
+           (convert_T (tsc_to_stc $d $x $sc) (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $dv))
+             (substitution (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+                           (der_shift_n _ (tsc_to_sc $sc) $d $du))))
+         (inv_eq (τ_substT_eq (tsc_to_tc $sc) $dB $du))
+         (inv_eq (τ_substT_eq (tsc_to_stc $d $x $sc)
+                   (der_shift_n _ (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+                   (der_shift_n _ (tsc_to_sc $sc) $d $du))))
+with τ_shift_n $id $sc (der_π1 _ $s _ _ $A _ $dA $dB $dp) $d $x
+  ↪ cong_proj1
+       (λ a, τ (TPush (tsc_to_tc $sc) $s $A $dA a) $dB)
+       (λ a, τ (TPush (tsc_to_stc $d $x $sc) $s (shift $id $A) (der_shift_n $id (tsc_to_sc $sc) $d $dA) a)
+               (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB))
+       (τ_shift_n $id $sc $dA $d $x)
+       (λ p, heq_trans
+          (τ_shift_n _ (TSCSucc $sc $dA (projT1 p)) $dB $d $x)
+          (convertR _ (PCPush (PCEmpty (tsc_to_stc $d $x $sc)) (der_shift_n $id (tsc_to_sc $sc) $d $dA) (der_shift_n $id (tsc_to_sc $sc) $d $dA)
+                              (heq_trans (heq_symm (heq_of_transport (projT1 p) (τ_shiftT_n _ $sc $dA $d $x))) (projHEq p)))
+                    (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+                    (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)))
+       (heq_conj
+         (τ_shift_n $id $sc $dp $d $x)
+         (τ_sum_eq (tsc_to_tc $sc) $dA $dB (inv_sort $dp))
+         (τ_sum_eq (tsc_to_stc $d $x $sc)
+                   (der_shift_n $id (tsc_to_sc $sc) $d $dA)
+                   (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+                   (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $dp))))
+with τ_shift_n $id $sc (der_π2 _ $s $s' $p $A $B $dA $dB $dp) $d $x
+  ↪ heq_conj
+       (cong_proj2
+         (λ a, τ (TPush (tsc_to_tc $sc) $s $A $dA a) $dB)
+         (λ a, τ (TPush (tsc_to_stc $d $x $sc) $s (shift $id $A) (der_shift_n $id (tsc_to_sc $sc) $d $dA) a)
+                 (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB))
+         (τ_shift_n $id $sc $dA $d $x)
+         (λ p, heq_trans
+            (τ_shift_n _ (TSCSucc $sc $dA (projT1 p)) $dB $d $x)
+            (convertR _ (PCPush (PCEmpty (tsc_to_stc $d $x $sc)) (der_shift_n $id (tsc_to_sc $sc) $d $dA) (der_shift_n $id (tsc_to_sc $sc) $d $dA)
+                                (heq_trans (heq_symm (heq_of_transport (projT1 p) (τ_shiftT_n _ $sc $dA $d $x))) (projHEq p)))
+                      (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+                      (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)))
+         (heq_conj
+           (τ_shift_n $id $sc $dp $d $x)
+           (τ_sum_eq (tsc_to_tc $sc) $dA $dB (inv_sort $dp))
+           (τ_sum_eq (tsc_to_stc $d $x $sc)
+                     (der_shift_n $id (tsc_to_sc $sc) $d $dA)
+                     (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+                     (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $dp)))))
+       (τ_substT_eq (tsc_to_tc $sc) $dB (der_π1 (tsc_to_ctx $sc) $s $s' $p $A $B $dA $dB $dp))
+       (τ_substT_eq (tsc_to_stc $d $x $sc)
+         (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+         (der_π1 (tsc_to_sctx $d $sc) $s $s'
+           (shift $id $p) (shift $id $A) (shift (dbsucc $id) $B)
+           (der_shift_n $id (tsc_to_sc $sc) $d $dA)
+           (der_shift_n (dbsucc $id) (SCSucc (tsc_to_sc $sc) $dA) $d $dB)
+           (der_shift_n $id (tsc_to_sc $sc) $d $dp)))
+with τ_shift_n $id $sc (der_refl _ _ _ _ $dA $du) $d $x
+  ↪ cong_refl
+       (τ_shift_n $id $sc $dA $d $x)
+       (heq_conj
+         (τ_shift_n $id $sc $du $d $x)
+         (convert_T (tsc_to_tc $sc) (inv_sort $du) $dA)
+         (convert_T (tsc_to_stc $d $x $sc)
+           (inv_sort (der_shift_n $id (tsc_to_sc $sc) $d $du))
+           (der_shift_n $id (tsc_to_sc $sc) $d $dA)))
 ;
