@@ -41,3 +41,13 @@ symbol η_exp {s s' : Sort} {A : U s} {B : ε s A → U s'} (f : Π(a : ε s A),
 // Uip
 symbol uip (s : Sort) (A : U s) (u v : ε s A) (e1 e2 : ε s (eq s A u v)) : ε s (eq s (eq s A u v) e1 e2) ≔
   J s (smax s s) A u (λ v e2, P s s (eq s A u v) (λ e1, eq s (eq s A u v) e1 e2)) K v e2 e1;
+
+// Induction on eq (weaker J)
+symbol eq_ind {s s' : Sort} {A : U s} {a : ε s A} (P : ε s A → U s')
+              : ε s' (P a) → Π{b : ε s A}, ε s (eq s A a b) → ε s' (P b) ≔
+  λ w b p, J s s' A a (λ b _, P b) w b p;
+
+// Helpers when migratings terms from coq
+symbol rewr {s s' : Sort} {A : U s} {a b : ε s A} (p : ε s (eq s A a b))
+            (P : ε s A → U s') : ε s' (P a) → ε s' (P b) ≔
+  λ w, eq_ind P w p;

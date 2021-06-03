@@ -4,11 +4,23 @@ require open ETT.ILemmas;
 require open ETT.HEq;
 require open ETT.Packing;
 
+// Helpers
+symbol magic_rewr {s s' : Sort} {A : U s} {a b : ε s A} (_ : ε s (eq s A a b))
+                  (P : ε s A → U s') : ε s' (P b);
+symbol magic {s : Sort} (A : U s) : ε s A;
+
 // Product
-// TODO cong_prod
 symbol cong_prod {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
-                 (_ : H A1 A2) (_ : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
-                 : H (P s s' A1 B1) (P s s' A2 B2);
+                 (hA : H A1 A2) (hB : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
+                 : H (P s s' A1 B1) (P s s' A2 B2) ≔
+  rewr (heq_to_eq hA)
+    (λ A, P _ _ (P _ _ A (λ _, u s'))
+            (λ B, P _ _ (P _ _ (Pack' A1 A) (λ p, H' (B1 (projT1 p)) (B (projT2 p))))
+                    (λ _, H' (P s s' A1 B1) (P s s' A B))))
+    (λ B hB, rewr (packExt B1 B hB)
+      (λ B, H' (P s s' A1 B1) (P s s' A1 B))
+      (heq_refl _ (P s s' A1 B1)))
+    B2 hB;
 
 // Lambda
 // TODO cong_lambda
