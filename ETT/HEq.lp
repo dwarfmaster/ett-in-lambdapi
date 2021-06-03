@@ -42,11 +42,11 @@ symbol lift_to_heq {s s' : Sort} {A : U s} {B : ε s A → U s'}
                    : HEq s' (B u) (B v) (f u) (f v) ≔
   J s _ A u (λ v _, HEq' s' (B u) (B v) (f u) (f v)) (heq_refl (B u) (f u)) v p;
 
-// Proved using uip
+// Proved using K
 symbol heq_to_eq {s : Sort} {A : U s} {a b : ε s A} (h : HEq s A A a b) : ε s (eq s A a b) ≔
   J (snext s) s (eq (snext s) (u s) A A) (getTeq h)
     (λ p _, eq s A (transport p a) b) (getEq h)
-    (refl (snext s) (u s) A) (uip (snext s) (u s) A A (getTeq h) (refl (snext s) (u s) A));
+    (refl (snext s) (u s) A) (K (getTeq h));
 
 // Extend heterogeneous equality with transports to the left and to the right
 symbol heq_of_transport {s : Sort} {A B : U s} (a : ε s A)

@@ -38,10 +38,6 @@ symbol η_exp {s s' : Sort} {A : U s} {B : ε s A → U s'} (f : Π(a : ε s A),
              : ε _ (eq (smax s s') (P s s' A B) f (λ a, f a)) ≔
   funext s s' A B f (λ a, f a) (λ a, refl s' (B a) (f a));
 
-// Uip
-symbol uip (s : Sort) (A : U s) (u v : ε s A) (e1 e2 : ε s (eq s A u v)) : ε s (eq s (eq s A u v) e1 e2) ≔
-  J s (smax s s) A u (λ v e2, P s s (eq s A u v) (λ e1, eq s (eq s A u v) e1 e2)) K v e2 e1;
-
 // Induction on eq (weaker J)
 symbol eq_ind {s s' : Sort} {A : U s} {a : ε s A} (P : ε s A → U s')
               : ε s' (P a) → Π{b : ε s A}, ε s (eq s A a b) → ε s' (P b) ≔
