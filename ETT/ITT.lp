@@ -38,7 +38,9 @@ symbol J (s s' : Sort) (A : U s) (u : ε s A) (P : Π(x : ε s A), ε s (eq s A 
 rule J _ _ _ _ _ $w _ (refl _ _ _) ↪ $w;
 
 // Axioms
-constant symbol uip (s : Sort) (A : U s) (u v : ε s A) (e1 e2 : ε s (eq s A u v)) : ε s (eq s (eq s A u v) e1 e2);
+symbol K {s : Sort} {A : U s} {a : ε s A} (p : ε s (eq s A a a))
+         : ε s (eq s (eq s A a a) p (refl s A a));
+rule K (refl $s $A $a) ↪ refl $s (eq $s $A $a $a) (refl $s $A $a);
 constant symbol funext (s s' : Sort) (A : U s) (B : ε s A → U s') (f g : ε (smax s s') (P s s' A B))
                        (_ : Π(x : ε s A), ε s' (eq s' (B x) (f x) (g x)))
               : ε (smax s s') (eq (smax s s') (P s s' A B) f g);
