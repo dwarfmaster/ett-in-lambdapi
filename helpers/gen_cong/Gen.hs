@@ -31,17 +31,17 @@ genIType typef [] acc = "H' (" <> (fromString $ typef $ fmap orig acc) <> ") (" 
 genIType typef ((Simple s, name) : tl) acc =
   "P _ _ (u " <> (fromString $ show s) <> ") "
   <> "(λ " <> (fromString name) <> ", P _ _ (H' " <> fromString name <> "1 " <> fromString name <> ") "
-  <> "(" <> genIType typef tl (AccT s name (name <> "1") : acc) <> "))"
+  <> "(λ _, " <> genIType typef tl (AccT s name (name <> "1") : acc) <> "))"
 genIType typef ((Dep d s, name) : tl) acc =
   "P _ _ (P _ _ " <> (fromString $ val $ acc !! d) <> " (λ _, u " <> (fromString $ show s) <> ")) "
   <> "(λ " <> (fromString name) <> ", P _ _ "
      <> "(P _ _ (Pack' " <> (fromString $ orig $ acc !! d) <> " " <> (fromString $ val$ acc !! d) <> ") "
      <> "(λ p, H' (" <> fromString name <> "1 (projT1 p)) (" <> fromString name <> " (projT2 p)))) "
-  <> "(" <> genIType typef tl (AccT s name (name <> "1") : acc) <> "))"
+  <> "(λ _, " <> genIType typef tl (AccT s name (name <> "1") : acc) <> "))"
 genIType _ _ _ = "UNIMPLEMENTED"
 
 genCong :: Builder -> ([String] -> String) -> [(Arg,String)] -> [AccT] -> Builder
-genCong tabs typef [] acc = tabs <> "(heq_refl _ (" <> (fromString $ typef $ fmap val acc) <> ")"
+genCong tabs typef [] acc = tabs <> "(heq_refl _ (" <> (fromString $ typef $ fmap val acc) <> "))"
 genCong tabs typef ((Simple s, name) : tl) acc =
   let t = fromString name :: Builder in
   let hT = fromString ('h' : name) :: Builder in
@@ -51,10 +51,10 @@ genCong tabs typef ((Simple s, name) : tl) acc =
 genCong tabs typef ((Dep d s, name) : tl) acc =
   let t = fromString name :: Builder in
   let hT = fromString ('h' : name) :: Builder in
-  let a = AccT (SMax (sort $ acc !! d) s) name (name <> "1") in
-    tabs <> "(λ _ " <> hT <> ", rewr (packExt " <> fromString name <> "1 " <> t <> " " <> hT <> ")\n"
-    <> tabs <> "  (λ " <> t <> ", " <> genIType typef tl (a : acc) <> ")\n"
-    <> genCong (tabs <> "  ") typef tl (a : acc) <> ")"
+  let a = AccT (SMax (sort $ acc !! d) s) (name <> "1") (name <> "1") in
+    tabs <> "(λ " <> t <> " " <> hT <> ", rewr (packExt " <> fromString name <> "1 " <> t <> " " <> hT <> ")\n"
+    <> tabs <> "  (λ " <> t <> ", " <> genIType typef tl (AccT (SMax (sort $ acc !! d) s) name (name <> "1") : acc) <> ")\n"
+    <> genCong (tabs <> "  ") typef tl (AccT (SMax (sort $ acc !! d) s) (name <> "1") (name <> "1") : acc) <> ")"
 genCong _ _ ((Term _ _, _) : _) _ = "UNIMPLEMENTED"
 
 generators :: M.Map String ([(Arg,String)],[String] -> String)
