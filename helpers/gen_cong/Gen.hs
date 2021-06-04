@@ -40,22 +40,22 @@ genIType typef ((Dep d s, name) : tl) acc =
   <> "(" <> genIType typef tl (AccT s name (name <> "1") : acc) <> "))"
 genIType _ _ _ = "UNIMPLEMENTED"
 
-genCong :: ([String] -> String) -> [(Arg,String)] -> [AccT] -> Builder
-genCong typef [] acc = "(heq_refl _ (" <> (fromString $ typef $ fmap val acc) <> ")"
-genCong typef ((Simple s, name) : tl) acc =
+genCong :: Builder -> ([String] -> String) -> [(Arg,String)] -> [AccT] -> Builder
+genCong tabs typef [] acc = tabs <> "(heq_refl _ (" <> (fromString $ typef $ fmap val acc) <> ")"
+genCong tabs typef ((Simple s, name) : tl) acc =
   let t = fromString name :: Builder in
   let hT = fromString ('h' : name) :: Builder in
-    "(λ _ " <> hT <> ", rewr (heq_to_eq " <> hT <> ")\n"
-    <> "  (λ " <> t <> ", " <> genIType typef tl (AccT s name (name <> "1") : acc) <> ")\n"
-    <> genCong typef tl (AccT s (name <> "1") (name <> "1") : acc) <> ")"
-genCong typef ((Dep d s, name) : tl) acc =
+    tabs <> "(λ _ " <> hT <> ", rewr (heq_to_eq " <> hT <> ")\n"
+    <> tabs <> "  (λ " <> t <> ", " <> genIType typef tl (AccT s name (name <> "1") : acc) <> ")\n"
+    <> genCong (tabs <> "  ") typef tl (AccT s (name <> "1") (name <> "1") : acc) <> ")"
+genCong tabs typef ((Dep d s, name) : tl) acc =
   let t = fromString name :: Builder in
   let hT = fromString ('h' : name) :: Builder in
   let a = AccT (SMax (sort $ acc !! d) s) name (name <> "1") in
-    "(λ _ " <> hT <> ", rewr (packExt " <> fromString name <> "1 " <> t <> " " <> hT <> ")\n"
-    <> "  (λ " <> t <> ", " <> genIType typef tl (a : acc) <> ")\n"
-    <> genCong typef tl (a : acc) <> ")"
-genCong _ ((Term _ _, _) : _) _ = "UNIMPLEMENTED"
+    tabs <> "(λ _ " <> hT <> ", rewr (packExt " <> fromString name <> "1 " <> t <> " " <> hT <> ")\n"
+    <> tabs <> "  (λ " <> t <> ", " <> genIType typef tl (a : acc) <> ")\n"
+    <> genCong (tabs <> "  ") typef tl (a : acc) <> ")"
+genCong _ _ ((Term _ _, _) : _) _ = "UNIMPLEMENTED"
 
 generators :: M.Map String ([(Arg,String)],[String] -> String)
 generators = M.fromList
@@ -67,4 +67,4 @@ main = getArgs >>= \case
   [] -> putStrLn "Expected one argument"
   arg : _ -> (case M.lookup arg generators of
                Nothing -> putStrLn $ "Constructor " <> arg <> " not defined"
-               Just (args,typef) -> TIO.putStrLn $ toLazyText $ genCong typef args [])
+               Just (args,typef) -> TIO.putStrLn $ toLazyText $ genCong "  " typef args [])
