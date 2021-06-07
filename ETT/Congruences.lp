@@ -4,39 +4,52 @@ require open ETT.ILemmas;
 require open ETT.HEq;
 require open ETT.Packing;
 
-// Helpers
-symbol magic_rewr {s s' : Sort} {A : U s} {a b : ε s A} (_ : ε s (eq s A a b))
-                  (P : ε s A → U s') : ε s' (P b);
 symbol magic {s : Sort} (A : U s) : ε s A;
 
 // Product
 symbol cong_prod {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
                  (hA : H A1 A2) (hB : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
                  : H (P s s' A1 B1) (P s s' A2 B2) ≔
-  rewr (heq_to_eq hA)
-    (λ A, P _ _ (P _ _ A (λ _, u s'))
-            (λ B, P _ _ (P _ _ (Pack' A1 A) (λ p, H' (B1 (projT1 p)) (B (projT2 p))))
-                    (λ _, H' (P s s' A1 B1) (P s s' A B))))
-    (λ B hB, rewr (packExt B1 B hB)
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ (P _ _ A (λ _, u s')) (λ B, P _ _ (P _ _ (Pack' A1 A) (λ p, H' (B1 (projT1 p)) (B (projT2 p)))) (λ _, H' (P s s' A1 B1) (P s s' A B))))
+    (λ B hB, rewr (packExtT B1 B hB)
       (λ B, H' (P s s' A1 B1) (P s s' A1 B))
-      (heq_refl _ (P s s' A1 B1)))
-    B2 hB;
+      (heq_refl _ (P s s' A1 B1))))
+    A2 hA B2 hB;
 
 // Lambda
-// TODO cong_lambda
 symbol cong_lambda {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
                    (t1 : ε _ (P s s' A1 B1)) (t2 : ε _ (P s s' A2 B2))
-                   (_ : H A1 A2) (_ : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
-                   (_ : Π(p : Pack A1 A2), H (t1 (projT1 p)) (t2 (projT2 p)))
-                   : H t1 t2;
+                   (hA : H A1 A2) (hB : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
+                   (ht : Π(p : Pack A1 A2), H (t1 (projT1 p)) (t2 (projT2 p)))
+                   : H t1 t2 ≔
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ (P _ _ A (λ _, u s')) (λ B, P _ _ (P _ _ (Pack' A1 A) (λ p, H' (B1 (projT1 p)) (B (projT2 p)))) (λ _, P _ _ (P _ _ A B) (λ t, P _ _ (P _ _ (Pack' A1 A) (λ p, HEq' _ (B1 (projT1 p)) (B (projT2 p)) (t1 (projT1 p)) (t (projT2
+p)))) (λ _, HEq' _ (P _ _ A1 B1) (P _ _ A B) t1 t)))))
+    (λ B hB, @rewr _ _ _ B1 B (packExtT B1 B hB)
+      (λ B, P _ _ (P _ _ A1 B) (λ t, P _ _ (P _ _ (Pack' A1 A1) (λ p, HEq' _ (B1 (projT1 p)) (B (projT2 p)) (t1 (projT1 p)) (t (projT2 p)))) (λ _, HEq' _ (P _ _ A1 B1) (P _ _ A1 B) t1 t)))
+      (λ(t : ε _ (P _ _ A1 B1)) ht, rewr (packExt t1 t ht)
+        (λ t, HEq' _ (P _ _ A1 B1) (P _ _ A1 B1) t1 t)
+        (heq_refl (P _ _ A1 B1) t1))))
+    A2 hA B2 hB t2 ht;
 
 // Application
-// TODO cong_app
 symbol cong_app {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
                 {f1 : ε _ (P s s' A1 B1)} {f2 : ε _ (P s s' A2 B2)} {a1 : ε s A1} {a2 : ε s A2}
-                (_ : H A1 A2) (_ : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
-                (_ : H f1 f2) (_ : H a1 a2)
-                : H (f1 a1) (f2 a2);
+                (hA : H A1 A2) (hB : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
+                (hf : H f1 f2) (ha : H a1 a2)
+                : H (f1 a1) (f2 a2) ≔
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ (P _ _ A (λ _, u s')) (λ B, P _ _ (P _ _ (Pack' A1 A) (λ p, H' (B1 (projT1 p)) (B (projT2 p)))) (λ _, P _ _ (P _ _ A B) (λ(f : ε _ ((P _ _ A B))), P _ _ (H' f1 f) (λ _, P _ _ A (λ(a : ε _ (A)), P _ _ (H' a1 a) (λ _, HEq' _
+(B1 a1) (B a) (f1 a1) (f a))))))))
+    (λ B hB, @rewr _ _ _ B1 B (packExtT B1 B hB)
+      (λ B, P _ _ (P _ _ A1 B) (λ(f : ε _ ((P _ _ A1 B))), P _ _ (H' f1 f) (λ _, P _ _ A1 (λ(a : ε _ (A1)), P _ _ (H' a1 a) (λ _, HEq' _ (B1 a1) (B a) (f1 a1) (f a))))))
+      (λ f hf, @rewr _ _ (P _ _ A1 B1) f1 f (heq_to_eq hf)
+        (λ f, P _ _ A1 (λ(a : ε _ (A1)), P _ _ (H' a1 a) (λ _, HEq' _ (B1 a1) (B1 a) (f1 a1) (f a))))
+        (λ a ha, @rewr _ _ A1 a1 a (heq_to_eq ha)
+          (λ a, HEq' _ (B1 a1) (B1 a) (f1 a1) (f1 a))
+          (heq_refl (B1 a1) (f1 a1))))))
+    A2 hA B2 hB f2 hf a2 ha;
 
 // Sum
 // TODO cong_sum
