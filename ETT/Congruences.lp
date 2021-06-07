@@ -121,7 +121,12 @@ symbol cong_eq {s : Sort} {A1 A2 : U s} {a1 b1 : ε s A1} {a2 b2 : ε s A2}
   A2 hA a2 ha b2 hb;
 
 // Reflexivity
-// TODO cong_refl
 symbol cong_refl {s : Sort} {A1 A2 : U s} {a1 : ε s A1} {a2 : ε s A2}
-                 (_ : H A1 A2) (_ : H a1 a2)
-                 : H (refl s A1 a1) (refl s A2 a2);
+                 (hA : H A1 A2) (ha : H a1 a2)
+                 : H (refl s A1 a1) (refl s A2 a2) ≔
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ A (λ(a : ε _ (A)), P _ _ (H' a1 a) (λ _, HEq' _ (eq _ A1 a1 a1) (eq _ A a a) (refl _ A1 a1) (refl _ A a))))
+    (λ a ha, @rewr _ _ A1 a1 a (heq_to_eq ha)
+      (λ a, HEq' _ (eq _ A1 a1 a1) (eq _ A1 a a) (refl _ A1 a1) (refl _ A1 a))
+      (heq_refl (eq _ A1 a1 a1) (refl _ A1 a1))))
+  A2 hA a2 ha;

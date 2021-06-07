@@ -119,11 +119,16 @@ generators = M.fromList
                        , \[p,tb,ta] -> "(proj2 _ _ " <> ta <> " " <> tb <> " " <> p <> ")"
                        , \[p,tb,ta] -> "(" <> tb <> " (proj1 _ _ " <> ta <> " " <> tb <> " " <> p <> "))"))
            , ("eq", ([ (Simple (SVar "s"), "A")
-                     , (Term (\l -> t0 l), "a")
-                     , (Term (\l -> t0 l), "b")
+                     , (Term t0, "a")
+                     , (Term t0, "b")
                      ]
                     , \[b,a,ta] -> "(eq _ " <> ta <> " " <> a <> " " <> b <> ")"
                     , \_ -> "(u s)"))
+           , ("refl", ([ (Simple (SVar "s"), "A")
+                       , (Term t0, "a")
+                       ]
+                      , \[a,ta] -> "(refl _ " <> ta <> " " <> a <> ")"
+                      , \[a,ta] -> "(eq _ " <> ta <> " " <> a <> " " <> a <> ")"))
            ]
 
 main :: IO ()

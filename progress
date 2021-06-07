@@ -5,14 +5,14 @@
 Progress:
 [X] ITT.lp
 [X] ILemmas.lp
-[-] Congruences.lp
+[X] HEq.lp
+[X] Packing.lp
+[X] Congruences.lp
 [X] XAst.lp
 [X] DeBruijn.lp
 [X] XTyping.lp
 [X] XLemmas.lp
 [X] Inversions.lp
-[X] HEq.lp
-[X] Packing.lp
 [X] TranslationDefinition.lp
 [X] TContext.lp
 [X] TranslationLemmas.lp
