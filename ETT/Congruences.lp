@@ -108,10 +108,17 @@ symbol cong_proj2 {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s
   A2 hA B2 hB s2 hs;
 
 // Equality
-// TODO cong_eq
 symbol cong_eq {s : Sort} {A1 A2 : U s} {a1 b1 : ε s A1} {a2 b2 : ε s A2}
-               (_ : H A1 A2) (_ : H a1 a2) (_ : H b1 b2)
-               : H (eq s A1 a1 b1) (eq s A2 a2 b2);
+               (hA : H A1 A2) (ha : H a1 a2) (hb : H b1 b2)
+               : H (eq s A1 a1 b1) (eq s A2 a2 b2) ≔
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ A (λ(a : ε _ (A)), P _ _ (H' a1 a) (λ _, P _ _ A (λ(b : ε _ (A)), P _ _ (H' b1 b) (λ _, HEq' _ (u s) (u s) (eq _ A1 a1 b1) (eq _ A a b))))))
+    (λ a ha, @rewr _ _ A1 a1 a (heq_to_eq ha)
+      (λ a, P _ _ A1 (λ(b : ε _ (A1)), P _ _ (H' b1 b) (λ _, HEq' _ (u s) (u s) (eq _ A1 a1 b1) (eq _ A1 a b))))
+      (λ b hb, @rewr _ _ A1 b1 b (heq_to_eq hb)
+        (λ b, HEq' _ (u s) (u s) (eq _ A1 a1 b1) (eq _ A1 a1 b))
+        (heq_refl (u s) (eq _ A1 a1 b1)))))
+  A2 hA a2 ha b2 hb;
 
 // Reflexivity
 // TODO cong_refl
