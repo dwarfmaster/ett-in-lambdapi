@@ -25,8 +25,12 @@ symbol packRefl {s : Sort} {A : U s} (a : ε s A) : Pack A A ≔
   packHEq (heq_refl A a);
 
 // Extensionality reformulation using packing
-symbol packExt {s s' : Sort} {A : U s} (B1 : ε s A → U s') (B2 : ε s A → U s')
+symbol packExtT {s s' : Sort} {A : U s} (B1 : ε s A → U s') (B2 : ε s A → U s')
                (h : Π(p : Pack A A), H (B1 (projT1 p)) (B2 (projT2 p)))
                : ε _ (eq _ (P s (snext s') A (λ _, u s')) B1 B2) ≔
   funext s (snext s') A (λ _, u s') B1 B2
          (λ a, heq_to_eq (h (mkPack a a (heq_refl _ a))));
+symbol packExt {s s' : Sort} {A : U s} {B : ε s A → U s'}
+               (t1 t2 : ε _ (P s s' A B))
+               (h : Π(p : Pack A A), H (t1 (projT1 p)) (t2 (projT2 p)))
+               : ε _ (eq _ (P s s' A B) t1 t2);
