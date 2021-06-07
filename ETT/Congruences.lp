@@ -61,12 +61,21 @@ symbol cong_sum {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A
   A2 hA B2 hB;
 
 // Pair
-// TODO cong_pair
 symbol cong_pair {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
                  {a1 : ε s A1} {a2 : ε s A2} {b1 : ε s' (B1 a1)} {b2 : ε s' (B2 a2)}
-                 (_ : H A1 A2) (_ : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
-                 (_ : H a1 a2) (_ : H b1 b2)
-                 : H (mkS s s' A1 B1 a1 b1) (mkS s s' A2 B2 a2 b2);
+                 (hA : H A1 A2) (hB : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
+                 (ha : H a1 a2) (hb : H b1 b2)
+                 : H (mkS s s' A1 B1 a1 b1) (mkS s s' A2 B2 a2 b2) ≔
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ (P _ _ A (λ _, u s')) (λ B, P _ _ (P _ _ (Pack' A1 A) (λ p, H' (B1 (projT1 p)) (B (projT2 p)))) (λ _, P _ _ A (λ(a : ε _ (A)), P _ _ (H' a1 a) (λ _, P _ _ (B a) (λ(b : ε _ ((B a))), P _ _ (H' b1 b) (λ _, HEq' _ (S _ _ A1 B1) (S _ _ A B) (mkS _ _ A1 B1 a1 b1) (mkS _ _ A B a b))))))))
+    (λ B hB, @rewr _ _ _ B1 B (packExtT B1 B hB)
+      (λ B, P _ _ A1 (λ(a : ε _ (A1)), P _ _ (H' a1 a) (λ _, P _ _ (B a) (λ(b : ε _ ((B a))), P _ _ (H' b1 b) (λ _, HEq' _ (S _ _ A1 B1) (S _ _ A1 B) (mkS _ _ A1 B1 a1 b1) (mkS _ _ A1 B a b))))))
+      (λ a ha, @rewr _ _ A1 a1 a (heq_to_eq ha)
+        (λ a, P _ _ (B1 a) (λ(b : ε _ ((B1 a))), P _ _ (H' b1 b) (λ _, HEq' _ (S _ _ A1 B1) (S _ _ A1 B1) (mkS _ _ A1 B1 a1 b1) (mkS _ _ A1 B1 a b))))
+        (λ b hb, @rewr _ _ (B1 a1) b1 b (heq_to_eq hb)
+          (λ b, HEq' _ (S _ _ A1 B1) (S _ _ A1 B1) (mkS _ _ A1 B1 a1 b1) (mkS _ _ A1 B1 a1 b))
+          (heq_refl (S _ _ A1 B1) (mkS _ _ A1 B1 a1 b1))))))
+  A2 hA B2 hB a2 ha b2 hb;
 
 // First projection
 // TODO cong_proj1

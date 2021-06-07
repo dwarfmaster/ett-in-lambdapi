@@ -99,6 +99,13 @@ generators = M.fromList
                       \[x,f,_,_] -> "(" <> f <> " " <> x <> ")",
                       \[x,_,b,_] -> "(" <> b <> " " <> x <> ")"))
            , ("sum", ([(Simple (SVar "s"), "A"), (Dep 0 (SVar "s'"), "B")], \[b, a] -> "(S s s' " <> a <> " " <> b <> ")", \_ -> "(u (smax s s'))"))
+           , ("pair", ([ (Simple (SVar "s"), "A")
+                       , (Dep 0 (SVar "s'"), "B")
+                       , (Term (\l -> t0 l), "a")
+                       , (Term (\l -> "(" <> t1 l <> " " <> head l <> ")"), "b")
+                       ]
+                      , \[b,a,tb,ta] -> "(mkS _ _ " <> ta <> " " <> tb <> " " <> a <> " " <> b <> ")"
+                      , \[_,_,tb,ta] -> "(S _ _ " <> ta <> " " <> tb <> ")"))
            ]
 
 main :: IO ()
