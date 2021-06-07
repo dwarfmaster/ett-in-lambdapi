@@ -78,12 +78,19 @@ symbol cong_pair {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s 
   A2 hA B2 hB a2 ha b2 hb;
 
 // First projection
-// TODO cong_proj1
 symbol cong_proj1 {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
                   {s1 : ε _ (S s s' A1 B1)} {s2 : ε _ (S s s' A2 B2)}
-                  (_ : H A1 A2) (_ : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
-                  (_ : H s1 s2)
-                  : H (proj1 s s' A1 B1 s1) (proj1 s s' A2 B2 s2);
+                  (hA : H A1 A2) (hB : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
+                  (hs : H s1 s2)
+                  : H (proj1 s s' A1 B1 s1) (proj1 s s' A2 B2 s2) ≔
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ (P _ _ A (λ _, u s')) (λ B, P _ _ (P _ _ (Pack' A1 A) (λ p, H' (B1 (projT1 p)) (B (projT2 p)))) (λ _, P _ _ (S _ _ A B) (λ(s : ε _ ((S _ _ A B))), P _ _ (H' s1 s) (λ _, HEq' _ A1 A (proj1 _ _ A1 B1 s1) (proj1 _ _ A B s))))))
+    (λ B hB, @rewr _ _ _ B1 B (packExtT B1 B hB)
+      (λ B, P _ _ (S _ _ A1 B) (λ(s : ε _ ((S _ _ A1 B))), P _ _ (H' s1 s) (λ _, HEq' _ A1 A1 (proj1 _ _ A1 B1 s1) (proj1 _ _ A1 B s))))
+      (λ s hs, @rewr _ _ (S _ _ A1 B1) s1 s (heq_to_eq hs)
+        (λ s, HEq' _ A1 A1 (proj1 _ _ A1 B1 s1) (proj1 _ _ A1 B1 s))
+        (heq_refl A1 (proj1 _ _ A1 B1 s1)))))
+  A2 hA B2 hB s2 hs;
 
 // Second projection
 // TODO cong_proj2

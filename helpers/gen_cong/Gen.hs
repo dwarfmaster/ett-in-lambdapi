@@ -106,6 +106,12 @@ generators = M.fromList
                        ]
                       , \[b,a,tb,ta] -> "(mkS _ _ " <> ta <> " " <> tb <> " " <> a <> " " <> b <> ")"
                       , \[_,_,tb,ta] -> "(S _ _ " <> ta <> " " <> tb <> ")"))
+           , ("proj1", ([ (Simple (SVar "s"), "A")
+                        , (Dep 0 (SVar "s'"), "B")
+                        , (Term (\l -> "(S _ _ " <> t0 l <> " " <> t1 l <> ")"), "s")
+                        ]
+                       , \[p,tb,ta] -> "(proj1 _ _ " <> ta <> " " <> tb <> " " <> p <> ")"
+                       , \[_,_,ta] -> ta))
            ]
 
 main :: IO ()
