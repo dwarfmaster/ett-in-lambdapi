@@ -93,42 +93,68 @@ t1 lst = (reverse lst) !! 1
 
 generators :: M.Map String ([(Arg,String)],[String] -> String,[String] -> String)
 generators = M.fromList
-           [ ("prod", ([(Simple (SVar "s"), "A"), (Dep 0 (SVar "s'"), "B")], \[b, a] -> "(P s s' " <> a <> " " <> b <> ")", \_ -> "(u (smax s s'))"))
-           , ("lambda", ([(Simple (SVar "s"), "A"), (Dep 0 (SVar "s'"), "B"), (TermDep 1 0, "t")], \[t, _, _] -> t, \[_, b, a] -> "(P _ _ " <> a <> " " <> b <> ")"))
-           , ("app", ([(Simple (SVar "s"), "A"), (Dep 0 (SVar "s'"), "B"), (Term (\l -> "(P _ _ " <> t0 l <> " " <> t1 l <> ")"), "f"), (Term t0, "a")],
-                      \[x,f,_,_] -> "(" <> f <> " " <> x <> ")",
-                      \[x,_,b,_] -> "(" <> b <> " " <> x <> ")"))
-           , ("sum", ([(Simple (SVar "s"), "A"), (Dep 0 (SVar "s'"), "B")], \[b, a] -> "(S s s' " <> a <> " " <> b <> ")", \_ -> "(u (smax s s'))"))
-           , ("pair", ([ (Simple (SVar "s"), "A")
-                       , (Dep 0 (SVar "s'"), "B")
-                       , (Term (\l -> t0 l), "a")
-                       , (Term (\l -> "(" <> t1 l <> " " <> head l <> ")"), "b")
-                       ]
-                      , \[b,a,tb,ta] -> "(mkS _ _ " <> ta <> " " <> tb <> " " <> a <> " " <> b <> ")"
-                      , \[_,_,tb,ta] -> "(S _ _ " <> ta <> " " <> tb <> ")"))
-           , ("proj1", ([ (Simple (SVar "s"), "A")
-                        , (Dep 0 (SVar "s'"), "B")
-                        , (Term (\l -> "(S _ _ " <> t0 l <> " " <> t1 l <> ")"), "s")
-                        ]
-                       , \[p,tb,ta] -> "(proj1 _ _ " <> ta <> " " <> tb <> " " <> p <> ")"
-                       , \[_,_,ta] -> ta))
-           , ("proj2", ([ (Simple (SVar "s"), "A")
-                        , (Dep 0 (SVar "s'"), "B")
-                        , (Term (\l -> "(S _ _ " <> t0 l <> " " <> t1 l <> ")"), "s")
-                        ]
-                       , \[p,tb,ta] -> "(proj2 _ _ " <> ta <> " " <> tb <> " " <> p <> ")"
-                       , \[p,tb,ta] -> "(" <> tb <> " (proj1 _ _ " <> ta <> " " <> tb <> " " <> p <> "))"))
-           , ("eq", ([ (Simple (SVar "s"), "A")
-                     , (Term t0, "a")
-                     , (Term t0, "b")
-                     ]
-                    , \[b,a,ta] -> "(eq _ " <> ta <> " " <> a <> " " <> b <> ")"
-                    , \_ -> "(u s)"))
-           , ("refl", ([ (Simple (SVar "s"), "A")
-                       , (Term t0, "a")
-                       ]
-                      , \[a,ta] -> "(refl _ " <> ta <> " " <> a <> ")"
-                      , \[a,ta] -> "(eq _ " <> ta <> " " <> a <> " " <> a <> ")"))
+           [ ("prod",
+              ([ (Simple (SVar "s"), "A")
+               , (Dep 0 (SVar "s'"), "B")
+               ]
+              , \[b, a] -> "(P s s' " <> a <> " " <> b <> ")"
+              , \_ -> "(u (smax s s'))"))
+           , ("lambda",
+              ([ (Simple (SVar "s"), "A")
+               , (Dep 0 (SVar "s'"), "B")
+               , (TermDep 1 0, "t")
+               ]
+              , \[t, _, _] -> t
+              , \[_, b, a] -> "(P _ _ " <> a <> " " <> b <> ")"))
+           , ("app",
+              ([ (Simple (SVar "s"), "A")
+               , (Dep 0 (SVar "s'"), "B")
+               , (Term (\l -> "(P _ _ " <> t0 l <> " " <> t1 l <> ")"), "f")
+               , (Term t0, "a")
+               ]
+              , \[x,f,_,_] -> "(" <> f <> " " <> x <> ")"
+              , \[x,_,b,_] -> "(" <> b <> " " <> x <> ")"))
+           , ("sum",
+              ([ (Simple (SVar "s"), "A")
+               , (Dep 0 (SVar "s'"), "B")
+               ]
+              , \[b, a] -> "(S s s' " <> a <> " " <> b <> ")"
+              , \_ -> "(u (smax s s'))"))
+           , ("pair",
+              ([ (Simple (SVar "s"), "A")
+               , (Dep 0 (SVar "s'"), "B")
+               , (Term (\l -> t0 l), "a")
+               , (Term (\l -> "(" <> t1 l <> " " <> head l <> ")"), "b")
+               ]
+              , \[b,a,tb,ta] -> "(mkS _ _ " <> ta <> " " <> tb <> " " <> a <> " " <> b <> ")"
+              , \[_,_,tb,ta] -> "(S _ _ " <> ta <> " " <> tb <> ")"))
+           , ("proj1",
+              ([ (Simple (SVar "s"), "A")
+               , (Dep 0 (SVar "s'"), "B")
+               , (Term (\l -> "(S _ _ " <> t0 l <> " " <> t1 l <> ")"), "s")
+               ]
+              , \[p,tb,ta] -> "(proj1 _ _ " <> ta <> " " <> tb <> " " <> p <> ")"
+              , \[_,_,ta] -> ta))
+           , ("proj2",
+              ([ (Simple (SVar "s"), "A")
+               , (Dep 0 (SVar "s'"), "B")
+               , (Term (\l -> "(S _ _ " <> t0 l <> " " <> t1 l <> ")"), "s")
+               ]
+              , \[p,tb,ta] -> "(proj2 _ _ " <> ta <> " " <> tb <> " " <> p <> ")"
+              , \[p,tb,ta] -> "(" <> tb <> " (proj1 _ _ " <> ta <> " " <> tb <> " " <> p <> "))"))
+           , ("eq",
+              ([ (Simple (SVar "s"), "A")
+               , (Term t0, "a")
+               , (Term t0, "b")
+               ]
+              , \[b,a,ta] -> "(eq _ " <> ta <> " " <> a <> " " <> b <> ")"
+              , \_ -> "(u s)"))
+           , ("refl",
+              ([ (Simple (SVar "s"), "A")
+               , (Term t0, "a")
+               ]
+              , \[a,ta] -> "(refl _ " <> ta <> " " <> a <> ")"
+              , \[a,ta] -> "(eq _ " <> ta <> " " <> a <> " " <> a <> ")"))
            ]
 
 main :: IO ()
