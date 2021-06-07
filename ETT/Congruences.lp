@@ -4,8 +4,6 @@ require open ETT.ILemmas;
 require open ETT.HEq;
 require open ETT.Packing;
 
-symbol magic {s : Sort} (A : U s) : ε s A;
-
 // Product
 symbol cong_prod {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
                  (hA : H A1 A2) (hB : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
@@ -52,10 +50,15 @@ symbol cong_app {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A
     A2 hA B2 hB f2 hf a2 ha;
 
 // Sum
-// TODO cong_sum
 symbol cong_sum {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
-                (_ : H A1 A2) (_ : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
-                : H (S s s' A1 B1) (S s s' A2 B2);
+                (hA : H A1 A2) (hB : Π(p : Pack A1 A2), H (B1 (projT1 p)) (B2 (projT2 p)))
+                : H (S s s' A1 B1) (S s s' A2 B2) ≔
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ (P _ _ A (λ _, u s')) (λ B, P _ _ (P _ _ (Pack' A1 A) (λ p, H' (B1 (projT1 p)) (B (projT2 p)))) (λ _, HEq' _ (u (smax s s')) (u (smax s s')) (S s s' A1 B1) (S s s' A B))))
+    (λ B hB, @rewr _ _ _ B1 B (packExtT B1 B hB)
+      (λ B, HEq' _ (u (smax s s')) (u (smax s s')) (S s s' A1 B1) (S s s' A1 B))
+      (heq_refl (u (smax s s')) (S s s' A1 B1))))
+  A2 hA B2 hB;
 
 // Pair
 // TODO cong_pair
