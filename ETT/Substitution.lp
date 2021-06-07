@@ -19,7 +19,7 @@ symbol deq_cong_subst {Γ : Context} (id : ETT.DBId) (sc : ShiftContext Γ id)
                       (_ : der (sc_to_sctx (inv_eq_t1 deqA) sc) B1 (ETT.tsort s') (ETT.snext s')) (_ : der (sc_to_sctx (inv_eq_t2 deqA) sc) B2 (ETT.tsort s') (ETT.snext s'))
                       (_ : der (sc_to_sctx (inv_eq_t1 deqA) sc) f1 B1 s') (_ : der (sc_to_sctx (inv_eq_t2 deqA) sc) f2 B2 s')
                       (_ : der Γ t1 A1 s) (_ : der Γ t2 A2 s)
-                      : der_eq (sc_to_ctx sc) s' (subst id t1 B1) (subst id t1 f1) (subst id t2 f2);
+                      : der_eq (sc_to_ctx sc) s' (subst id (Shift* id t1) B1) (subst id (Shift* id t1) f1) (subst id (Shift* id t2) f2);
 rule @der_eq_cong_apply $Γ $s $s' $A1 $A2 _ _ _ _ $deqA $deqB $deqt $dB1 $dB2 $dt1 $dt2
   ↪ deq_cong_subst db0 (SC0 (inv_eq_context $deqA)) $deqA
                     (der_eq_refl (Push $A1 $s $Γ) (ETT.snext (ETT.snext $s')) (ETT.tsort $s') (ETT.tsort (ETT.snext $s'))
@@ -33,8 +33,15 @@ rule @der_eq_cong_apply $Γ $s $s' $A1 $A2 _ _ _ _ $deqA $deqB $deqt $dB1 $dB2 $
 symbol der_subst {Γ : Context} (id : ETT.DBId) (sc : ShiftContext Γ id)
                  {s s' : ETT.Sort} {A B C u : ETT.Term}
                  (du : der Γ u A s) (_ : der (sc_to_sctx (inv_sort du) sc) C B s')
-                 : der (sc_to_ctx sc) (subst id u C) (subst id u B) s';
+                 : der (sc_to_ctx sc) (subst id (Shift* id u) C) (subst id (Shift* id u) B) s';
 rule substitution $dB $du ↪ der_subst db0 (SC0 (inv_context $du)) $du $dB;
+
+//rule der_subst _ $sc _ (der_sort _ $s _) ↪ der_sort (sc_to_ctx $sc) $s (sc_to_dctx $sc)
+//with der_subst $id $sc $d (der_prod _ $s $s' $A $B $dA $dB)
+//  ↪ der_prod (sc_to_ctx $sc) $s $s' _ _
+//              (der_subst $id $sc $d $dA)
+//              (der_subst (dbsucc $id) (SCSucc $sc $dA) (der_shift0 $dA $d) $dB)
+//;
 
 // TODO τ_subst_n
 symbol τ_subst_n {Γ : TContext} (id : ETT.DBId) (sc : ShiftTContext Γ id)

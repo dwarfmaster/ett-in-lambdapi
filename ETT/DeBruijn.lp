@@ -39,10 +39,12 @@ with shift $i (trefl $A $u) ↪ trefl (shift $i $A) (shift $i $u)
 with shift $i (teq $A $u $v) ↪ teq (shift $i $A) (shift $i $u) (shift $i $v);
 symbol Shift : Term → Term ≔ shift db0;
 symbol Shift1 : Term → Term ≔ shift db1;
+symbol Shift* : DBId → Term → Term;
 symbol ShiftN : DBId → Term → Term;
-rule ShiftN db0 $t ↪ Shift $t
-with ShiftN (dbsucc $n) $t ↪ Shift (ShiftN $n $t)
-with ShiftN _ (tsort $s) ↪ tsort $s;
+rule Shift* db0 $t ↪ $t
+with Shift* (dbsucc $n) $t ↪ Shift (Shift* $n $t)
+with Shift* _ (tsort $s) ↪ tsort $s
+with ShiftN $i $t ↪ Shift (Shift* $i $t);
 
 // Some confluent commutations
 rule shift db0 (shift $i $t) ↪ shift (dbsucc $i) (Shift $t);
