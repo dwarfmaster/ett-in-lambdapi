@@ -75,8 +75,9 @@ with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
 
 // Some substitution commutation
-rule subst db0 _ (Shift $t) ↪ $t
+rule subst db0 _ (shift db0 $t) ↪ $t
 with subst $id (var $id) (shift (dbsucc $id) $t) ↪ $t
 with shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id) $t)
 with subst $id (Shift* $id $u) (subst db0 $t1 $t2)
-  ↪ apply1 (subst (dbsucc $id) (Shift* (dbsucc $id) $u) $t2) (subst $id (Shift* $id $u) $t1);
+  ↪ apply1 (subst (dbsucc $id) (Shift* (dbsucc $id) $u) $t2) (subst $id (Shift* $id $u) $t1)
+with subst (dbsucc $id) (shift db0 $u) (shift db0 $t) ↪ shift db0 (subst $id $u $t);

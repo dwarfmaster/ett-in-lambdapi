@@ -61,6 +61,15 @@ symbol der_subst {Γ : Context} (id : ETT.DBId)
                  (_ : der (sc_to_ctx sc) C B s')
                  : der (sc_to_sctx du sc) (subst id (Shift* id u) C) (subst id (Shift* id u) B) s';
 rule substitution $dB $du ↪ der_subst db0 $du (SC0 (inv_sort $du)) $dB;
+// TODO der_context_subst
+symbol der_context_subst
+       {Γ : Context} (id : ETT.DBId)
+       {s : ETT.Sort} {A u : ETT.Term}
+       (d : der Γ u A s) (sc : SubstContext (inv_sort d) id)
+       (i : ETT.DBId)
+       : der (sc_to_sctx d sc) (dbselect id i (Shift* id u) (ETT.var i) (ETT.var (dbprev i)))
+             (subst id (Shift* id u) (ShiftN i (get (sc_to_ctx sc) i)))
+             (getS (sc_to_ctx sc) i);
 
 // Types
 rule der_subst _ $d $sc (der_sort _ $s _) ↪ der_sort (sc_to_sctx $d $sc) $s (sc_to_dsctx $d $sc)
@@ -79,7 +88,14 @@ with der_subst $id $d $sc (der_prop_type_eq _ $s _ _ _ $dA $du $dv)
                       (der_subst $id $d $sc $dv)
 
 // Structural
-// TODO der_var
+with der_subst $id $d $sc (der_var _ $i _)
+  ↪ der_context_subst $id $d $sc $i
+with der_context_subst db0 $d (SC0 _) db0
+  ↪ $d
+with der_context_subst (dbsucc _) $d (SCPush $sc $dA) db0
+  ↪ der_var _ db0 (sc_to_dsctx $d (SCPush $sc $dA))
+//with der_context_subst db0 $d (SC0 $Γ) (dbsucc $i)
+//  ↪ der_var _ $i (sc_to_dsctx $d (SC0 $Γ))
 // TODO der_type_conv
 
 // λ-calculus
