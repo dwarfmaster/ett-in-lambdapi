@@ -18,6 +18,7 @@ symbol sc_to_dctx {Γ : Context} {A : ETT.Term} {s : ETT.Sort} {d : der Γ A (ET
                   (sc : SubstContext d id) : der_context (sc_to_ctx sc);
 symbol sc_to_sctx {Γ : Context} {A t : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}
                   : der Γ t A s → SubstContext d id → Context;
+// TODO sc_to_dsctx
 symbol sc_to_dsctx {Γ : Context} {A t : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}
                    (dt : der Γ t A s) (sc : SubstContext d id) : der_context (sc_to_sctx dt sc);
 
@@ -61,12 +62,60 @@ symbol der_subst {Γ : Context} (id : ETT.DBId)
                  : der (sc_to_sctx du sc) (subst id (Shift* id u) C) (subst id (Shift* id u) B) s';
 rule substitution $dB $du ↪ der_subst db0 $du (SC0 (inv_sort $du)) $dB;
 
-//rule der_subst _ $sc _ (der_sort _ $s _) ↪ der_sort (sc_to_ctx $sc) $s (sc_to_dctx $sc)
-//with der_subst $id $sc $d (der_prod _ $s $s' $A $B $dA $dB)
-//  ↪ der_prod (sc_to_ctx $sc) $s $s' _ _
-//              (der_subst $id $sc $d $dA)
-//              (der_subst (dbsucc $id) (SCSucc $sc (der_subst $id $sc $d $dA)) $d $dB)
-//;
+// Types
+rule der_subst _ $d $sc (der_sort _ $s _) ↪ der_sort (sc_to_sctx $d $sc) $s (sc_to_dsctx $d $sc)
+with der_subst $id $d $sc (der_prod _ $s $s' _ _ $dA $dB)
+  ↪ der_prod (sc_to_sctx $d $sc) $s $s' _ _
+              (der_subst $id $d $sc $dA)
+              (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+with der_subst $id $d $sc (der_sigma _ $s $s' _ _ $dA $dB)
+  ↪ der_sigma (sc_to_sctx $d $sc) $s $s' _ _
+               (der_subst $id $d $sc $dA)
+               (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+with der_subst $id $d $sc (der_prop_type_eq _ $s _ _ _ $dA $du $dv)
+  ↪ der_prop_type_eq _ $s _ _ _
+                      (der_subst $id $d $sc $dA)
+                      (der_subst $id $d $sc $du)
+                      (der_subst $id $d $sc $dv)
+
+// Structural
+// TODO der_var
+// TODO der_type_conv
+
+// λ-calculus
+with der_subst $id $d $sc (der_abs _ $s $s' _ _ _ $dA $dB $dt)
+  ↪ der_abs _ $s $s' _ _ _
+             (der_subst $id $d $sc $dA)
+             (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+             (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dt)
+with der_subst $id $d $sc (der_app _ $s $s' _ _ _ _ $dA $dB $df $da)
+  ↪ der_app _ $s $s' _ _ _ _
+             (der_subst $id $d $sc $dA)
+             (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+             (der_subst $id $d $sc $df)
+             (der_subst $id $d $sc $da)
+with der_subst $id $d $sc (der_pair _ $s $s' _ _ _ _ $dA $du $dB $dv)
+  ↪ der_pair _ $s $s' _ _ _ _
+              (der_subst $id $d $sc $dA)
+              (der_subst $id $d $sc $du)
+              (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+              (der_subst $id $d $sc $dv)
+with der_subst $id $d $sc (der_π1 _ $s $s' _ _ _ $dA $dB $dp)
+  ↪ der_π1 _ $s $s' _ _ _
+            (der_subst $id $d $sc $dA)
+            (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+            (der_subst $id $d $sc $dp)
+with der_subst $id $d $sc (der_π2 _ $s $s' _ _ _ $dA $dB $dp)
+  ↪ der_π2 _ $s $s' _ _ _
+            (der_subst $id $d $sc $dA)
+            (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+            (der_subst $id $d $sc $dp)
+// Equality
+with der_subst $id $d $sc (der_refl _ $s _ _ $dA $du)
+  ↪ der_refl _ $s _ _
+              (der_subst $id $d $sc $dA)
+              (der_subst $id $d $sc $du)
+;
 
 // TODO τ_subst_n
 //symbol τ_subst_n {Γ : TContext} (id : ETT.DBId) (sc : ShiftTContext Γ id)

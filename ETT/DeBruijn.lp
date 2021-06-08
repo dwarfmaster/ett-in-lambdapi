@@ -1,6 +1,8 @@
 
 require open ETT.XAst;
 
+// TODO check confluence
+
 /* De Bruijn indices */
 constant symbol db0 : DBId;
 constant symbol dbsucc : DBId → DBId;
@@ -70,7 +72,11 @@ with subst $i $V (π2 $A $B $p) ↪ π2 (subst $i $V $A) (subst (dbsucc $i) (Shi
 with subst $i $V (tsum $A $B) ↪ tsum (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B)
 with subst $i $V (trefl $A $u) ↪ trefl (subst $i $V $A) (subst $i $V $u)
 with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst $i $V $v);
-rule subst db0 _ (Shift $t) ↪ $t
-with subst $id (var $id) (shift (dbsucc $id) $t) ↪ $t;
-rule shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id) $t);
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
+
+// Some substitution commutation
+rule subst db0 _ (Shift $t) ↪ $t
+with subst $id (var $id) (shift (dbsucc $id) $t) ↪ $t
+with shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id) $t)
+with subst $id (Shift* $id $u) (subst db0 $t1 $t2)
+  ↪ apply1 (subst (dbsucc $id) (Shift* (dbsucc $id) $u) $t2) (subst $id (Shift* $id $u) $t1);
