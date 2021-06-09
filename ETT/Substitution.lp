@@ -53,7 +53,6 @@ rule @der_eq_cong_apply $Γ $s $s' $A1 $A2 _ _ _ _ $deqA $deqB $deqt $dB1 $dB2 $
                     (der_sort (Push $A2 $s $Γ) $s' (inv_context $dB2))
                     $dB1 $dB2 $dt1 $dt2;
 
-// TODO der_subst
 symbol der_subst {Γ : Context} (id : ETT.DBId)
                  {s s' : ETT.Sort} {A B C u : ETT.Term}
                  (du : der Γ u A s) (sc : SubstContext (inv_sort du) id)
@@ -116,6 +115,11 @@ with der_subst _ $d $sc (der_type_conv _ _ _ _ $s $du $deq)
   ↪ der_type_conv _ _ _ _ $s
                    (der_subst _ $d $sc $du)
                    (der_eq_subst _ $d $sc $deq)
+with der_eq_subst $id $d $sc $deq
+  ↪ deq_cong_subst $id (der_eq_refl _ _ _ _ (inv_sort $d)) $sc $sc
+                    (der_eq_refl _ _ _ _ (inv_eq_sort $deq)) $deq
+                    (der_eq_refl _ _ _ _ $d)
+                    (inv_eq_sort $deq) (inv_eq_sort $deq) (inv_eq_t1 $deq) (inv_eq_t2 $deq) $d $d
 
 // λ-calculus
 with der_subst $id $d $sc (der_abs _ $s $s' _ _ _ $dA $dB $dt)
