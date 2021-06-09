@@ -87,3 +87,9 @@ symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
 symbol teq_subst_shift (i : DBId) (u t : Term) :
   TEq (subst (dbsucc i) (Shift u) (Shift t))
       (Shift (subst i u t));
+symbol teq_shift_cancel_subst (i : DBId) (u t : Term) :
+  TEq (subst i u (shift (dbsucc i) (shift i t)))
+      (shift i t);
+symbol teq_select_shift (i id : DBId) (V : Term) :
+  TEq (dbselect (dbsucc i) (dbsucc id) (Shift V) (var (dbsucc id)) (var id))
+      (Shift (dbselect i id V (var id) (var (dbprev id))));
