@@ -48,10 +48,6 @@ with Shift* (dbsucc $n) $t ↪ Shift (Shift* $n $t)
 with Shift* _ (tsort $s) ↪ tsort $s
 with ShiftN $i $t ↪ Shift (Shift* $i $t);
 
-// Some confluent commutations
-rule shift db0 (shift $i $t) ↪ shift (dbsucc $i) (Shift $t);
-rule shift (dbsucc db0) (shift (dbsucc $i) $t) ↪ shift (dbsucc (dbsucc $i)) (Shift1 $t);
-
 // Select a term depending on whether two indices are equal, the first one is greater, or lower
 symbol dbselect : DBId → DBId → Term → Term → Term → Term;
 rule dbselect db0 db0 $eq _ _ ↪ $eq
@@ -74,10 +70,20 @@ with subst $i $V (trefl $A $u) ↪ trefl (subst $i $V $A) (subst $i $V $u)
 with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst $i $V $v);
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
 
-// Some substitution commutation
+// Term equality, necessary to express commutation of different operations
+constant symbol TEq : Term → Term → TYPE;
+constant symbol TRefl (t : Term) : TEq t t;
+
+// TODO Some substitution commutation
+rule shift db0 (shift $i $t) ↪ shift (dbsucc $i) (Shift $t);
+rule shift (dbsucc db0) (shift (dbsucc $i) $t) ↪ shift (dbsucc (dbsucc $i)) (Shift1 $t);
 rule subst db0 _ (shift db0 $t) ↪ $t
 with subst $id (var $id) (shift (dbsucc $id) $t) ↪ $t
-with shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id) $t)
-with subst $id (Shift* $id $u) (subst db0 $t1 $t2)
-  ↪ apply1 (subst (dbsucc $id) (Shift* (dbsucc $id) $u) $t2) (subst $id (Shift* $id $u) $t1)
-with subst (dbsucc $id) (shift db0 $u) (shift db0 $t) ↪ shift db0 (subst $id $u $t);
+with shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id) $t);
+
+symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
+  TEq (subst i (Shift* i u) (apply1 t2 t1))
+      (apply1 (subst (dbsucc i) (Shift* (dbsucc i) u) t2) (subst i (Shift* i u) t1));
+symbol teq_subst_shift (i : DBId) (u t : Term) :
+  TEq (subst (dbsucc i) (Shift u) (Shift t))
+      (Shift (subst i u t));
