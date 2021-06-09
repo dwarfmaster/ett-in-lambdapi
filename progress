@@ -9,7 +9,7 @@ Progress:
 [X] Packing.lp
 [X] Congruences.lp
 [X] XAst.lp
-[X] DeBruijn.lp
+[-] DeBruijn.lp
 [X] XTyping.lp
 [X] XLemmas.lp
 [X] Inversions.lp

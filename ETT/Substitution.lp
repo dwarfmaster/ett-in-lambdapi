@@ -159,12 +159,46 @@ with der_subst $id $d $sc (der_refl _ $s _ _ $dA $du)
               (der_subst $id $d $sc $du)
 ;
 
+// SubstTContext
+constant symbol SubstTContext (Γ : TContext) {t A : ETT.Term} {s : ETT.Sort} : der (τ_Γ Γ) t A s → ETT.DBId → TYPE;
+symbol tsc_to_tc {Γ : TContext} {t A : ETT.Term} {s : ETT.Sort} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
+                 : SubstTContext Γ d id → TContext;
+// TODO tsc_to_stc
+symbol tsc_to_stc {Γ : TContext} {A t : ETT.Term} {s : ETT.Sort} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
+                  : SubstTContext Γ d id → TContext;
+symbol tsc_to_sc {Γ : TContext} {t A : ETT.Term} {s : ETT.Sort} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
+                 : SubstTContext Γ d id → SubstContext (inv_sort d) id;
+
+symbol tsc_to_ctx {Γ : TContext} {t A : ETT.Term} {s : ETT.Sort} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
+                 : SubstTContext Γ d id → Context;
+rule tsc_to_ctx $sc ↪ sc_to_ctx (tsc_to_sc $sc)
+with τ_Γ (tsc_to_tc $sc) ↪ sc_to_ctx (tsc_to_sc $sc);
+symbol tsc_to_sctx {Γ : TContext} {t A : ETT.Term} {s : ETT.Sort} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
+                  : SubstTContext Γ d id → Context;
+rule @tsc_to_sctx _ _ _ _ $d _ $sc ↪ sc_to_sctx $d (tsc_to_sc $sc)
+with τ_Γ (@tsc_to_stc _ _ _ _ $d _ $sc) ↪ sc_to_sctx $d (tsc_to_sc $sc);
+
+constant symbol TSC0 (Γ : TContext) {s : ETT.Sort} {t A : ETT.Term} (d : der (τ_Γ Γ) t A s) : SubstTContext Γ d db0;
+constant symbol TSCPush {Γ : TContext} {s s' : ETT.Sort} {t A B : ETT.Term} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
+                        (sc : SubstTContext Γ d id) (dB : der (tsc_to_ctx sc) B (ETT.tsort s') (ETT.snext s'))
+                        : ε _ (τ (tsc_to_tc sc) dB) → SubstTContext Γ d (dbsucc id);
+
+rule tsc_to_tc (TSC0 $Γ $d) ↪ TPush $Γ _ _ (inv_sort $d) (τ $Γ $d)
+with tsc_to_tc (TSCPush $sc $dB $b) ↪ TPush (tsc_to_tc $sc) _ _ $dB $b
+with tsc_to_sc (TSC0 _ $d) ↪ SC0 (inv_sort $d)
+with tsc_to_sc (TSCPush $sc $dB _) ↪ SCPush (tsc_to_sc $sc) $dB;
+
 // TODO τ_subst_n
-//symbol τ_subst_n {Γ : TContext} (id : ETT.DBId) (sc : ShiftTContext Γ id)
-//                 {s s' : ETT.Sort} {A B b a : ETT.Term}
-//                 (da : der (τ_Γ Γ) a A s)
-//                 (db : der (tsc_to_sctx (inv_sort da) sc) b B s') :
-//  H (τ (tsc_to_stc (inv_sort da) (τ Γ da) sc) db)
-//    (τ (tsc_to_tc sc) (der_subst id (tsc_to_sc sc) da db));
-//rule τ_subst_eq $Γ $db $da ↪ τ_subst_n db0 (TSC0 $Γ (inv_context $da)) $da $db
-//with τ_substT_eq $Γ $dB $da ↪ heq_to_eq (τ_subst_eq $Γ $dB $da);
+symbol τ_subst_n {Γ : TContext} (id : ETT.DBId)
+                 {s s' : ETT.Sort} {A B b a : ETT.Term}
+                 (da : der (τ_Γ Γ) a A s) (sc : SubstTContext Γ da id)
+                 (db : der (tsc_to_ctx sc) b B s') :
+  H (τ (tsc_to_tc sc) db)
+    (τ (tsc_to_stc sc) (der_subst id da (tsc_to_sc sc) db));
+rule tsc_to_stc (TSC0 $Γ _) ↪ $Γ
+with tsc_to_stc (@TSCPush _ _ _ _ _ _ $d $id $sc $dB $b)
+   ↪ TPush (tsc_to_stc $sc) _ _
+            (der_subst $id $d (tsc_to_sc $sc) $dB)
+            (transport (heq_to_eq (τ_subst_n $id $d $sc $dB)) $b);
+rule τ_subst_eq $Γ $db $da ↪ τ_subst_n db0 $da (TSC0 $Γ $da) $db
+with τ_substT_eq $Γ $dB $da ↪ heq_to_eq (τ_subst_eq $Γ $dB $da);
