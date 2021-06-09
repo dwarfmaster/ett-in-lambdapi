@@ -18,7 +18,6 @@ symbol sc_to_dctx {Γ : Context} {A : ETT.Term} {s : ETT.Sort} {d : der Γ A (ET
                   (sc : SubstContext d id) : der_context (sc_to_ctx sc);
 symbol sc_to_sctx {Γ : Context} {A t : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}
                   : der Γ t A s → SubstContext d id → Context;
-// TODO sc_to_dsctx
 symbol sc_to_dsctx {Γ : Context} {A t : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}
                    (dt : der Γ t A s) (sc : SubstContext d id) : der_context (sc_to_sctx dt sc);
 
@@ -61,7 +60,6 @@ symbol der_subst {Γ : Context} (id : ETT.DBId)
                  (_ : der (sc_to_ctx sc) C B s')
                  : der (sc_to_sctx du sc) (subst id (Shift* id u) C) (subst id (Shift* id u) B) s';
 rule substitution $dB $du ↪ der_subst db0 $du (SC0 (inv_sort $du)) $dB;
-// TODO der_context_subst
 symbol der_context_subst
        {Γ : Context} (id : ETT.DBId)
        {s : ETT.Sort} {A u : ETT.Term}
@@ -70,6 +68,10 @@ symbol der_context_subst
        : der (sc_to_sctx d sc) (dbselect id i (Shift* id u) (ETT.var i) (ETT.var (dbprev i)))
              (subst id (Shift* id u) (ShiftN i (get (sc_to_ctx sc) i)))
              (getS (sc_to_ctx sc) i);
+
+// TODO sc_to_dsctx
+//rule sc_to_dsctx _ (SC0 $dA) ↪ inv_context $dA
+//with sc_to_dsctx $d (SCPush $sc $dA) ↪ der_context_push (sc_to_sctx $d $sc) _ _ (der_subst _ $d $sc $dA) (sc_to_dsctx $d $sc);
 
 // Types
 rule der_subst _ $d $sc (der_sort _ $s _) ↪ der_sort (sc_to_sctx $d $sc) $s (sc_to_dsctx $d $sc)
@@ -90,12 +92,20 @@ with der_subst $id $d $sc (der_prop_type_eq _ $s _ _ _ $dA $du $dv)
 // Structural
 with der_subst $id $d $sc (der_var _ $i _)
   ↪ der_context_subst $id $d $sc $i
-//with der_context_subst db0 $d (SC0 _) db0
-//  ↪ $d
-//with der_context_subst (dbsucc _) $d (SCPush $sc $dA) db0
-//  ↪ der_var _ db0 (sc_to_dsctx $d (SCPush $sc $dA))
-//with der_context_subst db0 $d (SC0 $Γ) (dbsucc $i)
-//  ↪ der_var _ $i (sc_to_dsctx $d (SC0 $Γ))
+with der_context_subst db0 $d (SC0 _) db0
+  ↪ $d
+with @der_context_subst _ (dbsucc $id) _ _ $x $d (@SCPush _ _ _ _ $A _ _ $sc $dA) db0
+  ↪ JT (teq_inv (teq_subst_shift $id (Shift* $id $x) $A))
+        (der_var (sc_to_sctx $d (SCPush $sc $dA)) db0 (sc_to_dsctx $d (SCPush $sc $dA)))
+with @der_context_subst _ db0 _ _ $x _ (@SC0 $Γ _ _ $dA) (dbsucc $i)
+  ↪ JT (teq_inv (teq_shift_cancel_subst db0 $x (Shift* $i (get $Γ $i))))
+        (der_var $Γ $i (inv_context $dA))
+with @der_context_subst _ (dbsucc $id) _ _ $x $d (SCPush $sc $dA) (dbsucc $i)
+  ↪ JtT (teq_inv (teq_select_shift $id $i (Shift* $id $x)))
+         (teq_inv (teq_subst_shift $id (Shift* $id $x) (ShiftN $i (get (sc_to_ctx $sc) $i))))
+         (der_shift0
+           (der_subst _ $d $sc $dA)
+           (der_context_subst $id $d $sc $i))
 // TODO der_type_conv
 
 // λ-calculus
