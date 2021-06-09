@@ -90,10 +90,10 @@ with der_subst $id $d $sc (der_prop_type_eq _ $s _ _ _ $dA $du $dv)
 // Structural
 with der_subst $id $d $sc (der_var _ $i _)
   ↪ der_context_subst $id $d $sc $i
-with der_context_subst db0 $d (SC0 _) db0
-  ↪ $d
-with der_context_subst (dbsucc _) $d (SCPush $sc $dA) db0
-  ↪ der_var _ db0 (sc_to_dsctx $d (SCPush $sc $dA))
+//with der_context_subst db0 $d (SC0 _) db0
+//  ↪ $d
+//with der_context_subst (dbsucc _) $d (SCPush $sc $dA) db0
+//  ↪ der_var _ db0 (sc_to_dsctx $d (SCPush $sc $dA))
 //with der_context_subst db0 $d (SC0 $Γ) (dbsucc $i)
 //  ↪ der_var _ $i (sc_to_dsctx $d (SC0 $Γ))
 // TODO der_type_conv
@@ -104,28 +104,31 @@ with der_subst $id $d $sc (der_abs _ $s $s' _ _ _ $dA $dB $dt)
              (der_subst $id $d $sc $dA)
              (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
              (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dt)
-with der_subst $id $d $sc (der_app _ $s $s' _ _ _ _ $dA $dB $df $da)
-  ↪ der_app _ $s $s' _ _ _ _
-             (der_subst $id $d $sc $dA)
-             (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
-             (der_subst $id $d $sc $df)
-             (der_subst $id $d $sc $da)
-with der_subst $id $d $sc (der_pair _ $s $s' _ _ _ _ $dA $du $dB $dv)
+with @der_subst _ $id _ _ _ _ _ $x $d $sc (der_app _ $s $s' _ _ $a $B $dA $dB $df $da)
+  ↪ JT (teq_inv (teq_subst_apply $id $x $a $B))
+        (der_app _ $s $s' _ _ _ _
+                 (der_subst $id $d $sc $dA)
+                 (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+                 (der_subst $id $d $sc $df)
+                 (der_subst $id $d $sc $da))
+with @der_subst _ $id _ _ _ _ _ $x $d $sc (der_pair _ $s $s' $u _ _ $B $dA $du $dB $dv)
   ↪ der_pair _ $s $s' _ _ _ _
               (der_subst $id $d $sc $dA)
               (der_subst $id $d $sc $du)
               (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
-              (der_subst $id $d $sc $dv)
+              (JT (teq_subst_apply $id $x $u $B)
+                  (der_subst $id $d $sc $dv))
 with der_subst $id $d $sc (der_π1 _ $s $s' _ _ _ $dA $dB $dp)
   ↪ der_π1 _ $s $s' _ _ _
             (der_subst $id $d $sc $dA)
             (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
             (der_subst $id $d $sc $dp)
-with der_subst $id $d $sc (der_π2 _ $s $s' _ _ _ $dA $dB $dp)
-  ↪ der_π2 _ $s $s' _ _ _
-            (der_subst $id $d $sc $dA)
-            (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
-            (der_subst $id $d $sc $dp)
+with @der_subst _ $id _ _ _ _ _ $x $d $sc (der_π2 _ $s $s' $p $A $B $dA $dB $dp)
+  ↪ JT (teq_inv (teq_subst_apply $id $x (ETT.π1 $A $B $p) $B))
+        (der_π2 _ $s $s' _ _ _
+                (der_subst $id $d $sc $dA)
+                (der_subst (dbsucc $id) $d (SCPush $sc $dA) $dB)
+                (der_subst $id $d $sc $dp))
 // Equality
 with der_subst $id $d $sc (der_refl _ $s _ _ $dA $du)
   ↪ der_refl _ $s _ _
