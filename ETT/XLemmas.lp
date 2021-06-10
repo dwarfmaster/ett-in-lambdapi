@@ -87,7 +87,7 @@ symbol JtT {Γ : Context} {s : Sort} {t1 t2 T1 T2 : Term}
 symbol Jcong {t1 t2 : Term} (f : Term → Term)
              : TEq t1 t2 → TEq (f t1) (f t2);
 rule teq_inv (TRefl $t) ↪ TRefl $t
-with Jt (TRefl _) $d ↪ $d
-with JT (TRefl _) $d ↪ $d
 with JtT (TRefl _) (TRefl _) $d ↪ $d
+with @Jt _ _ _ _ $T $eqt $d ↪ JtT $eqt (TRefl $T) $d
+with @JT _ _ $t _ _ $eqT $d ↪ JtT (TRefl $t) $eqT $d
 with @Jcong $t _ $f (TRefl _) ↪ TRefl ($f $t);
