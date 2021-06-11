@@ -22,10 +22,10 @@ symbol sc_to_ctx {Γ : Context} {A : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT
                  : SubstContext d id → Context;
 symbol sc_to_dctx {Γ : Context} {A : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}
                   (sc : SubstContext d id) : der_context (sc_to_ctx sc);
-symbol sc_to_sctx {Γ : Context} {A t : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}
-                  : der Γ t A s → SubstContext d id → Context;
-symbol sc_to_dsctx {Γ : Context} {A t : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}
-                   (dt : der Γ t A s) (sc : SubstContext d id) : der_context (sc_to_sctx dt sc);
+symbol sc_to_sctx {Γ : Context} {A t : ETT.Term} {s : ETT.Sort} {id : ETT.DBId}
+                  (d : der Γ t A s) : SubstContext (inv_sort d) id → Context;
+symbol sc_to_dsctx {Γ : Context} {A t : ETT.Term} {s : ETT.Sort} {id : ETT.DBId}
+                   (dt : der Γ t A s) (sc : SubstContext (inv_sort dt) id) : der_context (sc_to_sctx dt sc);
 
 constant symbol SC0 {Γ : Context} {s : ETT.Sort} {A : ETT.Term} (d : der Γ A (ETT.tsort s) (ETT.snext s)) : SubstContext d db0;
 constant symbol SCPush {Γ : Context} {s s' : ETT.Sort} {A B : ETT.Term} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}
@@ -34,7 +34,7 @@ constant symbol SCPush {Γ : Context} {s s' : ETT.Sort} {A B : ETT.Term} {d : de
 rule sc_to_ctx (@SC0 $Γ $s $A _) ↪ Push $A $s $Γ
 with sc_to_ctx (@SCPush _ _ $s _ $B _ _ $sc _) ↪ Push $B $s (sc_to_ctx $sc)
 with sc_to_sctx _ (@SC0 $Γ _ _ _) ↪ $Γ
-with @sc_to_sctx _ _ $t _ _ _ $dt (@SCPush _ _ $s _ $B _ $id $sc _) ↪ Push (subst $id (Shift* $id $t) $B) $s (sc_to_sctx $dt $sc);
+with @sc_to_sctx _ _ $t _ _ $dt (@SCPush _ _ $s _ $B _ $id $sc _) ↪ Push (subst $id (Shift* $id $t) $B) $s (sc_to_sctx $dt $sc);
 rule sc_to_dctx (SC0 $d) ↪ pushΓ $d
 with sc_to_dctx (SCPush _ $dB) ↪ pushΓ $dB;
 
@@ -42,22 +42,22 @@ with sc_to_dctx (SCPush _ $dB) ↪ pushΓ $dB;
 symbol deq_cong_subst {Γ : Context} (id : ETT.DBId)
                       {s s' : ETT.Sort} {A1 A2 B1 B2 f1 f2 t1 t2 : ETT.Term}
                       (deqA : der_eq Γ (ETT.snext s) (ETT.tsort s) A1 A2)
-                      (sc1 : SubstContext (inv_eq_t1 deqA) id) (sc2 : SubstContext (inv_eq_t2 deqA) id)
+                      (dt1 : der Γ t1 A1 s) (dt2 : der Γ t2 A2 s)
+                      (sc1 : SubstContext (inv_sort dt1) id) (sc2 : SubstContext (inv_sort dt2) id)
                       (_ : der_eq (sc_to_ctx sc1) (ETT.snext s') (ETT.tsort s') B1 B2)
                       (_ : der_eq (sc_to_ctx sc1) s' B1 f1 f2) (_ : der_eq Γ s A1 t1 t2)
                       (_ : der (sc_to_ctx sc1) B1 (ETT.tsort s') (ETT.snext s')) (_ : der (sc_to_ctx sc2) B2 (ETT.tsort s') (ETT.snext s'))
                       (_ : der (sc_to_ctx sc1) f1 B1 s') (_ : der (sc_to_ctx sc2) f2 B2 s')
-                      (dt1 : der Γ t1 A1 s) (_ : der Γ t2 A2 s)
                       : der_eq (sc_to_sctx dt1 sc1) s' (subst id (Shift* id t1) B1) (subst id (Shift* id t1) f1) (subst id (Shift* id t2) f2);
 rule @der_eq_cong_apply $Γ $s $s' $A1 $A2 _ _ _ _ $deqA $deqB $deqt $dB1 $dB2 $dt1 $dt2
-  ↪ deq_cong_subst db0 $deqA
-                    (SC0 (inv_eq_t1 $deqA)) (SC0 (inv_eq_t2 $deqA))
+  ↪ deq_cong_subst db0 $deqA $dt1 $dt2
+                    (SC0 (inv_sort $dt1)) (SC0 (inv_sort $dt2))
                     (der_eq_refl (Push $A1 $s $Γ) (ETT.snext (ETT.snext $s')) (ETT.tsort $s') (ETT.tsort (ETT.snext $s'))
                                  (der_sort (Push $A1 $s $Γ) $s' (inv_context $dB1)))
                     $deqB $deqt
                     (der_sort (Push $A1 $s $Γ) $s' (inv_context $dB1))
                     (der_sort (Push $A2 $s $Γ) $s' (inv_context $dB2))
-                    $dB1 $dB2 $dt1 $dt2;
+                    $dB1 $dB2;
 
 symbol der_subst {Γ : Context} (id : ETT.DBId)
                  {s s' : ETT.Sort} {A B C u : ETT.Term}
@@ -80,9 +80,8 @@ symbol der_eq_subst {Γ : Context} (id : ETT.DBId)
 
 rule substitution $dB $du ↪ der_subst db0 $du (SC0 (inv_sort $du)) $dB;
 
-// TODO sc_to_dsctx
-//rule sc_to_dsctx _ (SC0 $dA) ↪ inv_context $dA
-//with sc_to_dsctx $d (SCPush $sc $dA) ↪ der_context_push (sc_to_sctx $d $sc) _ _ (der_subst _ $d $sc $dA) (sc_to_dsctx $d $sc);
+rule sc_to_dsctx _ (SC0 $dA) ↪ inv_context $dA
+with sc_to_dsctx $d (SCPush $sc $dA) ↪ der_context_push _ _ _ (der_subst _ $d $sc $dA) (sc_to_dsctx $d $sc);
 
 // Types
 rule der_subst _ $d $sc (der_sort _ $s _) ↪ der_sort (sc_to_sctx $d $sc) $s (sc_to_dsctx $d $sc)
@@ -122,10 +121,10 @@ with der_subst _ $d $sc (der_type_conv _ _ _ _ $s $du $deq)
                    (der_subst _ $d $sc $du)
                    (der_eq_subst _ $d $sc $deq)
 with der_eq_subst $id $d $sc $deq
-  ↪ deq_cong_subst $id (der_eq_refl _ _ _ _ (inv_sort $d)) $sc $sc
+  ↪ deq_cong_subst $id (der_eq_refl _ _ _ _ (inv_sort $d)) $d $d $sc $sc
                     (der_eq_refl _ _ _ _ (inv_eq_sort $deq)) $deq
                     (der_eq_refl _ _ _ _ $d)
-                    (inv_eq_sort $deq) (inv_eq_sort $deq) (inv_eq_t1 $deq) (inv_eq_t2 $deq) $d $d
+                    (inv_eq_sort $deq) (inv_eq_sort $deq) (inv_eq_t1 $deq) (inv_eq_t2 $deq)
 
 // λ-calculus
 with der_subst $id $d $sc (der_abs _ $s $s' _ _ _ $dA $dB $dt)
