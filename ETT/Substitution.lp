@@ -169,7 +169,6 @@ with der_subst $id $d $sc (der_refl _ $s _ _ $dA $du)
 constant symbol SubstTContext (Γ : TContext) {t A : ETT.Term} {s : ETT.Sort} : der (τ_Γ Γ) t A s → ETT.DBId → TYPE;
 symbol tsc_to_tc {Γ : TContext} {t A : ETT.Term} {s : ETT.Sort} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
                  : SubstTContext Γ d id → TContext;
-// TODO tsc_to_stc
 symbol tsc_to_stc {Γ : TContext} {A t : ETT.Term} {s : ETT.Sort} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
                   : SubstTContext Γ d id → TContext;
 symbol tsc_to_sc {Γ : TContext} {t A : ETT.Term} {s : ETT.Sort} {d : der (τ_Γ Γ) t A s} {id : ETT.DBId}
@@ -200,7 +199,6 @@ symbol τ_subst_n {Γ : TContext} (id : ETT.DBId)
                  (db : der (tsc_to_ctx sc) b B s') :
   H (τ (tsc_to_tc sc) db)
     (τ (tsc_to_stc sc) (der_subst id da (tsc_to_sc sc) db));
-// TODO τ_context_subst_n
 symbol τ_context_subst_n
        {Γ : TContext} (id : ETT.DBId)
        {s : ETT.Sort} {A u : ETT.Term}
@@ -283,6 +281,59 @@ with τ_subst_n $id $d $sc (der_var _ $i $dΓ)
                     (der_shift $i (τ_dΓ (tsc_to_tc $sc)) (tgetD $i (tsc_to_tc $sc)))
                     (der_shift $i $dΓ (der_getΓ $i $dΓ)))))
        (τ_context_subst_n $id $d $sc $i)
+with τ_context_subst_n db0 _ (TSC0 $Γ $d) db0
+  ↪ heq_symm (heq_of_transport
+       (τ $Γ $d)
+       (τ_shift0T_eq $Γ (inv_sort $d) (inv_sort $d) (τ $Γ $d)))
+with @τ_context_subst_n _ (dbsucc $id) _ _ $x $d (@TSCPush _ _ _ _ _ $A _ _ $sc $dA $a) db0
+  ↪ heq_trans
+       (heq_trans
+         (heq_symm (heq_of_transport $a
+           (τ_shift0T_eq (tsc_to_tc $sc) $dA $dA $a)))
+         (heq_trans
+           (heq_trans
+             (heq_of_transport $a
+               (heq_to_eq (τ_subst_n $id $d $sc $dA)))
+             (heq_of_transport
+               (transport (heq_to_eq (τ_subst_n $id $d $sc $dA)) $a)
+               (τ_shift0T_eq (tsc_to_stc $sc)
+                 (der_subst _ $d (tsc_to_sc $sc) $dA)
+                 (der_subst _ $d (tsc_to_sc $sc) $dA)
+                 (transport (heq_to_eq (τ_subst_n $id $d $sc $dA)) $a))))
+           (heq_of_transport
+             (tgetShift db0 (tsc_to_stc (TSCPush $sc $dA $a)))
+             (convert_T (tsc_to_stc (TSCPush $sc $dA $a))
+                        (der_shift db0 (τ_dΓ (tsc_to_stc (TSCPush $sc $dA $a))) (tgetD db0 (tsc_to_stc (TSCPush $sc $dA $a))))
+                        (der_shift db0 (sc_to_dsctx $d (SCPush (tsc_to_sc $sc) $dA)) (der_getΓ db0 (sc_to_dsctx $d (SCPush (tsc_to_sc $sc) $dA))))))))
+       (τT (tsc_to_stc (TSCPush $sc $dA $a)) (teq_inv (teq_subst_shift $id (Shift* $id $x) $A))
+           (der_var (sc_to_sctx $d (SCPush (tsc_to_sc $sc) $dA)) db0 (sc_to_dsctx $d (SCPush (tsc_to_sc $sc) $dA))))
+with @τ_context_subst_n _ db0 _ _ $x _ (TSC0 $Γ $d) (dbsucc $i)
+  ↪ heq_trans
+       (heq_conj
+         (heq_refl _ (tgetShift $i $Γ))
+         (τ_shift0T_eq $Γ (der_shift $i (τ_dΓ $Γ) (tgetD $i $Γ)) (inv_sort $d) (τ $Γ $d))
+         (convert_T $Γ
+           (der_shift $i (τ_dΓ $Γ) (tgetD $i $Γ))
+           (der_shift $i (inv_context (inv_sort $d)) (der_getΓ $i (inv_context (inv_sort $d))))))
+       (τT $Γ (teq_inv (teq_shift_cancel_subst db0 $x (Shift* $i (get (τ_Γ $Γ) $i))))
+           (der_var (τ_Γ $Γ) $i (inv_context (inv_sort $d))))
+with @τ_context_subst_n _ (dbsucc $id) _ _ $x $d (TSCPush $sc $dA $a) (dbsucc $i)
+  ↪ heq_trans
+       (heq_trans
+         (heq_trans
+           (heq_symm (heq_of_transport
+             (tgetShift $i (tsc_to_tc $sc))
+             (τ_shift0T_eq (tsc_to_tc $sc) (der_shift $i (τ_dΓ (tsc_to_tc $sc)) (tgetD $i (tsc_to_tc $sc))) $dA $a)))
+           (τ_context_subst_n $id $d $sc $i))
+         (τ_shift0_eq (tsc_to_stc $sc) (der_context_subst $id $d (tsc_to_sc $sc) $i)
+                      (der_subst $id $d (tsc_to_sc $sc) $dA)
+                      (transport (heq_to_eq (τ_subst_n $id $d $sc $dA)) $a)))
+       (τtT (tsc_to_stc (TSCPush $sc $dA $a))
+            (teq_inv (teq_select_shift $id $i (Shift* $id $x)))
+            (teq_inv (teq_subst_shift $id (Shift* $id $x) (ShiftN $i (get (tsc_to_ctx $sc) $i))))
+            (der_shift0
+              (der_subst _ $d (tsc_to_sc $sc) $dA)
+              (der_context_subst $id $d (tsc_to_sc $sc) $i)))
 with τ_subst_n $id $d $sc (der_type_conv _ _ _ _ _ $du $deq)
   ↪ heq_conj
        (heq_conj
