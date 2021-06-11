@@ -194,13 +194,21 @@ with tsc_to_tc (TSCPush $sc $dB $b) ↪ TPush (tsc_to_tc $sc) _ _ $dB $b
 with tsc_to_sc (TSC0 _ $d) ↪ SC0 (inv_sort $d)
 with tsc_to_sc (TSCPush $sc $dB _) ↪ SCPush (tsc_to_sc $sc) $dB;
 
-// TODO τ_subst_n
 symbol τ_subst_n {Γ : TContext} (id : ETT.DBId)
                  {s s' : ETT.Sort} {A B b a : ETT.Term}
                  (da : der (τ_Γ Γ) a A s) (sc : SubstTContext Γ da id)
                  (db : der (tsc_to_ctx sc) b B s') :
   H (τ (tsc_to_tc sc) db)
     (τ (tsc_to_stc sc) (der_subst id da (tsc_to_sc sc) db));
+// TODO τ_context_subst_n
+symbol τ_context_subst_n
+       {Γ : TContext} (id : ETT.DBId)
+       {s : ETT.Sort} {A u : ETT.Term}
+       (d : der (τ_Γ Γ) u A s) (sc : SubstTContext Γ d id)
+       (i : ETT.DBId)
+       : H (tgetShift i (tsc_to_tc sc))
+           (τ (tsc_to_stc sc) (der_context_subst id d (tsc_to_sc sc) i));
+
 rule tsc_to_stc (TSC0 $Γ _) ↪ $Γ
 with tsc_to_stc (@TSCPush _ _ _ _ _ _ $d $id $sc $dB $b)
    ↪ TPush (tsc_to_stc $sc) _ _
@@ -267,7 +275,14 @@ with τ_subst_n $id $d $sc (der_prop_type_eq _ _ _ _ _ $dA $da1 $da2)
          (convert_T (tsc_to_tc $sc) (inv_sort $da2) $dA)
          (convert_T (tsc_to_stc $sc) (inv_sort (der_subst $id $d (tsc_to_sc $sc) $da2)) (der_subst $id $d (tsc_to_sc $sc) $dA)))
 // Structural rules
-// TODO der_var
+with τ_subst_n $id $d $sc (der_var _ $i $dΓ)
+  ↪ heq_trans
+       (heq_symm (heq_of_transport
+         (tgetShift $i (tsc_to_tc $sc))
+         (convert_T (tsc_to_tc $sc)
+                    (der_shift $i (τ_dΓ (tsc_to_tc $sc)) (tgetD $i (tsc_to_tc $sc)))
+                    (der_shift $i $dΓ (der_getΓ $i $dΓ)))))
+       (τ_context_subst_n $id $d $sc $i)
 with τ_subst_n $id $d $sc (der_type_conv _ _ _ _ _ $du $deq)
   ↪ heq_conj
        (heq_conj

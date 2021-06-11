@@ -1,8 +1,6 @@
 
 require open ETT.XAst;
 
-// TODO check confluence
-
 /* De Bruijn indices */
 constant symbol db0 : DBId;
 constant symbol dbsucc : DBId → DBId;
