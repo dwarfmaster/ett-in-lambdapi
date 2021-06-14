@@ -40,7 +40,7 @@ rule τ_eq $Γ (der_eq_beta _ $s $s' _ $A $t $B _ _ $dt $du)
            (τ_substT_eq $Γ (inv_sort $dt) $du))))
 
 with τ_eq $Γ (der_eq_eta _ $s $s' $A $f $B $dA $dB $df)
-  ↪ heq_trans
+  ↪ heq_symm (heq_trans
        (heq_of_transport (τ $Γ $df)
          (τ_fun_eq $Γ $dA $dB (inv_sort $df)))
        (cong_lambda
@@ -49,7 +49,7 @@ with τ_eq $Γ (der_eq_eta _ $s $s' $A $f $B $dA $dB $df)
                    (substitution (der_shift1 $dA $dA $dB)
                                  (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))
          (τ_fun $Γ $dA $dB (inv_sort $df) (τ $Γ $df))
-         (τ $Γ (inv_eq_t2 (der_eq_eta (τ_Γ $Γ) $s $s' $A $f $B $dA $dB $df)))
+         (τ $Γ (inv_eq_t1 (der_eq_eta (τ_Γ $Γ) $s $s' $A $f $B $dA $dB $df)))
          (heq_refl (u (τ_s $s)) (τ_T $Γ $dA))
          (λ p, convertR $Γ (PCPush (PCEmpty $Γ) $dA $dA (projHEq p)) $dB
                  (substitution (der_shift1 $dA $dA $dB) (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))
@@ -105,7 +105,7 @@ with τ_eq $Γ (der_eq_eta _ $s $s' $A $f $B $dA $dB $df)
                     (τ (TPush $Γ $s $A $dA (projT2 p)) (der_shift0 $dA $df))
                     (τ (TPush $Γ $s $A $dA (projT2 p)) (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))
              (τ_substT_eq (TPush $Γ $s $A $dA (projT2 p)) (der_shift1 $dA $dA $dB)
-               (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df)))))))
+               (der_var (Push $A $s (τ_Γ $Γ)) db0 (der_context_push (τ_Γ $Γ) $s $A $dA (inv_context $df))))))))
 
 with τ_eq $Γ (der_eq_π1 _ $s $s' $u $A $v $B _ $du $dB $dv)
   ↪ eq_to_heq (inv_eq

@@ -39,14 +39,14 @@ with inv_eq_t1   (der_eq_beta $Γ $s $s' $u $A $t $B _ _ $dt $du) ↪ der_app $�
                                                                             (der_abs $Γ $s $s' $A $t $B (inv_sort $du) (inv_sort $dt) $dt) $du
 with inv_eq_t2   (der_eq_beta _  _  _   _  _  _  _  _ _ $dt $du) ↪ substitution $dt $du
 with inv_eq_sort (der_eq_eta  $Γ $s $s' $A _  $B $dA $dB _  ) ↪ der_prod $Γ $s $s' $A $B $dA $dB
-with inv_eq_t1   (der_eq_eta  _  _  _   _  _  _  _   _   $df) ↪ $df
-with inv_eq_t2   (der_eq_eta  $Γ $s $s' $A $f $B $dA $dB $df) ↪ der_abs $Γ $s $s' $A (tapp (Shift $A) (Shift1 $B) (Shift $f) (var db0)) $B $dA $dB
+with inv_eq_t1   (der_eq_eta  $Γ $s $s' $A $f $B $dA $dB $df) ↪ der_abs $Γ $s $s' $A (tapp (Shift $A) (Shift1 $B) (Shift $f) (var db0)) $B $dA $dB
                                                                    (der_app (Push $A $s $Γ) $s $s' (Shift $A) (Shift $f) (var db0) (Shift1 $B)
                                                                      (der_shift0 $dA $dA)
                                                                      (der_shift1 $dA $dA $dB)
                                                                      (der_shift0 $dA $df)
                                                                      (der_var (Push $A $s $Γ) db0
                                                                        (der_context_push $Γ $s $A $dA (inv_context $df))))
+with inv_eq_t2   (der_eq_eta  _  _  _   _  _  _  _   _   $df) ↪ $df
 with inv_eq_sort (der_eq_π1 _  _  _   _  _  _  _  _ $du _   _  ) ↪ inv_sort $du
 with inv_eq_t1   (der_eq_π1 $Γ $s $s' $u $A $v $B _ $du $dB $dv) ↪ der_π1 $Γ $s $s' (tpair $A $B $u $v) $A $B (inv_sort $du) $dB
                                                                            (der_pair $Γ $s $s' $u $A $v $B (inv_sort $du) $du $dB $dv)
