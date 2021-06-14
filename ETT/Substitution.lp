@@ -48,6 +48,14 @@ symbol deq_cong_subst {Γ : Context} (id : ETT.DBId)
                       (sc1 : SubstContext (inv_sort dt1) id)
                       (_ : der_eq (sc_to_ctx sc1) s' B1 f1 f2) (_ : der_eq Γ s A1 t1 t2)
                       : der_eq (sc_to_sctx dt1 sc1) s' (subst id (Shift* id t1) B1) (subst id (Shift* id t1) f1) (subst id (Shift* id t2) f2);
+// TODO deq_subst_convert
+symbol deq_subst_convert {Γ : Context} (id : ETT.DBId)
+                         {s s' : ETT.Sort} {A1 A2 B f : ETT.Term} (t1 t2 : ETT.Term)
+                         (deqA : der_eq Γ (ETT.snext s) (ETT.tsort s) A1 A2)
+                         (dt1 : der Γ t1 A1 s) (dt2 : der Γ t2 A2 s)
+                         (sc1 : SubstContext (inv_sort dt1) id)
+                         (_ : der (sc_to_ctx sc1) f B s') (_ : der_eq Γ s A1 t1 t2)
+                         : der_eq (sc_to_sctx dt1 sc1) s' (subst id (Shift* id t1) B) (subst id (Shift* id t1) f) (subst id (Shift* id t2) f);
 rule @der_eq_cong_apply _ _ _ _ _ _ _ _ _ $deqA $deqB $deqt _ _ $dt1 $dt2
   ↪ deq_cong_subst db0 _ _ $deqA $dt1 $dt2
                     (SC0 (inv_sort $dt1))
@@ -528,9 +536,7 @@ with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_eta _ $s $s' $A $f 
                         (der_subst _ $dr1 $sc1 $dA)
                         (der_subst _ $dr1 (SCPush $sc1 $dA) $dB)
                         (der_subst _ $dr1 $sc1 $df)))
-       (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
-                       (der_eq_refl _ _ _ _ $df)
-                       $deqr)
+       (deq_subst_convert $id $r1 $r2 $deqA $dr1 $dr2 $sc1 $df $deqr)
 with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_π1 _ $s $s' $u _ _ $B $dA $du $dB $dv) $deqr
   ↪ der_eq_trans _ _ _ _ _ _
        (der_eq_π1 _ $s $s' _ _ _ _
@@ -539,9 +545,7 @@ with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_π1 _ $s $s' $u _ _
           (der_subst _ $dr1 (SCPush $sc1 $dA) $dB)
           (JT (teq_subst_apply $id $r1 $u $B)
               (der_subst _ $dr1 $sc1 $dv)))
-       (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
-                       (der_eq_refl _ _ _ _ $du)
-                       $deqr)
+       (deq_subst_convert $id $r1 $r2 $deqA $dr1 $dr2 $sc1 $du $deqr)
 with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_π2 _ $s $s' $u _ _ $B $dA $du $dB $dv) $deqr
   ↪ der_eq_trans _ _ _ _ _ _
        (Jeq (teq_inv (teq_subst_apply $id $r1 $u $B))
@@ -553,9 +557,7 @@ with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_π2 _ $s $s' $u _ _
                (der_subst _ $dr1 (SCPush $sc1 $dA) $dB)
                (JT (teq_subst_apply $id $r1 $u $B)
                    (der_subst _ $dr1 $sc1 $dv))))
-       (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
-                       (der_eq_refl _ _ _ _ $dv)
-                       $deqr)
+       (deq_subst_convert $id $r1 $r2 $deqA $dr1 $dr2 $sc1 $dv $deqr)
 with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_conversion _ $s _ _ _ _ $deqt $deqT) $deqr
   ↪ der_eq_conversion _ $s _ _ _ _
        (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 $deqt $deqr)
@@ -563,8 +565,17 @@ with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_conversion _ $s _ _
 with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_lift _ $s _ _ _ _ $de) $deqr
   ↪ der_eq_trans _ _ _ _ _ _
        (der_eq_lift _ $s _ _ _ _ (der_subst _ $dr1 $sc1 $de))
-       (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
-                       (der_eq_refl _ _ _ _ (inv_teq_t2 (inv_sort $de)))
-                       $deqr)
+       (deq_subst_convert $id $r1 $r2 $deqA $dr1 $dr2 $sc1
+                          (inv_teq_t2 (inv_sort $de)) $deqr)
+with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_refl _ _ _ _ $du) $deqr
+  ↪ deq_subst_convert $id $r1 $r2 $deqA $dr1 $dr2 $sc1 $du $deqr
+with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_trans _ $s _ _ _ _ $duv $dvw) $deqr
+  ↪ der_eq_trans _ $s _ _ _ _
+                  (der_eq_subst $id $dr1 $sc1 $duv)
+                  (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 $dvw $deqr)
+with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_symm _ _ _ _ _ $duv) $deqr
+  ↪ der_eq_trans _ _ _ _ _ _
+       (der_eq_symm _ _ _ _ _ (der_eq_subst $id $dr1 $sc1 $duv))
+       (deq_subst_convert $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (inv_eq_t1 $duv) $deqr)
 
 ;
