@@ -42,18 +42,15 @@ with sc_to_dctx (SCPush _ $dB) ↪ pushΓ $dB;
 
 // TODO deq_cong_subst
 symbol deq_cong_subst {Γ : Context} (id : ETT.DBId)
-                      {s s' : ETT.Sort} {A1 A2 B1 B2 f1 f2 : ETT.Term} (t1 t2 : ETT.Term)
+                      {s s' : ETT.Sort} {A1 A2 B1 f1 f2 : ETT.Term} (t1 t2 : ETT.Term)
                       (deqA : der_eq Γ (ETT.snext s) (ETT.tsort s) A1 A2)
                       (dt1 : der Γ t1 A1 s) (dt2 : der Γ t2 A2 s)
                       (sc1 : SubstContext (inv_sort dt1) id)
-                      (_ : der_eq (sc_to_ctx sc1) (ETT.snext s') (ETT.tsort s') B1 B2)
                       (_ : der_eq (sc_to_ctx sc1) s' B1 f1 f2) (_ : der_eq Γ s A1 t1 t2)
                       : der_eq (sc_to_sctx dt1 sc1) s' (subst id (Shift* id t1) B1) (subst id (Shift* id t1) f1) (subst id (Shift* id t2) f2);
-rule @der_eq_cong_apply $Γ $s $s' $A1 _ _ _ _ _ $deqA $deqB $deqt $dB1 _ $dt1 $dt2
+rule @der_eq_cong_apply _ _ _ _ _ _ _ _ _ $deqA $deqB $deqt _ _ $dt1 $dt2
   ↪ deq_cong_subst db0 _ _ $deqA $dt1 $dt2
                     (SC0 (inv_sort $dt1))
-                    (der_eq_refl (Push $A1 $s $Γ) (ETT.snext (ETT.snext $s')) (ETT.tsort $s') (ETT.tsort (ETT.snext $s'))
-                                 (der_sort (Push $A1 $s $Γ) $s' (inv_context $dB1)))
                     $deqB $deqt;
 
 symbol der_subst {Γ : Context} (id : ETT.DBId)
@@ -119,8 +116,7 @@ with der_subst _ $d $sc (der_type_conv _ _ _ _ $s $du $deq)
                    (der_eq_subst _ $d $sc $deq)
 with der_eq_subst $id $d $sc $deq
   ↪ deq_cong_subst $id _ _ (der_eq_refl _ _ _ _ (inv_sort $d)) $d $d $sc
-                    (der_eq_refl _ _ _ _ (inv_eq_sort $deq)) $deq
-                    (der_eq_refl _ _ _ _ $d)
+                    $deq (der_eq_refl _ _ _ _ $d)
 
 // λ-calculus
 with der_subst $id $d $sc (der_abs _ $s $s' _ _ _ $dA $dB $dt)
@@ -492,7 +488,7 @@ with τ_subst_n $id $d $sc (der_refl _ _ _ _ $dA $du)
 ;
 
 
-rule deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 _ (der_eq_beta _ $s $s' $u _ $t $B $dA $dB $dt $du) $deqr
+rule deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_beta _ $s $s' $u _ $t $B $dA $dB $dt $du) $deqr
   ↪ der_eq_trans _ _ _ _ _ _
        (Jeq (teq_inv (teq_subst_apply $id $r1 $u $B))
             (TRefl _)
@@ -503,10 +499,9 @@ rule deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 _ (der_eq_beta _ $s $s' $u 
                          (der_subst _ $dr1 (SCPush $sc1 $dA) $dt)
                          (der_subst _ $dr1 $sc1 $du)))
        (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
-                       (der_eq_subst db0 $du (SC0 (inv_sort $du)) (der_eq_refl _ _ _ _ $dB))
                        (der_eq_subst db0 $du (SC0 (inv_sort $du)) (der_eq_refl _ _ _ _ $dt))
                        $deqr)
-with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 _ (der_eq_eta _ $s $s' $A $f $B $dA $dB $df) $deqr
+with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_eta _ $s $s' $A $f $B $dA $dB $df) $deqr
   ↪ der_eq_trans _ _ _ _ _ _
        (Jeq (TRefl _)
             (Jcong (ETT.tabs (subst $id (Shift* $id $r1) $A) (subst (dbsucc $id) (Shift* (dbsucc $id) $r1) $B))
@@ -534,10 +529,9 @@ with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 _ (der_eq_eta _ $s $s' $A $
                         (der_subst _ $dr1 (SCPush $sc1 $dA) $dB)
                         (der_subst _ $dr1 $sc1 $df)))
        (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
-                       (der_eq_refl _ _ _ _ (der_prod _ _ _ _ _ $dA $dB))
                        (der_eq_refl _ _ _ _ $df)
                        $deqr)
-with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 _ (der_eq_π1 _ $s $s' $u _ _ $B $dA $du $dB $dv) $deqr
+with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_π1 _ $s $s' $u _ _ $B $dA $du $dB $dv) $deqr
   ↪ der_eq_trans _ _ _ _ _ _
        (der_eq_π1 _ $s $s' _ _ _ _
           (der_subst _ $dr1 $sc1 $dA)
@@ -546,10 +540,9 @@ with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 _ (der_eq_π1 _ $s $s' $u _
           (JT (teq_subst_apply $id $r1 $u $B)
               (der_subst _ $dr1 $sc1 $dv)))
        (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
-                       (der_eq_refl _ _ _ _ $dA)
                        (der_eq_refl _ _ _ _ $du)
                        $deqr)
-with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 _ (der_eq_π2 _ $s $s' $u _ _ $B $dA $du $dB $dv) $deqr
+with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_π2 _ $s $s' $u _ _ $B $dA $du $dB $dv) $deqr
   ↪ der_eq_trans _ _ _ _ _ _
        (Jeq (teq_inv (teq_subst_apply $id $r1 $u $B))
             (TRefl _)
@@ -561,7 +554,17 @@ with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 _ (der_eq_π2 _ $s $s' $u _
                (JT (teq_subst_apply $id $r1 $u $B)
                    (der_subst _ $dr1 $sc1 $dv))))
        (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
-                       (der_eq_refl _ _ _ _ (substitution $dB $du))
                        (der_eq_refl _ _ _ _ $dv)
                        $deqr)
+with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_conversion _ $s _ _ _ _ $deqt $deqT) $deqr
+  ↪ der_eq_conversion _ $s _ _ _ _
+       (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 $deqt $deqr)
+       (der_eq_subst $id $dr1 $sc1 $deqT)
+with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_lift _ $s _ _ _ _ $de) $deqr
+  ↪ der_eq_trans _ _ _ _ _ _
+       (der_eq_lift _ $s _ _ _ _ (der_subst _ $dr1 $sc1 $de))
+       (deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1
+                       (der_eq_refl _ _ _ _ (inv_teq_t2 (inv_sort $de)))
+                       $deqr)
+
 ;
