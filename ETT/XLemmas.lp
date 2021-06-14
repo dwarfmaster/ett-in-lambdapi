@@ -78,6 +78,7 @@ symbol substitution {Γ : Context} {s s' : Sort} {A B C : Term} :
 
 // Elimination of term equality
 symbol teq_inv {t1 t2 : Term} : TEq t1 t2 → TEq t2 t1;
+symbol teq_trans {t1 t2 t3 : Term} : TEq t1 t2 → TEq t2 t3 → TEq t1 t3;
 symbol Jt {Γ : Context} {s : Sort} {t1 t2 T : Term}
           : TEq t1 t2 → der Γ t1 T s → der Γ t2 T s;
 symbol JT {Γ : Context} {s : Sort} {t T1 T2 : Term}
@@ -93,6 +94,7 @@ symbol Jeq {Γ : Context} {s : Sort} {T T' t1 t1' t2 t2'}
            → der_eq Γ s T  t1  t2
            → der_eq Γ s T' t1' t2';
 rule teq_inv (TRefl $t) ↪ TRefl $t
+with teq_trans (TRefl $t) (TRefl _) ↪ TRefl $t
 with JtT (TRefl _) (TRefl _) $d ↪ $d
 with @Jt _ _ _ _ $T $eqt $d ↪ JtT $eqt (TRefl $T) $d
 with @JT _ _ $t _ _ $eqT $d ↪ JtT (TRefl $t) $eqT $d
