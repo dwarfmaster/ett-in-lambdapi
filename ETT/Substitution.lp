@@ -578,4 +578,12 @@ with deq_cong_subst $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (der_eq_symm _ _ _ _ _ $duv
        (der_eq_symm _ _ _ _ _ (der_eq_subst $id $dr1 $sc1 $duv))
        (deq_subst_convert $id $r1 $r2 $deqA $dr1 $dr2 $sc1 (inv_eq_t1 $duv) $deqr)
 
+with deq_cong_subst $id $r1 $r2 $deqR $dr1 $dr2 $sc1 (der_eq_cong_tfun _ $s $s' _ _ _ _ $deqA $deqB $dB1 $dB2) $deqr
+  ↪ der_eq_trans _ _ _ _ _ _
+       (der_eq_cong_tfun _ $s $s' _ _ _ _
+                         (der_eq_subst $id $dr1 $sc1 $deqA)
+                         (der_eq_subst (dbsucc $id) $dr1 (SCPush $sc1 (inv_eq_t1 $deqA)) $deqB)
+                         (der_subst _ $dr1 (SCPush $sc1 (inv_eq_t1 $deqA)) $dB1)
+                         (der_subst _ $dr1 (SCPush $sc1 (inv_eq_t2 $deqA)) $dB2))
+       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $sc1 (der_prod _ _ _ _ _ (inv_eq_t2 $deqA) $dB2) $deqr)
 ;
