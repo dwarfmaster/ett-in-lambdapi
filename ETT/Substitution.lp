@@ -586,4 +586,15 @@ with deq_cong_subst $id $r1 $r2 $deqR $dr1 $dr2 $sc1 (der_eq_cong_tfun _ $s $s' 
                          (der_subst _ $dr1 (SCPush $sc1 (inv_eq_t1 $deqA)) $dB1)
                          (der_subst _ $dr1 (SCPush $sc1 (inv_eq_t2 $deqA)) $dB2))
        (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $sc1 (der_prod _ _ _ _ _ (inv_eq_t2 $deqA) $dB2) $deqr)
+with deq_cong_subst $id $r1 $r2 $deqR $dr1 $dr2 $sc1 (der_eq_cong_tabs _ $s $s' _ _ _ _ _ _ $deqA $deqB $deqt $dB1 $dB2 $dt1 $dt2) $deqr
+  ↪ der_eq_trans _ _ _ _ _ _
+       (der_eq_cong_tabs _ $s $s' _ _ _ _ _ _
+                         (der_eq_subst $id $dr1 $sc1 $deqA)
+                         (der_eq_subst (dbsucc $id) $dr1 (SCPush $sc1 (inv_eq_t1 $deqA)) $deqB)
+                         (der_eq_subst (dbsucc $id) $dr1 (SCPush $sc1 (inv_eq_t1 $deqA)) $deqt)
+                         (der_subst _ $dr1 (SCPush $sc1 (inv_eq_t1 $deqA)) $dB1)
+                         (der_subst _ $dr1 (SCPush $sc1 (inv_eq_t2 $deqA)) $dB2)
+                         (der_subst _ $dr1 (SCPush $sc1 (inv_eq_t1 $deqA)) $dt1)
+                         (der_subst _ $dr1 (SCPush $sc1 (inv_eq_t2 $deqA)) $dt2))
+       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $sc1 (inv_eq_t2 (der_eq_cong_tabs _ _ _ _ _ _ _ _ _ $deqA $deqB $deqt $dB1 $dB2 $dt1 $dt2)) $deqr)
 ;
