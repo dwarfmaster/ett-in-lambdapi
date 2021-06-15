@@ -41,13 +41,6 @@ rule sc_to_dctx (SC0 $d) ↪ pushΓ $d
 with sc_to_dctx (SCPush _ $dB) ↪ pushΓ $dB;
 
 // Conversion
-symbol deq_cong_subst {Γ : Context} (id : ETT.DBId)
-                      {s s' : ETT.Sort} {A1 A2 B1 f1 f2 : ETT.Term} (t1 t2 : ETT.Term)
-                      (deqA : der_eq Γ (ETT.snext s) (ETT.tsort s) A1 A2)
-                      (dt1 : der Γ t1 A1 s) (dt2 : der Γ t2 A2 s)
-                      (sc1 : SubstContext (inv_sort dt1) id)
-                      (_ : der_eq (sc_to_ctx sc1) s' B1 f1 f2) (_ : der_eq Γ s A1 t1 t2)
-                      : der_eq (sc_to_sctx dt1 sc1) s' (subst id (Shift* id t1) B1) (subst id (Shift* id t1) f1) (subst id (Shift* id t2) f2);
 // TODO deq_subst_convert
 symbol deq_subst_convert {Γ : Context} (id : ETT.DBId)
                          {s s' : ETT.Sort} {A1 A2 B f : ETT.Term} (t1 t2 : ETT.Term)
@@ -56,10 +49,6 @@ symbol deq_subst_convert {Γ : Context} (id : ETT.DBId)
                          (sc1 : SubstContext (inv_sort dt1) id)
                          (_ : der (sc_to_ctx sc1) f B s') (_ : der_eq Γ s A1 t1 t2)
                          : der_eq (sc_to_sctx dt1 sc1) s' (subst id (Shift* id t1) B) (subst id (Shift* id t1) f) (subst id (Shift* id t2) f);
-rule @der_eq_cong_apply _ _ _ _ _ _ _ _ _ $deqA $deqB $deqt _ _ $dt1 $dt2
-  ↪ deq_cong_subst db0 _ _ $deqA $dt1 $dt2
-                    (SC0 (inv_sort $dt1))
-                    $deqB $deqt;
 
 symbol der_subst {Γ : Context} (id : ETT.DBId)
                  {s s' : ETT.Sort} {A B C u : ETT.Term}
@@ -84,6 +73,12 @@ rule substitution $dB $du ↪ der_subst db0 $du (SC0 (inv_sort $du)) $dB;
 
 rule sc_to_dsctx _ (SC0 $dA) ↪ inv_context $dA
 with sc_to_dsctx $d (SCPush $sc $dA) ↪ der_context_push _ _ _ (der_subst _ $d $sc $dA) (sc_to_dsctx $d $sc);
+
+// der_eq_cong_apply
+rule der_eq_cong_apply _ $deqA $deqB $deqt _ _ $dt1 $dt2
+  ↪ der_eq_trans _ _ _ _ _ _
+       (der_eq_subst db0 _ $dt1 (SC0 (inv_sort $dt1)) $deqB)
+       (deq_subst_convert db0 _ _ $deqA $dt1 $dt2 (SC0 (inv_sort $dt1)) (inv_eq_t2 $deqB) $deqt);
 
 // Types
 rule der_subst _ $d $sc (der_sort _ $s _) ↪ der_sort (sc_to_sctx $d $sc) $s (sc_to_dsctx $d $sc)
@@ -491,11 +486,6 @@ with τ_subst_n $id $d $sc (der_refl _ _ _ _ $dA $du)
                     (inv_sort (der_subst _ $d (tsc_to_sc $sc) $du))
                     (der_subst _ $d (tsc_to_sc $sc) $dA)))
 ;
-
-rule deq_cong_subst $id $r1 $r2 $deqR $dr1 $dr2 $sc $deq $deqr
-  ↪ der_eq_trans _ _ _ _ _ _
-       (der_eq_subst $id $r1 $dr1 $sc $deq)
-       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $sc (inv_eq_t2 $deq) $deqr);
 
 rule der_eq_subst $id $r $dr $sc (der_eq_beta _ $s $s' $u _ $t $B $dA $dB $dt $du)
   ↪ Jeq (teq_inv (teq_subst_apply $id $r $u $B))
