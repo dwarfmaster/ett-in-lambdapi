@@ -12,6 +12,7 @@ Progress:
 [-] DeBruijn.lp
 [X] XTyping.lp
 [X] XLemmas.lp
+[-] XCongruences.lp
 [X] Inversions.lp
 [X] TranslationDefinition.lp
 [X] TContext.lp
