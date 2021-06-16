@@ -3,6 +3,7 @@ require ETT.XAst as ETT;
 require open ETT.XTyping;
 require open ETT.DeBruijn;
 require open ETT.XLemmas;
+require open ETT.XCongruences;
 require open ETT.ITT;
 require open ETT.ILemmas;
 require open ETT.Inversions;
@@ -17,6 +18,7 @@ require open ETT.TContext;
 symbol magic {s : Sort} (A : U s) : ε s A;
 symbol magic_teq (t1 t2 : ETT.Term) : TEq t1 t2;
 symbol magic_der_eq (Γ : Context) (s : ETT.Sort) (T t1 t2 : ETT.Term) : der_eq Γ s T t1 t2;
+symbol magic_der (Γ : Context) (t T : ETT.Term) (s : ETT.Sort) : der Γ t T s;
 
 // SubstContext
 constant symbol SubstContext {Γ : Context} {A : ETT.Term} {s : ETT.Sort} : der Γ A (ETT.tsort s) (ETT.snext s) → ETT.DBId → TYPE;
@@ -40,15 +42,46 @@ with @sc_to_sctx _ _ $t _ _ $dt (@SCPush _ _ $s _ $B _ $id $sc _) ↪ Push (subs
 rule sc_to_dctx (SC0 $d) ↪ pushΓ $d
 with sc_to_dctx (SCPush _ $dB) ↪ pushΓ $dB;
 
+// EqSubstContext
+constant symbol EqSubstContext {Γ : Context} {A1 A2 : ETT.Term} {s : ETT.Sort}
+                               : der Γ A1 (ETT.tsort s) (ETT.snext s)
+                               → der Γ A2 (ETT.tsort s) (ETT.snext s)
+                               → ETT.DBId → TYPE;
+symbol esc_to_sc1 {Γ : Context} {A1 A2 : ETT.Term} {s : ETT.Sort} {id : ETT.DBId}
+                  {d1 : der Γ A1 (ETT.tsort s) (ETT.snext s)}
+                  {d2 : der Γ A2 (ETT.tsort s) (ETT.snext s)}
+                  : EqSubstContext d1 d2 id → SubstContext d1 id;
+symbol esc_to_sc2 {Γ : Context} {A1 A2 : ETT.Term} {s : ETT.Sort} {id : ETT.DBId}
+                  {d1 : der Γ A1 (ETT.tsort s) (ETT.snext s)}
+                  {d2 : der Γ A2 (ETT.tsort s) (ETT.snext s)}
+                  : EqSubstContext d1 d2 id → SubstContext d2 id;
+constant symbol ESC0 {Γ : Context} {A1 A2 : ETT.Term} {s : ETT.Sort}
+                     (d1 : der Γ A1 (ETT.tsort s) (ETT.snext s))
+                     (d2 : der Γ A2 (ETT.tsort s) (ETT.snext s))
+                     : EqSubstContext d1 d2 db0;
+constant symbol ESCPush {Γ : Context} {A1 A2 B : ETT.Term} {s s' : ETT.Sort} {id : ETT.DBId}
+                        {d1 : der Γ A1 (ETT.tsort s) (ETT.snext s)}
+                        {d2 : der Γ A2 (ETT.tsort s) (ETT.snext s)}
+                        (esc : EqSubstContext d1 d2 id)
+                        (dB1 : der (sc_to_ctx (esc_to_sc1 esc)) B (ETT.tsort s') (ETT.snext s'))
+                        (dB2 : der (sc_to_ctx (esc_to_sc2 esc)) B (ETT.tsort s') (ETT.snext s'))
+                        : EqSubstContext d1 d2 (dbsucc id);
+
+rule esc_to_sc1 (ESC0 $d1 _) ↪ SC0 $d1
+with esc_to_sc1 (ESCPush $esc $d1 _) ↪ SCPush (esc_to_sc1 $esc) $d1
+with esc_to_sc2 (ESC0 _ $d2) ↪ SC0 $d2
+with esc_to_sc2 (ESCPush $esc _ $d2) ↪ SCPush (esc_to_sc2 $esc) $d2;
+
+
 // Conversion
 // TODO deq_subst_convert
 symbol deq_subst_convert {Γ : Context} (id : ETT.DBId)
                          {s s' : ETT.Sort} {A1 A2 B f : ETT.Term} (t1 t2 : ETT.Term)
                          (deqA : der_eq Γ (ETT.snext s) (ETT.tsort s) A1 A2)
                          (dt1 : der Γ t1 A1 s) (dt2 : der Γ t2 A2 s)
-                         (sc1 : SubstContext (inv_sort dt1) id)
-                         (_ : der (sc_to_ctx sc1) f B s') (_ : der_eq Γ s A1 t1 t2)
-                         : der_eq (sc_to_sctx dt1 sc1) s' (subst id (Shift* id t1) B) (subst id (Shift* id t1) f) (subst id (Shift* id t2) f);
+                         (esc : EqSubstContext (inv_sort dt1) (inv_sort dt2) id)
+                         (_ : der (sc_to_ctx (esc_to_sc1 esc)) f B s') (_ : der_eq Γ s A1 t1 t2)
+                         : der_eq (sc_to_sctx dt1 (esc_to_sc1 esc)) s' (subst id (Shift* id t1) B) (subst id (Shift* id t1) f) (subst id (Shift* id t2) f);
 
 symbol der_subst {Γ : Context} (id : ETT.DBId)
                  {s s' : ETT.Sort} {A B C u : ETT.Term}
@@ -78,7 +111,7 @@ with sc_to_dsctx $d (SCPush $sc $dA) ↪ der_context_push _ _ _ (der_subst _ $d 
 rule der_eq_cong_apply _ $deqA $deqB $deqt _ _ $dt1 $dt2
   ↪ der_eq_trans _ _ _ _ _ _
        (der_eq_subst db0 _ $dt1 (SC0 (inv_sort $dt1)) $deqB)
-       (deq_subst_convert db0 _ _ $deqA $dt1 $dt2 (SC0 (inv_sort $dt1)) (inv_eq_t2 $deqB) $deqt);
+       (deq_subst_convert db0 _ _ $deqA $dt1 $dt2 (ESC0 (inv_sort $dt1) (inv_sort $dt2)) (inv_eq_t2 $deqB) $deqt);
 
 // Types
 rule der_subst _ $d $sc (der_sort _ $s _) ↪ der_sort (sc_to_sctx $d $sc) $s (sc_to_dsctx $d $sc)
@@ -639,4 +672,41 @@ with der_eq_subst $id $r $dr $sc (der_eq_cong_trefl _ $s _ _ _ _ $deqA $deqa $da
                        (der_eq_subst $id $r $dr $sc $deqa)
                        (der_subst $id $dr $sc $da1)
                        (der_subst $id $dr $sc $da2)
+;
+
+symbol esc_to_sec {Γ : Context} {t1 t2 A1 A2 : ETT.Term} {s : ETT.Sort} {id : ETT.DBId}
+                  (d1 : der Γ t1 A1 s) (d2 : der Γ t2 A2 s)
+                  (deqt : der_eq Γ s A1 t1 t2) (deqT : der_eq Γ (ETT.snext s) (ETT.tsort s) A1 A2)
+                  : EqSubstContext (inv_sort d1) (inv_sort d2) id → EqContext;
+rule ec_to_ctx1 (esc_to_sec $dr1 _ _ _ $esc) ↪ sc_to_sctx $dr1 (esc_to_sc1 $esc)
+with ec_to_ctx2 (esc_to_sec _ $dr2 _ _ $esc) ↪ sc_to_sctx $dr2 (esc_to_sc2 $esc);
+rule esc_to_sec _ _ _ _ (@ESC0 $Γ _ _ _ _ _) ↪ EC0 $Γ
+with esc_to_sec $dr1 $dr2 $deqr $deqR (ESCPush $esc $d1 $d2)
+  ↪ ECPush (esc_to_sec $dr1 $dr2 $deqr $deqR $esc)
+            (der_subst _ $dr1 (esc_to_sc1 $esc) $d1)
+            (der_subst _ $dr2 (esc_to_sc2 $esc) $d2)
+            (deq_subst_convert _ _ _ $deqR $dr1 $dr2 $esc $d1 $deqr);
+symbol esc_to_ec {Γ : Context} {A1 A2 : ETT.Term} {s : ETT.Sort} {id : ETT.DBId}
+                 {d1 : der Γ A1 (ETT.tsort s) (ETT.snext s)} {d2 : der Γ A2 (ETT.tsort s) (ETT.snext s)}
+                 : EqSubstContext d1 d2 id → EqContext;
+rule ec_to_ctx1 (esc_to_ec $esc) ↪ sc_to_ctx (esc_to_sc1 $esc)
+with ec_to_ctx2 (esc_to_ec $esc) ↪ sc_to_ctx (esc_to_sc2 $esc);
+// TODO esc_to_ec
+
+rule deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_prod _ $s $s' _ _ $dA $dB) $deqr
+  ↪ der_eq_cong_tfun _ $s $s' _ _ _ _
+                      (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                      (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dB $deqr)
+                      (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dB)
+                      (convert_der'
+                        (ECPush (esc_to_sec $dr1 $dr2 $deqr $deqR $esc)
+                          (convert_der' (esc_to_sec $dr1 $dr2 $deqr $deqR $esc)
+                                        (der_subst _ $dr2 (esc_to_sc2 $esc) (convert_der (esc_to_ec $esc) $dA)))
+                          (der_subst _ $dr2 (esc_to_sc2 $esc) (convert_der (esc_to_ec $esc) $dA))
+                          (der_eq_refl _ _ _ _ (convert_der' (esc_to_sec $dr1 $dr2 $deqr $deqR $esc)
+                                                             (der_subst _ $dr2 (esc_to_sc2 $esc) (convert_der (esc_to_ec $esc) $dA)))))
+                        (der_subst _ $dr2 (SCPush (esc_to_sc2 $esc) (convert_der (esc_to_ec $esc) $dA))
+                                   (convert_der
+                                     (ECPush (esc_to_ec $esc) $dA (convert_der (esc_to_ec $esc) $dA) (der_eq_refl _ _ _ _ $dA))
+                                     $dB)))
 ;
