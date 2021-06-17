@@ -64,6 +64,8 @@ symbol der_shift1 {Γ : Context} {t A T B : Term} {s sa sb : Sort}
 symbol der_shift (id : DBId) {Γ : Context} (_ : der_context Γ) {t T : Term} {s : Sort} (_ : der (getΓ Γ id) t T s) : der Γ (ShiftN id t) (ShiftN id T) s;
 rule der_shift db0 (der_context_push _ _ _ $dA _) $d ↪ der_shift0 $dA $d
 with der_shift (dbsucc $id) (der_context_push _ _ _ $dA $dΓ) $d ↪ der_shift0 $dA (der_shift $id $dΓ $d);
+symbol der_eq_shift (id : DBId) {Γ : Context} (_ : der_context Γ) {t1 t2 T : Term} {s : Sort} (_ : der_eq (getΓ Γ id) s T t1 t2)
+                  : der_eq Γ s (ShiftN id T) (ShiftN id t1) (ShiftN id t2);
 
 // Congruence for replacement
 symbol der_eq_cong_apply (Γ : Context) {s s' : Sort} {A1 A2 B1 B2 t1 t2 : Term}

@@ -173,6 +173,10 @@ with der_eq_shift_n $id $sc $d (der_eq_cong_trefl _ $s $A1 $A2 $a1 $a2 $deqA $de
 rule der_shift0 $dA $dt ↪ der_shift_n db0 (SC0 (inv_context $dA)) $dA $dt
 with der_shift1 $dA $dB $dt ↪ der_shift_n db1 (SCSucc (SC0 (inv_context $dB)) $dA) $dB $dt;
 
+// Implementation of der_eq_shift
+rule der_eq_shift db0 (der_context_push _ _ _ $dA $dΓ) $deq ↪ der_eq_shift_n db0 (SC0 $dΓ) $dA $deq
+with der_eq_shift (dbsucc $id) (der_context_push _ _ _ $dA $dΓ) $deq ↪ der_eq_shift_n db0 (SC0 $dΓ) $dA (der_eq_shift $id $dΓ $deq);
+
 // Compatibility of translation with shifting
 constant symbol ShiftTContext : TContext → DBId → TYPE;
 symbol tsc_to_sc {Γ : TContext} {id : DBId} : ShiftTContext Γ id → ShiftContext (τ_Γ Γ) id;
