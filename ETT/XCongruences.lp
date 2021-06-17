@@ -10,9 +10,7 @@ require open ETT.Inversions;
 constant symbol EqContext : TYPE;
 symbol ec_to_ctx1 : EqContext → Context;
 symbol ec_to_ctx2 : EqContext → Context;
-// TODO ec_to_dctx1
 symbol ec_to_dctx1 (ec : EqContext) : der_context (ec_to_ctx1 ec);
-// TODO ec_to_dctx2
 symbol ec_to_dctx2 (ec : EqContext) : der_context (ec_to_ctx2 ec);
 // TODO ec_get1
 symbol ec_get1 (ec : EqContext) (id : DBId) : der_eq (getΓ (ec_to_ctx1 ec) id)
@@ -26,18 +24,22 @@ symbol ec_get2 (ec : EqContext) (id : DBId) : der_eq (getΓ (ec_to_ctx2 ec) id)
                                                      (tsort (getS (ec_to_ctx1 ec) id))
                                                      (get (ec_to_ctx1 ec) id)
                                                      (get (ec_to_ctx2 ec) id);
-constant symbol EC0 : Context → EqContext;
+constant symbol EC0 {Γ : Context} : der_context Γ → EqContext;
 constant symbol ECPush {s : Sort} {T1 T2 : Term}
                        (ec : EqContext)
                        : der (ec_to_ctx1 ec) T1 (tsort s) (snext s)
                        → der (ec_to_ctx2 ec) T2 (tsort s) (snext s)
                        → der_eq (ec_to_ctx1 ec) (snext s) (tsort s) T1 T2
                        → EqContext;
-rule ec_to_ctx1 (EC0 $Γ) ↪ $Γ
+rule ec_to_ctx1 (@EC0 $Γ _) ↪ $Γ
 with ec_to_ctx1 (@ECPush $s $T1 _ $ec _ _ _) ↪ Push $T1 $s (ec_to_ctx1 $ec)
-with ec_to_ctx2 (EC0 $Γ) ↪ $Γ
+with ec_to_ctx2 (@EC0 $Γ _) ↪ $Γ
 with ec_to_ctx2 (@ECPush $s _ $T2 $ec _ _ _) ↪ Push $T2 $s (ec_to_ctx2 $ec)
 with getS (ec_to_ctx2 $ec) $id ↪ getS (ec_to_ctx1 $ec) $id;
+rule ec_to_dctx1 (EC0 $dΓ) ↪ $dΓ
+with ec_to_dctx1 (ECPush _ $d1 _ _) ↪ pushΓ $d1
+with ec_to_dctx2 (EC0 $dΓ) ↪ $dΓ
+with ec_to_dctx2 (ECPush _ _ $d2 _) ↪ pushΓ $d2;
 
 // Convert in the context
 symbol convert_der {s : Sort} {t A : Term}
