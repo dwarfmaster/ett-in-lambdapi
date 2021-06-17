@@ -12,13 +12,11 @@ symbol ec_to_ctx1 : EqContext → Context;
 symbol ec_to_ctx2 : EqContext → Context;
 symbol ec_to_dctx1 (ec : EqContext) : der_context (ec_to_ctx1 ec);
 symbol ec_to_dctx2 (ec : EqContext) : der_context (ec_to_ctx2 ec);
-// TODO ec_get1
 symbol ec_get1 (ec : EqContext) (id : DBId) : der_eq (getΓ (ec_to_ctx1 ec) id)
                                                      (snext (getS (ec_to_ctx1 ec) id))
                                                      (tsort (getS (ec_to_ctx1 ec) id))
                                                      (get (ec_to_ctx1 ec) id)
                                                      (get (ec_to_ctx2 ec) id);
-// TODO ec_get2
 symbol ec_get2 (ec : EqContext) (id : DBId) : der_eq (getΓ (ec_to_ctx2 ec) id)
                                                      (snext (getS (ec_to_ctx1 ec) id))
                                                      (tsort (getS (ec_to_ctx1 ec) id))
@@ -58,6 +56,13 @@ symbol convert_der_eq' {s : Sort} {t1 t2 A : Term}
                        (ec : EqContext)
                        : der_eq (ec_to_ctx2 ec) s A t1 t2
                        → der_eq (ec_to_ctx1 ec) s A t1 t2;
+
+rule ec_get1 (EC0 $dΓ) $id ↪ der_eq_refl _ _ _ _ (der_getΓ $id $dΓ)
+with ec_get1 (ECPush _ _ _ $deq) db0 ↪ $deq
+with ec_get1 (ECPush $ec _ _ _) (dbsucc $id) ↪ ec_get1 $ec $id
+with ec_get2 (EC0 $dΓ) $id ↪ der_eq_refl _ _ _ _ (der_getΓ $id $dΓ)
+with ec_get2 (ECPush $ec _ _ $deq) db0 ↪ convert_der_eq $ec $deq
+with ec_get2 (ECPush $ec _ _ _) (dbsucc $id) ↪ ec_get2 $ec $id;
 
 symbol pushEC {s : Sort} {A : Term}
               (ec : EqContext) (d : der (ec_to_ctx1 ec) A (tsort s) (snext s))
