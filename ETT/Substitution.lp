@@ -744,7 +744,11 @@ with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_prop_type_eq _ $s _
                      (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $du)
                      (der_subst _ $dr1 (esc_to_sc1 $esc) $dv)
                      (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $dv)
-// TODO structural rules
+// TODO variable case
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_type_conv _ _ _ _ _ $du $deq) $deqr
+  ↪ der_eq_conversion _ _ _ _ _ _
+       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $du $deqr)
+       (der_eq_subst $id _ $dr1 (esc_to_sc1 $esc) $deq)
 with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_abs _ $s $s' _ _ _ $dA $dB $dt) $deqr
   ↪ der_eq_cong_tabs _ $s $s' _ _ _ _ _ _
                       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
