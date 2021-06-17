@@ -680,7 +680,7 @@ symbol esc_to_sec {Γ : Context} {t1 t2 A1 A2 : ETT.Term} {s : ETT.Sort} {id : E
                   : EqSubstContext (inv_sort d1) (inv_sort d2) id → EqContext;
 rule ec_to_ctx1 (esc_to_sec $dr1 _ _ _ $esc) ↪ sc_to_sctx $dr1 (esc_to_sc1 $esc)
 with ec_to_ctx2 (esc_to_sec _ $dr2 _ _ $esc) ↪ sc_to_sctx $dr2 (esc_to_sc2 $esc);
-rule esc_to_sec _ _ _ _ (@ESC0 $Γ _ _ _ _ _) ↪ EC0 $Γ
+rule esc_to_sec _ _ _ _ (ESC0 $d _) ↪ EC0 (inv_context $d)
 with esc_to_sec $dr1 $dr2 $deqr $deqR (ESCPush $esc $d1 $d2)
   ↪ ECPush (esc_to_sec $dr1 $dr2 $deqr $deqR $esc)
             (der_subst _ $dr1 (esc_to_sc1 $esc) $d1)
@@ -693,20 +693,125 @@ rule ec_to_ctx1 (esc_to_ec $esc) ↪ sc_to_ctx (esc_to_sc1 $esc)
 with ec_to_ctx2 (esc_to_ec $esc) ↪ sc_to_ctx (esc_to_sc2 $esc);
 // TODO esc_to_ec
 
-rule deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_prod _ $s $s' _ _ $dA $dB) $deqr
+symbol renormalize_subst {Γ : Context} {s s' : ETT.Sort} {A t B : ETT.Term}
+                         {sr : ETT.Sort} {R1 R2 r1 r2 : ETT.Term} {id : ETT.DBId}
+                         (dr1 : der Γ r1 R1 sr) (dr2 : der Γ r2 R2 sr)
+                         (deqR : der_eq Γ (ETT.snext sr) (ETT.tsort sr) R1 R2) (deqr : der_eq Γ sr R1 r1 r2)
+                         (esc : EqSubstContext (inv_sort dr1) (inv_sort dr2) id)
+                         (dA : der (sc_to_ctx (esc_to_sc1 esc)) A (ETT.tsort s) (ETT.snext s))
+                         (dB : der (Push A s (sc_to_ctx (esc_to_sc1 esc))) t B s') ≔
+  convert_der'
+   (ECPush (esc_to_sec dr1 dr2 deqr deqR esc)
+     (convert_der' (esc_to_sec dr1 dr2 deqr deqR esc)
+                   (der_subst _ dr2 (esc_to_sc2 esc) (convert_der (esc_to_ec esc) dA)))
+     (der_subst _ dr2 (esc_to_sc2 esc) (convert_der (esc_to_ec esc) dA))
+     (der_eq_refl _ _ _ _ (convert_der' (esc_to_sec dr1 dr2 deqr deqR esc)
+                                        (der_subst _ dr2 (esc_to_sc2 esc) (convert_der (esc_to_ec esc) dA)))))
+   (der_subst _ dr2 (SCPush (esc_to_sc2 esc) (convert_der (esc_to_ec esc) dA))
+              (convert_der
+                (ECPush (esc_to_ec esc) dA (convert_der (esc_to_ec esc) dA) (der_eq_refl _ _ _ _ dA))
+                dB));
+symbol der_subst_conj {Γ : Context} {s : ETT.Sort} {t A : ETT.Term}
+                      {sr : ETT.Sort} {R1 R2 r1 r2 : ETT.Term} {id : ETT.DBId}
+                      (dr1 : der Γ r1 R1 sr) (dr2 : der Γ r2 R2 sr)
+                      (deqR : der_eq Γ (ETT.snext sr) (ETT.tsort sr) R1 R2) (deqr : der_eq Γ sr R1 r1 r2)
+                      (esc : EqSubstContext (inv_sort dr1) (inv_sort dr2) id)
+                      (d : der (sc_to_ctx (esc_to_sc1 esc)) t A s) ≔
+  convert_der' (esc_to_sec dr1 dr2 deqr deqR esc)
+               (der_subst _ dr2 (esc_to_sc2 esc) (convert_der (esc_to_ec esc) d));
+
+rule deq_subst_convert _ _ _ _ $dr1 _ $esc (der_sort _ $s _) _
+  ↪ der_eq_refl _ _ _ _
+                 (der_sort _ $s (sc_to_dsctx $dr1 (esc_to_sc1 $esc)))
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_prod _ $s $s' _ _ $dA $dB) $deqr
   ↪ der_eq_cong_tfun _ $s $s' _ _ _ _
                       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
                       (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dB $deqr)
                       (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dB)
-                      (convert_der'
-                        (ECPush (esc_to_sec $dr1 $dr2 $deqr $deqR $esc)
-                          (convert_der' (esc_to_sec $dr1 $dr2 $deqr $deqR $esc)
-                                        (der_subst _ $dr2 (esc_to_sc2 $esc) (convert_der (esc_to_ec $esc) $dA)))
-                          (der_subst _ $dr2 (esc_to_sc2 $esc) (convert_der (esc_to_ec $esc) $dA))
-                          (der_eq_refl _ _ _ _ (convert_der' (esc_to_sec $dr1 $dr2 $deqr $deqR $esc)
-                                                             (der_subst _ $dr2 (esc_to_sc2 $esc) (convert_der (esc_to_ec $esc) $dA)))))
-                        (der_subst _ $dr2 (SCPush (esc_to_sc2 $esc) (convert_der (esc_to_ec $esc) $dA))
-                                   (convert_der
-                                     (ECPush (esc_to_ec $esc) $dA (convert_der (esc_to_ec $esc) $dA) (der_eq_refl _ _ _ _ $dA))
-                                     $dB)))
+                      (renormalize_subst $dr1 $dr2 $deqR $deqr $esc $dA $dB)
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_sigma _ $s $s' _ _ $dA $dB) $deqr
+  ↪ der_eq_cong_tsum _ $s $s' _ _ _ _
+                      (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                      (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dB $deqr)
+                      (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dB)
+                      (renormalize_subst $dr1 $dr2 $deqR $deqr $esc $dA $dB)
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_prop_type_eq _ $s _ _ _ $dA $du $dv) $deqr
+  ↪ der_eq_cong_teq _ $s _ _ _ _ _ _
+                     (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                     (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $du $deqr)
+                     (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dv $deqr)
+                     (der_subst _ $dr1 (esc_to_sc1 $esc) $du)
+                     (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $du)
+                     (der_subst _ $dr1 (esc_to_sc1 $esc) $dv)
+                     (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $dv)
+// TODO structural rules
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_abs _ $s $s' _ _ _ $dA $dB $dt) $deqr
+  ↪ der_eq_cong_tabs _ $s $s' _ _ _ _ _ _
+                      (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                      (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dB $deqr)
+                      (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dt $deqr)
+                      (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dB)
+                      (renormalize_subst $dr1 $dr2 $deqR $deqr $esc $dA $dB)
+                      (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dt)
+                      (renormalize_subst $dr1 $dr2 $deqR $deqr $esc $dA $dt)
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_app _ $s $s' _ _ $u $B $dA $dB $dt $du) $deqr
+  ↪ Jeq (teq_inv (teq_subst_apply $id $r1 $u $B))
+         (TRefl _)
+         (TRefl _)
+         (der_eq_cong_tapp _ $s $s' _ _ _ _ _ _ _ _
+                           (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                           (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dB $deqr)
+                           (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dt $deqr)
+                           (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $du $deqr)
+                           (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dB)
+                           (renormalize_subst $dr1 $dr2 $deqR $deqr $esc $dA $dB)
+                           (der_subst _ $dr1 (esc_to_sc1 $esc) $dt)
+                           (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $dt)
+                           (der_subst _ $dr1 (esc_to_sc1 $esc) $du)
+                           (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $du))
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_pair _ $s $s' $u _ _ $B $dA $du $dB $dv) $deqr
+  ↪ der_eq_cong_tpair _ $s $s' _ _ _ _ _ _ _ _
+                       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                       (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dB $deqr)
+                       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $du $deqr)
+                       (Jeq (teq_subst_apply $id $r1 $u $B)
+                            (TRefl _)
+                            (TRefl _)
+                            (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dv $deqr))
+                       (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dB)
+                       (renormalize_subst $dr1 $dr2 $deqR $deqr $esc $dA $dB)
+                       (der_subst _ $dr1 (esc_to_sc1 $esc) $du)
+                       (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $du)
+                       (JT (teq_subst_apply $id $r1 $u $B)
+                           (der_subst _ $dr1 (esc_to_sc1 $esc) $dv))
+                       (JT (teq_subst_apply $id $r2 $u $B)
+                           (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $dv))
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_π1 _ $s $s' _ _ _ $dA $dB $dp) $deqr
+  ↪ der_eq_cong_π1 _ $s $s' _ _ _ _ _ _
+                    (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                    (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dB $deqr)
+                    (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dp $deqr)
+                    (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dB)
+                    (renormalize_subst $dr1 $dr2 $deqR $deqr $esc $dA $dB)
+                    (der_subst _ $dr1 (esc_to_sc1 $esc) $dp)
+                    (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $dp)
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_π2 _ $s $s' $p $A $B $dA $dB $dp) $deqr
+  ↪ Jeq (teq_inv (teq_subst_apply $id $r1 (ETT.π1 $A $B $p) $B))
+         (TRefl _)
+         (TRefl _)
+         (der_eq_cong_π2 _ $s $s' _ _ _ _ _ _
+                         (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                         (deq_subst_convert (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $dA (convert_der (esc_to_ec $esc) $dA)) $dB $deqr)
+                         (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dp $deqr)
+                         (der_subst _ $dr1 (SCPush (esc_to_sc1 $esc) $dA) $dB)
+                         (renormalize_subst $dr1 $dr2 $deqR $deqr $esc $dA $dB)
+                         (der_subst _ $dr1 (esc_to_sc1 $esc) $dp)
+                         (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $dp))
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_refl _ $s _ _ $dA $du) $deqr
+  ↪ der_eq_cong_trefl _ $s _ _ _ _
+                       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $dA $deqr)
+                       (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $du $deqr)
+                       (der_subst _ $dr1 (esc_to_sc1 $esc) $du)
+                       (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $du)
+
 ;
