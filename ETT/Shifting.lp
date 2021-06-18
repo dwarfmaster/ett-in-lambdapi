@@ -171,6 +171,7 @@ with der_eq_shift_n $id $sc $d (der_eq_cong_trefl _ $s $A1 $A2 $a1 $a2 $deqA $de
 
 // Implementation of der_shift{0,1}
 rule der_shift0 $dA $dt ↪ der_shift_n db0 (SC0 (inv_context $dA)) $dA $dt
+with der_eq_shift0 $dA $deq ↪ der_eq_shift_n db0 (SC0 (inv_context $dA)) $dA $deq
 with der_shift1 $dA $dB $dt ↪ der_shift_n db1 (SCSucc (SC0 (inv_context $dB)) $dA) $dB $dt;
 
 // Implementation of der_eq_shift
