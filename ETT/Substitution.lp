@@ -74,7 +74,6 @@ with esc_to_sc2 (ESCPush $esc _ $d2) ↪ SCPush (esc_to_sc2 $esc) $d2;
 
 
 // Conversion
-// TODO deq_subst_convert
 symbol deq_subst_convert {Γ : Context} (id : ETT.DBId)
                          {s s' : ETT.Sort} {A1 A2 B f : ETT.Term} (t1 t2 : ETT.Term)
                          (deqA : der_eq Γ (ETT.snext s) (ETT.tsort s) A1 A2)
@@ -82,6 +81,17 @@ symbol deq_subst_convert {Γ : Context} (id : ETT.DBId)
                          (esc : EqSubstContext (inv_sort dt1) (inv_sort dt2) id)
                          (_ : der (sc_to_ctx (esc_to_sc1 esc)) f B s') (_ : der_eq Γ s A1 t1 t2)
                          : der_eq (sc_to_sctx dt1 (esc_to_sc1 esc)) s' (subst id (Shift* id t1) B) (subst id (Shift* id t1) f) (subst id (Shift* id t2) f);
+symbol deq_convert_var {Γ : Context} (id : ETT.DBId)
+                       {s : ETT.Sort} {A1 A2 : ETT.Term} (t1 t2 : ETT.Term)
+                       (deqA : der_eq Γ (ETT.snext s) (ETT.tsort s) A1 A2)
+                       (dt1 : der Γ t1 A1 s) (dt2 : der Γ t2 A2 s)
+                       (esc : EqSubstContext (inv_sort dt1) (inv_sort dt2) id)
+                       (i : ETT.DBId) (_ : der_eq Γ s A1 t1 t2)
+                       : der_eq (sc_to_sctx dt1 (esc_to_sc1 esc))
+                                (getS (sc_to_ctx (esc_to_sc1 esc)) i)
+                                (subst id (Shift* id t1) (ShiftN i (get (sc_to_ctx (esc_to_sc1 esc)) i)))
+                                (dbselect id i (Shift* id t1) (ETT.var i) (ETT.var (dbprev i)))
+                                (dbselect id i (Shift* id t2) (ETT.var i) (ETT.var (dbprev i)));
 
 symbol der_subst {Γ : Context} (id : ETT.DBId)
                  {s s' : ETT.Sort} {A B C u : ETT.Term}
@@ -744,7 +754,29 @@ with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_prop_type_eq _ $s _
                      (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $du)
                      (der_subst _ $dr1 (esc_to_sc1 $esc) $dv)
                      (der_subst_conj $dr1 $dr2 $deqR $deqr $esc $dv)
-// TODO variable case
+
+with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_var _ $i _) $deqr
+  ↪ deq_convert_var $id $r1 $r2 $deqR $dr1 $dr2 $esc $i $deqr
+with deq_convert_var db0 _ _ _ _ _ (ESC0 _ _) db0 $deqr
+  ↪ $deqr
+with deq_convert_var db0 $r1 _ _ _ _ (@ESC0 $Γ _ _ _ $d1 _) (dbsucc $i) _
+  ↪ Jeq (teq_inv (teq_shift_cancel_subst db0 $r1 (Shift* $i (get $Γ $i))))
+         (TRefl _)
+         (TRefl _)
+         (der_eq_refl _ _ _ _ (der_var _ $i (inv_context $d1)))
+with deq_convert_var (dbsucc $id) $r1 _ _ $dr1 _ (@ESCPush _ _ _ $B _ _ _ _ _ $esc $d1 $d2) db0 _
+  ↪ Jeq (teq_inv (teq_subst_shift $id (Shift* $id $r1) $B))
+         (TRefl _)
+         (TRefl _)
+         (der_eq_refl _ _ _ _ (der_var _ db0 (sc_to_dsctx $dr1 (esc_to_sc1 (ESCPush $esc $d1 $d2)))))
+with deq_convert_var (dbsucc $id) $r1 $r2 $deqR $dr1 $dr2 (ESCPush $esc $d1 _) (dbsucc $i) $deqr
+  ↪ Jeq (teq_inv (teq_subst_shift $id (Shift* $id $r1) (ShiftN $i (get (sc_to_ctx (esc_to_sc1 $esc)) $i))))
+         (teq_inv (teq_select_shift $id $i (Shift* $id $r1)))
+         (teq_inv (teq_select_shift $id $i (Shift* $id $r2)))
+         (der_eq_shift0
+           (der_subst _ $dr1 (esc_to_sc1 $esc) $d1)
+           (deq_convert_var $id $r1 $r2 $deqR $dr1 $dr2 $esc $i $deqr))
+
 with deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc (der_type_conv _ _ _ _ _ $du $deq) $deqr
   ↪ der_eq_conversion _ _ _ _ _ _
        (deq_subst_convert $id $r1 $r2 $deqR $dr1 $dr2 $esc $du $deqr)
