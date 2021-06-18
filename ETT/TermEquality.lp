@@ -32,6 +32,62 @@ with @JT _ _ $t _ _ $eqT $d ↪ JtT (TRefl $t) $eqT $d
 with @Jcong $t _ $f (TRefl _) ↪ TRefl ($f $t)
 with Jeq (TRefl _) (TRefl _) (TRefl _) $d ↪ $d;
 
+// Congruence for term equality
+symbol Jabs {A1 A2 B1 B2 t1 t2 : Term}
+            : TEq A1 A2
+            → TEq B1 B2
+            → TEq t1 t2
+            → TEq (tabs A1 B1 t1) (tabs A2 B2 t2);
+symbol Japp {A1 A2 B1 B2 f1 f2 a1 a2 : Term}
+            : TEq A1 A2
+            → TEq B1 B2
+            → TEq f1 f2
+            → TEq a1 a2
+            → TEq (tapp A1 B1 f1 a1) (tapp A2 B2 f2 a2);
+symbol Jfun {A1 A2 B1 B2 : Term}
+            : TEq A1 A2
+            → TEq B1 B2
+            → TEq (tfun A1 B1) (tfun A2 B2);
+symbol Jpair {A1 A2 B1 B2 a1 a2 b1 b2 : Term}
+             : TEq A1 A2
+             → TEq B1 B2
+             → TEq a1 a2
+             → TEq b1 b2
+             → TEq (tpair A1 B1 a1 b1) (tpair A2 B2 a2 b2);
+symbol Jπ1 {A1 A2 B1 B2 p1 p2 : Term}
+           : TEq A1 A2
+           → TEq B1 B2
+           → TEq p1 p2
+           → TEq (π1 A1 B1 p1) (π1 A2 B2 p2);
+symbol Jπ2 {A1 A2 B1 B2 p1 p2 : Term}
+           : TEq A1 A2
+           → TEq B1 B2
+           → TEq p1 p2
+           → TEq (π2 A1 B1 p1) (π2 A2 B2 p2);
+symbol Jsum {A1 A2 B1 B2 : Term}
+            : TEq A1 A2
+            → TEq B1 B2
+            → TEq (tsum A1 B1) (tsum A2 B2);
+symbol Jrefl {A1 A2 a1 a2 : Term}
+           : TEq A1 A2
+           → TEq a1 a2
+           → TEq (trefl A1 a1) (trefl A2 a2);
+symbol Jteq {A1 A2 a1 a2 b1 b2 : Term}
+            : TEq A1 A2
+            → TEq a1 a2
+            → TEq b1 b2
+            → TEq (teq A1 a1 b1) (teq A2 a2 b2);
+
+rule Jabs (TRefl $A) (TRefl $B) (TRefl $t) ↪ TRefl (tabs $A $B $t)
+with Japp (TRefl $A) (TRefl $B) (TRefl $f) (TRefl $a) ↪ TRefl (tapp $A $B $f $a)
+with Jfun (TRefl $A) (TRefl $B) ↪ TRefl (tfun $A $B)
+with Jpair (TRefl $A) (TRefl $B) (TRefl $a) (TRefl $b) ↪ TRefl (tpair $A $B $a $b)
+with Jπ1 (TRefl $A) (TRefl $B) (TRefl $p) ↪ TRefl (π1 $A $B $p)
+with Jπ2 (TRefl $A) (TRefl $B) (TRefl $p) ↪ TRefl (π2 $A $B $p)
+with Jsum (TRefl $A) (TRefl $B) ↪ TRefl (tsum $A $B)
+with Jrefl (TRefl $A) (TRefl $a) ↪ TRefl (trefl $A $a)
+with Jteq (TRefl $A) (TRefl $a) (TRefl $b) ↪ TRefl (teq $A $a $b);
+
 // Some equalities
 // TODO teq_subst_apply
 symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
