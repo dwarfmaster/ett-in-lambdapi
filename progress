@@ -9,10 +9,11 @@ Progress:
 [X] Packing.lp
 [X] Congruences.lp
 [X] XAst.lp
-[-] DeBruijn.lp
+[X] DeBruijn.lp
 [X] XTyping.lp
 [X] XLemmas.lp
 [X] XCongruences.lp
+[-] TermEquality.lp
 [X] Inversions.lp
 [X] TranslationDefinition.lp
 [X] TContext.lp

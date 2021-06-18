@@ -80,28 +80,3 @@ symbol der_eq_cong_apply (Γ : Context) {s s' : Sort} {A1 A2 B1 B2 t1 t2 : Term}
 
 symbol substitution {Γ : Context} {s s' : Sort} {A B C : Term} :
   der (Push A s Γ) C B s' → Π{u : Term}, der Γ u A s → der Γ (apply1 C u) (apply1 B u) s';
-
-// Elimination of term equality
-symbol teq_inv {t1 t2 : Term} : TEq t1 t2 → TEq t2 t1;
-symbol teq_trans {t1 t2 t3 : Term} : TEq t1 t2 → TEq t2 t3 → TEq t1 t3;
-symbol Jt {Γ : Context} {s : Sort} {t1 t2 T : Term}
-          : TEq t1 t2 → der Γ t1 T s → der Γ t2 T s;
-symbol JT {Γ : Context} {s : Sort} {t T1 T2 : Term}
-          : TEq T1 T2 → der Γ t T1 s → der Γ t T2 s;
-symbol JtT {Γ : Context} {s : Sort} {t1 t2 T1 T2 : Term}
-           : TEq t1 t2 → TEq T1 T2 → der Γ t1 T1 s → der Γ t2 T2 s;
-symbol Jcong {t1 t2 : Term} (f : Term → Term)
-             : TEq t1 t2 → TEq (f t1) (f t2);
-symbol Jeq {Γ : Context} {s : Sort} {T T' t1 t1' t2 t2'}
-           : TEq T T'
-           → TEq t1 t1'
-           → TEq t2 t2'
-           → der_eq Γ s T  t1  t2
-           → der_eq Γ s T' t1' t2';
-rule teq_inv (TRefl $t) ↪ TRefl $t
-with teq_trans (TRefl $t) (TRefl _) ↪ TRefl $t
-with JtT (TRefl _) (TRefl _) $d ↪ $d
-with @Jt _ _ _ _ $T $eqt $d ↪ JtT $eqt (TRefl $T) $d
-with @JT _ _ $t _ _ $eqT $d ↪ JtT (TRefl $t) $eqT $d
-with @Jcong $t _ $f (TRefl _) ↪ TRefl ($f $t)
-with Jeq (TRefl _) (TRefl _) (TRefl _) $d ↪ $d;

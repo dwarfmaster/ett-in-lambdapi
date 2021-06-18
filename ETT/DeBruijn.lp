@@ -68,10 +68,6 @@ with subst $i $V (trefl $A $u) ↪ trefl (subst $i $V $A) (subst $i $V $u)
 with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst $i $V $v);
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
 
-// Term equality, necessary to express commutation of different operations
-constant symbol TEq : Term → Term → TYPE;
-constant symbol TRefl (t : Term) : TEq t t;
-
 // Some substitution commutation
 rule shift db0 (shift $i $t) ↪ shift (dbsucc $i) (Shift $t);
 rule shift (dbsucc db0) (shift (dbsucc $i) $t) ↪ shift (dbsucc (dbsucc $i)) (Shift1 $t);
@@ -79,23 +75,3 @@ rule subst db0 _ (shift db0 $t) ↪ $t
 with subst $id (var $id) (shift (dbsucc $id) $t) ↪ $t
 with shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id) $t);
 
-// TODO teq_subst_apply
-symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
-  TEq (subst i (Shift* i u) (apply1 t2 t1))
-      (apply1 (subst (dbsucc i) (Shift* (dbsucc i) u) t2) (subst i (Shift* i u) t1));
-// TODO teq_subst_shift
-symbol teq_subst_shift (i : DBId) (u t : Term) :
-  TEq (subst (dbsucc i) (Shift u) (Shift t))
-      (Shift (subst i u t));
-// TODO teq_subst_shift1
-symbol teq_subst_shift1 (i : DBId) (u t : Term) :
-  TEq (subst (dbsucc (dbsucc i)) (Shift (Shift u)) (Shift1 t))
-      (Shift1 (subst (dbsucc i) (Shift u) t));
-// TODO teq_shift_cancel_subst
-symbol teq_shift_cancel_subst (i : DBId) (u t : Term) :
-  TEq (subst i u (shift (dbsucc i) (shift i t)))
-      (shift i t);
-// TODO teq_select_shift
-symbol teq_select_shift (i id : DBId) (V : Term) :
-  TEq (dbselect (dbsucc i) (dbsucc id) (Shift V) (var (dbsucc id)) (var id))
-      (Shift (dbselect i id V (var id) (var (dbprev id))));

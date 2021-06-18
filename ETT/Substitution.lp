@@ -4,6 +4,7 @@ require open ETT.XTyping;
 require open ETT.DeBruijn;
 require open ETT.XLemmas;
 require open ETT.XCongruences;
+require open ETT.TermEquality;
 require open ETT.ITT;
 require open ETT.ILemmas;
 require open ETT.Inversions;
