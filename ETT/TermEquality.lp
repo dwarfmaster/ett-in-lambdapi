@@ -89,23 +89,24 @@ with Jrefl (TRefl $A) (TRefl $a) ↪ TRefl (trefl $A $a)
 with Jteq (TRefl $A) (TRefl $a) (TRefl $b) ↪ TRefl (teq $A $a $b);
 
 // Some equalities
-// TODO teq_subst_apply
+// TODO teq_subst_apply : done in coq
 symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
   TEq (subst i (Shift* i u) (apply1 t2 t1))
       (apply1 (subst (dbsucc i) (Shift* (dbsucc i) u) t2) (subst i (Shift* i u) t1));
-// TODO teq_subst_shift
+// TODO teq_subst_shift : done in Coq
 symbol teq_subst_shift (i : DBId) (u t : Term) :
   TEq (subst (dbsucc i) (Shift u) (Shift t))
       (Shift (subst i u t));
-// TODO teq_subst_shift1
+// TODO teq_subst_shift1 : done in coq
 symbol teq_subst_shift1 (i : DBId) (u t : Term) :
   TEq (subst (dbsucc (dbsucc i)) (Shift (Shift u)) (Shift1 t))
       (Shift1 (subst (dbsucc i) (Shift u) t));
-// TODO teq_shift_cancel_subst
+// TODO teq_shift_cancel_subst : done in coq
 symbol teq_shift_cancel_subst (i : DBId) (u t : Term) :
   TEq (subst i u (shift (dbsucc i) (shift i t)))
       (shift i t);
-// TODO teq_select_shift
+// TODO teq_select_shift : done in Coq
 symbol teq_select_shift (i id : DBId) (V : Term) :
   TEq (dbselect (dbsucc i) (dbsucc id) (Shift V) (var (dbsucc id)) (var id))
       (Shift (dbselect i id V (var id) (var (dbprev id))));
+
