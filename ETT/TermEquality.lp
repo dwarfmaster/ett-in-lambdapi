@@ -24,13 +24,15 @@ symbol Jeq {Γ : Context} {s : Sort} {T T' t1 t1' t2 t2'}
            → TEq t2 t2'
            → der_eq Γ s T  t1  t2
            → der_eq Γ s T' t1' t2';
+symbol dbcongT {i j : DBId} (f : DBId → Term) : DBEq i j → TEq (f i) (f j);
 rule teq_inv (TRefl $t) ↪ TRefl $t
 with teq_trans (TRefl $t) (TRefl _) ↪ TRefl $t
 with JtT (TRefl _) (TRefl _) $d ↪ $d
 with @Jt _ _ _ _ $T $eqt $d ↪ JtT $eqt (TRefl $T) $d
 with @JT _ _ $t _ _ $eqT $d ↪ JtT (TRefl $t) $eqT $d
 with @Jcong $t _ $f (TRefl _) ↪ TRefl ($f $t)
-with Jeq (TRefl _) (TRefl _) (TRefl _) $d ↪ $d;
+with Jeq (TRefl _) (TRefl _) (TRefl _) $d ↪ $d
+with dbcongT $f (DBRefl $i) ↪ TRefl ($f $i);
 
 // Congruence for term equality
 symbol Jabs {A1 A2 B1 B2 t1 t2 : Term}
@@ -103,9 +105,54 @@ rule aux_dbselect_spec_gt (dbsucc _) db0 _ $gtT _ _ ↪ TRefl $gtT
 with aux_dbselect_spec_gt (dbsucc $i) (dbsucc $j) $eqT $gtT $ltT $h
   ↪ aux_dbselect_spec_gt $i $j $eqT $gtT $ltT (dble_S_n $h);
 
-// TODO teq_shift_shift
+// teq_shift_shift
 symbol aux_teq_shift_shift (i j : DBId) (u : Term) :
   DBLe i j → TEq (shift i (shift j u)) (shift (dbsucc j) (shift i u));
+symbol aux_teq_shift_shift_var (i j n : DBId) :
+  DBLe i j → DBEq (dbshift i (dbshift j n)) (dbshift (dbsucc j) (dbshift i n));
+
+rule aux_teq_shift_shift_var db0 $j $n _ ↪ DBRefl (dbsucc (dbshift $j $n))
+with aux_teq_shift_shift_var (dbsucc _) (dbsucc _) db0 _ ↪ DBRefl db0
+with aux_teq_shift_shift_var (dbsucc $i) (dbsucc $j) (dbsucc $n) $h
+  ↪ dbcongI dbsucc (aux_teq_shift_shift_var $i $j $n (dble_S_n $h))
+with aux_teq_shift_shift $i $j (var $n) $h ↪ dbcongT var (aux_teq_shift_shift_var $i $j $n $h)
+with aux_teq_shift_shift _ _ (tabs $A $B $t) $h
+  ↪ Jabs (aux_teq_shift_shift _ _ $A $h)
+          (aux_teq_shift_shift _ _ $B (dble_n_S $h))
+          (aux_teq_shift_shift _ _ $t (dble_n_S $h))
+with aux_teq_shift_shift _ _ (tapp $A $B $f $a) $h
+  ↪ Japp (aux_teq_shift_shift _ _ $A $h)
+          (aux_teq_shift_shift _ _ $B (dble_n_S $h))
+          (aux_teq_shift_shift _ _ $f $h)
+          (aux_teq_shift_shift _ _ $a $h)
+with aux_teq_shift_shift _ _ (tfun $A $B) $h
+  ↪ Jfun (aux_teq_shift_shift _ _ $A $h)
+          (aux_teq_shift_shift _ _ $B (dble_n_S $h))
+with aux_teq_shift_shift _ _ (tsort $s) _ ↪ TRefl (tsort $s)
+with aux_teq_shift_shift _ _ (tpair $A $B $a $b) $h
+  ↪ Jpair (aux_teq_shift_shift _ _ $A $h)
+           (aux_teq_shift_shift _ _ $B (dble_n_S $h))
+           (aux_teq_shift_shift _ _ $a $h)
+           (aux_teq_shift_shift _ _ $b $h)
+with aux_teq_shift_shift _ _ (π1 $A $B $p) $h
+  ↪ Jπ1 (aux_teq_shift_shift _ _ $A $h)
+         (aux_teq_shift_shift _ _ $B (dble_n_S $h))
+         (aux_teq_shift_shift _ _ $p $h)
+with aux_teq_shift_shift _ _ (π2 $A $B $p) $h
+  ↪ Jπ2 (aux_teq_shift_shift _ _ $A $h)
+         (aux_teq_shift_shift _ _ $B (dble_n_S $h))
+         (aux_teq_shift_shift _ _ $p $h)
+with aux_teq_shift_shift _ _ (tsum $A $B) $h
+  ↪ Jsum (aux_teq_shift_shift _ _ $A $h)
+          (aux_teq_shift_shift _ _ $B (dble_n_S $h))
+with aux_teq_shift_shift _ _ (trefl $A $a) $h
+  ↪ Jrefl (aux_teq_shift_shift _ _ $A $h)
+           (aux_teq_shift_shift _ _ $a $h)
+with aux_teq_shift_shift _ _ (teq $A $a $b) $h
+  ↪ Jteq (aux_teq_shift_shift _ _ $A $h)
+          (aux_teq_shift_shift _ _ $a $h)
+          (aux_teq_shift_shift _ _ $b $h)
+;
 
 // TODO teq_shift_shift0
 symbol aux_teq_shift_shift0 (i j : DBId) (u : Term) :

@@ -78,9 +78,9 @@ with shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id
 // Equality
 constant symbol DBEq : DBId → DBId → TYPE;
 constant symbol DBRefl (i : DBId) : DBEq i i;
-symbol DB_cong_id (f : DBId → DBId) {i j : DBId}
+symbol dbcongI (f : DBId → DBId) {i j : DBId}
                   : DBEq i j → DBEq (f i) (f j);
-rule DB_cong_id $f (DBRefl $i) ↪ DBRefl ($f $i);
+rule dbcongI $f (DBRefl $i) ↪ DBRefl ($f $i);
 
 // Comparison
 constant symbol DBLe : DBId → DBId → TYPE;
