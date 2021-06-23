@@ -86,6 +86,7 @@ Ltac fold_Shift' :=
   end.
 
 Hint Resolve le_n_S : core.
+Hint Resolve le_S_n : core.
 Hint Extern 0 => rewrite_all' : core.
 
 Lemma dbselect_spec_lt (i j : nat) (eqT gtT ltT : Term) :
@@ -95,8 +96,9 @@ Proof.
   induction j; intros i H; destruct i; simpl; auto.
   - inversion H.
   - inversion H.
-  - apply IHj. unfold lt in *. apply le_S_n. assumption.
 Qed.
+
+Print dbselect_spec_lt.
 
 Lemma dbselect_spec_gt (i j : nat) (eqT gtT ltT : Term) :
   i > j -> dbselect i j eqT gtT ltT = gtT.
@@ -105,8 +107,9 @@ Proof.
   induction j; intros i H; destruct i; simpl; auto.
   - inversion H.
   - inversion H.
-  - apply IHj. apply le_S_n. assumption.
 Qed.
+
+Print dbselect_spec_gt.
 
 Lemma teq_shift_shift (i j : nat) (u : Term) :
   i <= j -> shift i (shift j u) = shift (S j) (shift i u).
@@ -118,9 +121,7 @@ Proof.
   { destruct i; simpl; try reflexivity.
     destruct Hij; simpl; reflexivity.
   }
-  { destruct i; destruct j; simpl; auto.
-    - inversion Hij.
-    - f_equal. apply IHn. apply le_S_n. assumption.
+  { destruct i; destruct j; simpl; auto. inversion Hij.
   }
 Qed.
 Lemma teq_shift_shift0 (i : nat) (u : Term) :
@@ -128,6 +129,8 @@ Lemma teq_shift_shift0 (i : nat) (u : Term) :
 Proof.
   apply teq_shift_shift. apply le_0_n.
 Qed.
+Print teq_shift_shift.
+Print teq_shift_shift0.
 
 Lemma teq_shift_dbselect (n i j : nat) (eqT gtT ltT : Term) :
   shift n (dbselect i j eqT gtT ltT) = dbselect i j (shift n eqT) (shift n gtT) (shift n ltT).
@@ -146,6 +149,9 @@ Lemma teq_dbselect_Sn (i n : nat) (eqT gtT : Term) :
 Proof.
   induction i; induction n; reflexivity.
 Qed.
+Print teq_shift_dbselect.
+Print teq_shift_dbselect0.
+Print teq_dbselect_Sn.
 
 Ltac raise_dbselect :=
   match goal with
@@ -200,6 +206,7 @@ Proof.
     + remember (dbshift j n) as djn. pose (IH := (IHn i j)). rewrite <- Heqdjn in IH.
       destruct djn; pop_shift; f_equal; push_shift; apply IH; apply le_S_n; assumption.
 Qed.
+Print teq_subst_shift.
 
 Lemma LP_teq_subst_shift (i : nat) (u t : Term) :
   sub (S i) (Shift u) (Shift t) = Shift (sub i u t).
@@ -221,6 +228,9 @@ Lemma LP_teq_select_shift (i id : nat) (V : Term) :
 Proof.
   simpl. pop_shift. reflexivity.
 Qed.
+Print LP_teq_subst_shift.
+Print LP_teq_subst_shift1.
+Print LP_teq_select_shift.
 
 Ltac pop_shift ::=
   match goal with
@@ -271,7 +281,7 @@ Proof.
     + left. split; try reflexivity. unfold lt. apply le_n_S. apply le_0_n.
     + destruct (IHi n) as [ [ Heq H ] | [ Heq H ] ]; [ left | right ];
         rewrite Heq in *; split; try reflexivity;
-        unfold gt in *; unfold lt in *; auto using le_n_S.
+        unfold gt in *; unfold lt in *; auto.
 Qed.
 
 Lemma teq_shift_cancel_subst (i : nat) (u t : Term) :
