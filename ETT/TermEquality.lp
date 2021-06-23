@@ -151,27 +151,36 @@ with aux_teq_shift_shift _ _ (trefl $A $a) $h
 with aux_teq_shift_shift _ _ (teq $A $a $b) $h
   ↪ Jteq (aux_teq_shift_shift _ _ $A $h)
           (aux_teq_shift_shift _ _ $a $h)
-          (aux_teq_shift_shift _ _ $b $h)
-;
+          (aux_teq_shift_shift _ _ $b $h);
 
-// TODO teq_shift_shift0
-symbol aux_teq_shift_shift0 (i j : DBId) (u : Term) :
-  DBLe i j → TEq (Shift (shift j u)) (shift (dbsucc j) (Shift u));
+// teq_shift_shift0
+symbol aux_teq_shift_shift0 (i : DBId) (u : Term) :
+  TEq (Shift (shift i u)) (shift (dbsucc i) (Shift u)) ≔
+  aux_teq_shift_shift db0 i u (dble_0_n i);
 
-// TODO teq_shift_dbselect
+// teq_shift_dbselect
 symbol aux_teq_shift_dbselect (n i j : DBId) (eqT gtT ltT : Term) :
   TEq (shift n (dbselect i j eqT gtT ltT))
       (dbselect i j (shift n eqT) (shift n gtT) (shift n ltT));
+rule aux_teq_shift_dbselect $n db0        db0 $eqT _ _ ↪ TRefl (shift $n $eqT)
+with aux_teq_shift_dbselect $n (dbsucc _) db0 _ $gtT _ ↪ TRefl (shift $n $gtT)
+with aux_teq_shift_dbselect $n db0 (dbsucc _) _ _ $ltT ↪ TRefl (shift $n $ltT)
+with aux_teq_shift_dbselect $n (dbsucc $i) (dbsucc $j) $eqT $gtT $ltT ↪ aux_teq_shift_dbselect $n $i $j $eqT $gtT $ltT;
 
-// TODO teq_shift_dbselect0
+// teq_shift_dbselect0
 symbol aux_teq_shift_dbselect0 (i j : DBId) (eqT gtT ltT : Term) :
   TEq (Shift (dbselect i j eqT gtT ltT))
-      (dbselect i j (Shift eqT) (Shift gtT) (Shift ltT));
+      (dbselect i j (Shift eqT) (Shift gtT) (Shift ltT)) ≔
+  aux_teq_shift_dbselect db0 i j eqT gtT ltT;
 
-// TODO teq_dbselect_Sn
+// teq_dbselect_Sn
 symbol aux_teq_dbselect_Sn (i n : DBId) (eqT gtT : Term) :
   TEq (dbselect i n eqT gtT (var n))
       (dbselect i n eqT gtT (var (dbsucc (dbprev n))));
+rule aux_teq_dbselect_Sn db0 db0 $eqT _ ↪ TRefl $eqT
+with aux_teq_dbselect_Sn (dbsucc _) db0 _ $gtT ↪ TRefl $gtT
+with aux_teq_dbselect_Sn db0 (dbsucc $n) _ _ ↪ TRefl (var (dbsucc $n))
+with aux_teq_dbselect_Sn (dbsucc $i) (dbsucc $n) $eqT $gtT ↪ TRefl (dbselect $i $n $eqT $gtT (var (dbsucc $n)));
 
 // TODO teq_subst_shift
 symbol aux_teq_subst_shift (i j : DBId) (u t : Term) :
@@ -189,15 +198,22 @@ symbol teq_subst_shift1 (i : DBId) (u t : Term) :
   TEq (subst (dbsucc (dbsucc i)) (Shift (Shift u)) (Shift1 t))
       (Shift1 (subst (dbsucc i) (Shift u) t));
 
-// TODO teq_select_shift
+// teq_select_shift
 symbol teq_select_shift (i id : DBId) (V : Term) :
   TEq (dbselect (dbsucc i) (dbsucc id) (Shift V) (var (dbsucc id)) (var id))
-      (Shift (dbselect i id V (var id) (var (dbprev id))));
+      (Shift (dbselect i id V (var id) (var (dbprev id)))) ≔
+  teq_trans
+    (aux_teq_dbselect_Sn i id (Shift V) (var (dbsucc id)))
+    (teq_inv (aux_teq_shift_dbselect0 i id V (var id) (var (dbprev id))));
 
-// TODO teq_subst_dbselect
-symbol aux_teq_subst_dbselect (i j  k : DBId) (u eqT gtT ltT : Term) :
+// teq_subst_dbselect
+symbol aux_teq_subst_dbselect (i j k : DBId) (u eqT gtT ltT : Term) :
   TEq (subst k u (dbselect i j eqT gtT ltT))
       (dbselect i j (subst k u eqT) (subst k u gtT) (subst k u ltT));
+rule aux_teq_subst_dbselect db0        db0 $k $u $eqT _ _ ↪ TRefl (subst $k $u $eqT)
+with aux_teq_subst_dbselect (dbsucc _) db0 $k $u _ $gtT _ ↪ TRefl (subst $k $u $gtT)
+with aux_teq_subst_dbselect db0 (dbsucc _) $k $u _ _ $ltT ↪ TRefl (subst $k $u $ltT)
+with aux_teq_subst_dbselect (dbsucc $i) (dbsucc $j) $k $u $eqT $gtT $ltT ↪ aux_teq_subst_dbselect $i $j $k $u $eqT $gtT $ltT;
 
 // TODO dbshift_spec ?
 
