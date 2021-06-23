@@ -88,25 +88,88 @@ with Jsum (TRefl $A) (TRefl $B) ↪ TRefl (tsum $A $B)
 with Jrefl (TRefl $A) (TRefl $a) ↪ TRefl (trefl $A $a)
 with Jteq (TRefl $A) (TRefl $a) (TRefl $b) ↪ TRefl (teq $A $a $b);
 
-// Some equalities
-// TODO teq_subst_apply : done in coq
-symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
-  TEq (subst i (Shift* i u) (apply1 t2 t1))
-      (apply1 (subst (dbsucc i) (Shift* (dbsucc i) u) t2) (subst i (Shift* i u) t1));
-// TODO teq_subst_shift : done in Coq
+// Auxiliary lemmas
+// dbselect_spec_lt
+symbol aux_dbselect_spec_lt (i j : DBId) (eqT gtT ltT : Term) :
+  DBLe (dbsucc i) j → TEq (dbselect i j eqT gtT ltT) ltT;
+rule aux_dbselect_spec_lt db0 (dbsucc _) _ _ $ltT _ ↪ TRefl $ltT
+with aux_dbselect_spec_lt (dbsucc $i) (dbsucc $j) $eqT $gtT $ltT $h
+   ↪ aux_dbselect_spec_lt $i $j $eqT $gtT $ltT (dble_S_n $h);
+
+// dbselect_spec_gt
+symbol aux_dbselect_spec_gt (i j : DBId) (eqT gtT ltT : Term) :
+  DBLe (dbsucc j) i → TEq (dbselect i j eqT gtT ltT) gtT;
+rule aux_dbselect_spec_gt (dbsucc _) db0 _ $gtT _ _ ↪ TRefl $gtT
+with aux_dbselect_spec_gt (dbsucc $i) (dbsucc $j) $eqT $gtT $ltT $h
+  ↪ aux_dbselect_spec_gt $i $j $eqT $gtT $ltT (dble_S_n $h);
+
+// TODO teq_shift_shift
+symbol aux_teq_shift_shift (i j : DBId) (u : Term) :
+  DBLe i j → TEq (shift i (shift j u)) (shift (dbsucc j) (shift i u));
+
+// TODO teq_shift_shift0
+symbol aux_teq_shift_shift0 (i j : DBId) (u : Term) :
+  DBLe i j → TEq (Shift (shift j u)) (shift (dbsucc j) (Shift u));
+
+// TODO teq_shift_dbselect
+symbol aux_teq_shift_dbselect (n i j : DBId) (eqT gtT ltT : Term) :
+  TEq (shift n (dbselect i j eqT gtT ltT))
+      (dbselect i j (shift n eqT) (shift n gtT) (shift n ltT));
+
+// TODO teq_shift_dbselect0
+symbol aux_teq_shift_dbselect0 (i j : DBId) (eqT gtT ltT : Term) :
+  TEq (Shift (dbselect i j eqT gtT ltT))
+      (dbselect i j (Shift eqT) (Shift gtT) (Shift ltT));
+
+// TODO teq_dbselect_Sn
+symbol aux_teq_dbselect_Sn (i n : DBId) (eqT gtT : Term) :
+  TEq (dbselect i n eqT gtT (var n))
+      (dbselect i n eqT gtT (var (dbsucc (dbprev n))));
+
+// TODO teq_subst_shift
+symbol aux_teq_subst_shift (i j : DBId) (u t : Term) :
+  DBLe i j
+  → TEq (subst (dbsucc i) (shift j (Shift* j u)) (shift j t))
+        (shift j (subst i (Shift* j u) t));
+
+// TODO teq_subst_shift
 symbol teq_subst_shift (i : DBId) (u t : Term) :
   TEq (subst (dbsucc i) (Shift u) (Shift t))
       (Shift (subst i u t));
-// TODO teq_subst_shift1 : done in coq
+
+// TODO teq_subst_shift1
 symbol teq_subst_shift1 (i : DBId) (u t : Term) :
   TEq (subst (dbsucc (dbsucc i)) (Shift (Shift u)) (Shift1 t))
       (Shift1 (subst (dbsucc i) (Shift u) t));
-// TODO teq_shift_cancel_subst : done in coq
-symbol teq_shift_cancel_subst (i : DBId) (u t : Term) :
-  TEq (subst i u (shift (dbsucc i) (shift i t)))
-      (shift i t);
-// TODO teq_select_shift : done in Coq
+
+// TODO teq_select_shift
 symbol teq_select_shift (i id : DBId) (V : Term) :
   TEq (dbselect (dbsucc i) (dbsucc id) (Shift V) (var (dbsucc id)) (var id))
       (Shift (dbselect i id V (var id) (var (dbprev id))));
 
+// TODO teq_subst_dbselect
+symbol aux_teq_subst_dbselect (i j  k : DBId) (u eqT gtT ltT : Term) :
+  TEq (subst k u (dbselect i j eqT gtT ltT))
+      (dbselect i j (subst k u eqT) (subst k u gtT) (subst k u ltT));
+
+// TODO dbshift_spec ?
+
+// TODO teq_shift_cancel_subst
+symbol aux_teq_shift_cancel_subst (i : DBId) (u t : Term) :
+  TEq (subst i u (shift i t)) t;
+
+// TODO teq_subst_subst
+symbol aux_teq_subst_subst (i j : DBId) (u t1 t2 : Term) :
+  DBLe j i
+  → TEq (subst i (Shift* i u) (subst j (Shift* j t1) t2))
+        (subst j (subst i (Shift* i u) (Shift* j t1)) (subst (dbsucc i) (Shift* (dbsucc i) u) t2));
+
+// TODO teq_subst_apply
+symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
+  TEq (subst i (Shift* i u) (apply1 t2 t1))
+      (apply1 (subst (dbsucc i) (Shift* (dbsucc i) u) t2) (subst i (Shift* i u) t1));
+
+// TODO teq_shift_cancel_subst
+symbol teq_shift_cancel_subst (i : DBId) (u t : Term) :
+  TEq (subst i u (shift (dbsucc i) (shift i t)))
+      (shift i t);
