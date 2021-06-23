@@ -88,41 +88,6 @@ Ltac fold_Shift' :=
 Hint Resolve le_n_S : core.
 Hint Extern 0 => rewrite_all' : core.
 
-Lemma ordered_integers (i j n : nat) :
-  j <= i ->
-  n <= j \/ (j < n /\ n <= i) \/ i < n.
-Proof.
-  intro Hij.
-  induction n.
-  - destruct j; auto. left. apply le_0_n.
-  - destruct Hij; destruct IHn as [ Hnj | [ [ Hjn Hni ] | Hin ] ]; auto.
-    + destruct Hnj; auto.
-    + destruct Hnj; auto.
-    + destruct Hni; auto.
-      right. left. split; auto.
-Qed.
-
-Lemma dbshift_spec1 (i j : nat) :
-  i <= j -> dbshift i j = S j.
-Proof.
-  generalize dependent i.
-  induction j; intros i H; destruct i; auto.
-  - inversion H.
-  - simpl. f_equal. apply IHj.
-    apply le_S_n. assumption.
-Qed.
-
-Lemma dbshift_spec2 (i j : nat) :
-  j < i -> dbshift i j = j.
-Proof.
-  generalize dependent i.
-  induction j; intros i H; destruct i; auto.
-  - inversion H.
-  - inversion H.
-  - simpl. f_equal. apply IHj.
-    unfold lt in *. apply le_S_n. assumption.
-Qed.
-
 Lemma dbselect_spec_lt (i j : nat) (eqT gtT ltT : Term) :
   i < j -> dbselect i j eqT gtT ltT = ltT.
 Proof.
@@ -131,12 +96,6 @@ Proof.
   - inversion H.
   - inversion H.
   - apply IHj. unfold lt in *. apply le_S_n. assumption.
-Qed.
-
-Lemma dbselect_spec_eq (i j : nat) (eqT gtT ltT : Term) :
-  i = j -> dbselect i j eqT gtT ltT = eqT.
-Proof.
-  intro H. subst. induction j; auto.
 Qed.
 
 Lemma dbselect_spec_gt (i j : nat) (eqT gtT ltT : Term) :
