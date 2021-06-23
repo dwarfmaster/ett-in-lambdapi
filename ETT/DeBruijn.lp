@@ -75,3 +75,29 @@ rule subst db0 _ (shift db0 $t) ↪ $t
 with subst $id (var $id) (shift (dbsucc $id) $t) ↪ $t
 with shift $id (subst db0 $u $t) ↪ subst db0 (shift $id $u) (shift (dbsucc $id) $t);
 
+// Equality
+constant symbol DBEq : DBId → DBId → TYPE;
+constant symbol DBRefl (i : DBId) : DBEq i i;
+symbol DB_cong_id (f : DBId → DBId) {i j : DBId}
+                  : DBEq i j → DBEq (f i) (f j);
+rule DB_cong_id $f (DBRefl $i) ↪ DBRefl ($f $i);
+
+// Comparison
+constant symbol DBLe : DBId → DBId → TYPE;
+constant symbol DBLe_refl (i : DBId) : DBLe i i;
+constant symbol DBLe_succ {i j : DBId} : DBLe i j → DBLe i (dbsucc j);
+
+symbol dble_n_S {i j : DBId} : DBLe i j → DBLe (dbsucc i) (dbsucc j);
+symbol dble_S_n {i j : DBId} : DBLe (dbsucc i) (dbsucc j) → DBLe i j;
+symbol dble_Sn_n {i j : DBId} : DBLe (dbsucc i) j → DBLe i j;
+symbol dble_n_Sn (i : DBId) : DBLe i (dbsucc i);
+symbol dble_0_n (i : DBId) : DBLe db0 i;
+rule dble_n_S (DBLe_refl $i) ↪ DBLe_refl (dbsucc $i)
+with dble_n_S (DBLe_succ $h) ↪ DBLe_succ (dble_n_S $h)
+with dble_n_Sn $i ↪ DBLe_succ (DBLe_refl $i)
+with dble_Sn_n (DBLe_refl (dbsucc $i)) ↪ dble_n_Sn $i
+with dble_Sn_n (DBLe_succ $h) ↪ DBLe_succ (dble_Sn_n $h)
+with dble_S_n (DBLe_refl (dbsucc $i)) ↪ DBLe_refl $i
+with dble_S_n (DBLe_succ $h) ↪ dble_Sn_n $h
+with dble_0_n db0 ↪ DBLe_refl db0
+with dble_0_n (dbsucc $i) ↪ DBLe_succ (dble_0_n $i);
