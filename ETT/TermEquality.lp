@@ -187,7 +187,6 @@ symbol aux_teq_subst_shift (i j : DBId) (u t : Term) :
   DBLe j i
   → TEq (subst (dbsucc i) (shift j (Shift* j u)) (shift j t))
         (shift j (subst i (Shift* j u) t));
-
 // teq_subst_shift_var
 symbol aux_teq_subst_shift_var (i j : DBId) (u : Term) (n : DBId) :
   DBLe j i
@@ -266,15 +265,17 @@ with aux_teq_subst_shift $i $j $u (teq $A $a $b) $h
           (aux_teq_subst_shift $i $j $u $b $h)
 ;
 
-// TODO teq_subst_shift
+// teq_subst_shift
 symbol teq_subst_shift (i : DBId) (u t : Term) :
   TEq (subst (dbsucc i) (Shift u) (Shift t))
-      (Shift (subst i u t));
+      (Shift (subst i u t)) ≔
+  aux_teq_subst_shift i db0 u t (dble_0_n i);
 
-// TODO teq_subst_shift1
+// teq_subst_shift1
 symbol teq_subst_shift1 (i : DBId) (u t : Term) :
   TEq (subst (dbsucc (dbsucc i)) (Shift (Shift u)) (Shift1 t))
-      (Shift1 (subst (dbsucc i) (Shift u) t));
+      (Shift1 (subst (dbsucc i) (Shift u) t)) ≔
+  aux_teq_subst_shift (dbsucc i) db1 u t (dble_n_S (dble_0_n i));
 
 // teq_select_shift
 symbol teq_select_shift (i id : DBId) (V : Term) :
