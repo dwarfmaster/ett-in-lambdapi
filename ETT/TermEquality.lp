@@ -388,7 +388,11 @@ symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
   TEq (subst i (Shift* i u) (apply1 t2 t1))
       (apply1 (subst (dbsucc i) (Shift* (dbsucc i) u) t2) (subst i (Shift* i u) t1));
 
-// TODO teq_shift_cancel_subst
+// teq_shift_cancel_subst
 symbol teq_shift_cancel_subst (i : DBId) (u t : Term) :
   TEq (subst i u (shift (dbsucc i) (shift i t)))
-      (shift i t);
+      (shift i t) ≔
+  teq_trans
+   (Jcong (subst i u)
+     (teq_inv (aux_teq_shift_shift i i t (DBLe_refl i))))
+   (aux_teq_shift_cancel_subst i u (shift i t));
