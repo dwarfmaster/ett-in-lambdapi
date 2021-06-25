@@ -294,11 +294,88 @@ with aux_teq_subst_dbselect (dbsucc _) db0 $k $u _ $gtT _ ↪ TRefl (subst $k $u
 with aux_teq_subst_dbselect db0 (dbsucc _) $k $u _ _ $ltT ↪ TRefl (subst $k $u $ltT)
 with aux_teq_subst_dbselect (dbsucc $i) (dbsucc $j) $k $u $eqT $gtT $ltT ↪ aux_teq_subst_dbselect $i $j $k $u $eqT $gtT $ltT;
 
-// TODO dbshift_spec ?
-
-// TODO teq_shift_cancel_subst
+// teq_shift_cancel_subst
 symbol aux_teq_shift_cancel_subst (i : DBId) (u t : Term) :
   TEq (subst i u (shift i t)) t;
+symbol select_neq : DBId → DBId → Term → Term → Term;
+rule select_neq (dbsucc _) db0 $gt _ ↪ $gt
+with select_neq db0 (dbsucc _) _ $lt ↪ $lt
+with select_neq (dbsucc $i) (dbsucc $n) $gt $lt ↪ select_neq $i $n $gt $lt;
+// aux_teq_shift_neq
+symbol aux_teq_shift_neq (i n : DBId) (eqT gtT ltT : Term) :
+  TEq (dbselect i (dbshift i n) eqT gtT ltT) (select_neq i (dbshift i n) gtT ltT);
+// aux_shift_select_neq
+symbol aux_shift_select_neq (i j k : DBId) (gtT ltT : Term) :
+  TEq (shift k (select_neq i (dbshift i j) gtT ltT)) (select_neq i (dbshift i j) (shift k gtT) (shift k ltT));
+// aux_select_neq_Sn
+symbol aux_select_neq_Sn (i j : DBId) (gtT : Term) :
+  TEq (select_neq i (dbshift i j) gtT (var (dbshift i j)))
+      (select_neq i (dbshift i j) gtT (var (dbsucc (dbprev (dbshift i j)))));
+// aux_shift_cancel_select_neq
+symbol aux_shift_cancel_select_neq (i n : DBId) :
+  TEq (select_neq i (dbshift i n) (var (dbshift i n)) (var (dbprev (dbshift i n)))) (var n);
+
+rule aux_teq_shift_neq db0 db0 _ _ $ltT ↪ TRefl $ltT
+with aux_teq_shift_neq (dbsucc _) db0 _ $gtT _ ↪ TRefl $gtT
+with aux_teq_shift_neq db0 (dbsucc _) _ _ $ltT ↪ TRefl $ltT
+with aux_teq_shift_neq (dbsucc $i) (dbsucc $n) $eqT $gtT $ltT ↪ aux_teq_shift_neq $i $n $eqT $gtT $ltT
+with aux_shift_select_neq db0 db0 $k _ $ltT ↪ TRefl (shift $k $ltT)
+with aux_shift_select_neq (dbsucc _) db0 $k $gtT _ ↪ TRefl (shift $k $gtT)
+with aux_shift_select_neq db0 (dbsucc _) $k _ $ltT ↪ TRefl (shift $k $ltT)
+with aux_shift_select_neq (dbsucc $i) (dbsucc $j) $k $gtT $ltT ↪ aux_shift_select_neq $i $j $k $gtT $ltT
+with aux_select_neq_Sn db0 $n _ ↪ TRefl (var (dbsucc $n))
+with aux_select_neq_Sn (dbsucc _) db0 $gtT ↪ TRefl $gtT
+with aux_select_neq_Sn (dbsucc $i) (dbsucc $n) $gtT ↪ TRefl (select_neq $i (dbshift $i $n) $gtT (var (dbsucc (dbshift $i $n))))
+with aux_shift_cancel_select_neq db0 $n ↪ TRefl (var $n)
+with aux_shift_cancel_select_neq (dbsucc _) db0 ↪ TRefl (var db0)
+with aux_shift_cancel_select_neq (dbsucc $i) (dbsucc $n)
+  ↪ teq_trans
+       (teq_trans
+         (aux_select_neq_Sn $i $n (var (dbsucc (dbshift $i $n))))
+         (teq_inv (aux_shift_select_neq $i $n db0 (var (dbshift $i $n)) (var (dbprev (dbshift $i $n))))))
+       (Jcong Shift (aux_shift_cancel_select_neq $i $n))
+;
+
+rule aux_teq_shift_cancel_subst $i $u (var $n)
+  ↪ teq_trans
+       (aux_teq_shift_neq $i $n $u (var (dbshift $i $n)) (var (dbprev (dbshift $i $n))))
+       (aux_shift_cancel_select_neq $i $n)
+with aux_teq_shift_cancel_subst $i $u (tabs $A $B $t)
+  ↪ Jabs (aux_teq_shift_cancel_subst $i $u $A)
+          (aux_teq_shift_cancel_subst (dbsucc $i) (Shift $u) $B)
+          (aux_teq_shift_cancel_subst (dbsucc $i) (Shift $u) $t)
+with aux_teq_shift_cancel_subst $i $u (tapp $A $B $f $a)
+  ↪ Japp (aux_teq_shift_cancel_subst $i $u $A)
+          (aux_teq_shift_cancel_subst (dbsucc $i) (Shift $u) $B)
+          (aux_teq_shift_cancel_subst $i $u $f)
+          (aux_teq_shift_cancel_subst $i $u $a)
+with aux_teq_shift_cancel_subst $i $u (tfun $A $B)
+  ↪ Jfun (aux_teq_shift_cancel_subst $i $u $A)
+          (aux_teq_shift_cancel_subst (dbsucc $i) (Shift $u) $B)
+with aux_teq_shift_cancel_subst _ _ (tsort $s) ↪ TRefl (tsort $s)
+with aux_teq_shift_cancel_subst $i $u (tpair $A $B $a $b)
+  ↪ Jpair (aux_teq_shift_cancel_subst $i $u $A)
+           (aux_teq_shift_cancel_subst (dbsucc $i) (Shift $u) $B)
+           (aux_teq_shift_cancel_subst $i $u $a)
+           (aux_teq_shift_cancel_subst $i $u $b)
+with aux_teq_shift_cancel_subst $i $u (π1 $A $B $p)
+  ↪ Jπ1 (aux_teq_shift_cancel_subst $i $u $A)
+         (aux_teq_shift_cancel_subst (dbsucc $i) (Shift $u) $B)
+         (aux_teq_shift_cancel_subst $i $u $p)
+with aux_teq_shift_cancel_subst $i $u (π2 $A $B $p)
+  ↪ Jπ2 (aux_teq_shift_cancel_subst $i $u $A)
+         (aux_teq_shift_cancel_subst (dbsucc $i) (Shift $u) $B)
+         (aux_teq_shift_cancel_subst $i $u $p)
+with aux_teq_shift_cancel_subst $i $u (tsum $A $B)
+  ↪ Jsum (aux_teq_shift_cancel_subst $i $u $A)
+          (aux_teq_shift_cancel_subst (dbsucc $i) (Shift $u) $B)
+with aux_teq_shift_cancel_subst $i $u (trefl $A $a)
+  ↪ Jrefl (aux_teq_shift_cancel_subst $i $u $A)
+           (aux_teq_shift_cancel_subst $i $u $a)
+with aux_teq_shift_cancel_subst $i $u (teq $A $a $b)
+  ↪ Jteq (aux_teq_shift_cancel_subst $i $u $A)
+          (aux_teq_shift_cancel_subst $i $u $a)
+          (aux_teq_shift_cancel_subst $i $u $b);
 
 // TODO teq_subst_subst
 symbol aux_teq_subst_subst (i j : DBId) (u t1 t2 : Term) :
