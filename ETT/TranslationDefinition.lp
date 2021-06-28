@@ -60,6 +60,7 @@ symbol convert (Γ : TContext) {s : ETT.Sort} {t T : ETT.Term} (d1 d2 : der (τ_
 rule @τ_T _ (ETT.tsort $s) (ETT.snext $s) _ ↪ u (τ_s $s);
 rule @τ _ (ETT.snext (ETT.snext $s)) (ETT.tsort $s) (ETT.tsort (ETT.snext $s)) _ ↪ u (τ_s $s);
 rule τ_T $Γ $d ↪ τ $Γ $d;
+rule τ_eqT $Γ $d ↪ heq_to_eq (τ_eq $Γ $d);
 
 // Translation context constructors
 constant symbol TEmpty : TContext;
