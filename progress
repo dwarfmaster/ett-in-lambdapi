@@ -13,7 +13,7 @@ Progress:
 [X] XTyping.lp
 [X] XLemmas.lp
 [X] XCongruences.lp
-[-] TermEquality.lp
+[X] TermEquality.lp
 [X] Inversions.lp
 [X] TranslationDefinition.lp
 [X] TContext.lp

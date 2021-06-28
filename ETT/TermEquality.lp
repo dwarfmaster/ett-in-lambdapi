@@ -512,10 +512,11 @@ with aux_teq_subst_subst $i $j $u $t1 (teq $A $a $b) $h
           (aux_teq_subst_subst $i $j $u $t1 $b $h)
 ;
 
-// TODO teq_subst_apply
+// teq_subst_apply
 symbol teq_subst_apply (i : DBId) (u t1 t2 : Term) :
   TEq (subst i (Shift* i u) (apply1 t2 t1))
-      (apply1 (subst (dbsucc i) (Shift* (dbsucc i) u) t2) (subst i (Shift* i u) t1));
+      (apply1 (subst (dbsucc i) (Shift* (dbsucc i) u) t2) (subst i (Shift* i u) t1)) ≔
+  aux_teq_subst_subst i db0 u t1 t2 (dble_0_n i);
 
 // teq_shift_cancel_subst
 symbol teq_shift_cancel_subst (i : DBId) (u t : Term) :
