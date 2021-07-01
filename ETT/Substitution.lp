@@ -16,11 +16,6 @@ require open ETT.TranslationLemmas;
 require open ETT.Translation;
 require open ETT.TContext;
 
-symbol magic {s : Sort} (A : U s) : ε s A;
-symbol magic_teq (t1 t2 : ETT.Term) : TEq t1 t2;
-symbol magic_der_eq (Γ : Context) (s : ETT.Sort) (T t1 t2 : ETT.Term) : der_eq Γ s T t1 t2;
-symbol magic_der (Γ : Context) (t T : ETT.Term) (s : ETT.Sort) : der Γ t T s;
-
 // SubstContext
 constant symbol SubstContext {Γ : Context} {A : ETT.Term} {s : ETT.Sort} : der Γ A (ETT.tsort s) (ETT.snext s) → ETT.DBId → TYPE;
 symbol sc_to_ctx {Γ : Context} {A : ETT.Term} {s : ETT.Sort} {d : der Γ A (ETT.tsort s) (ETT.snext s)} {id : ETT.DBId}

@@ -14,8 +14,6 @@ require open ETT.TranslationLemmas;
 require open ETT.TContext;
 require open ETT.Translation;
 
-symbol magic {s : Sort} (A : U s) : ε s A;
-
 // Translation of product
 symbol τ_fun_heq (Γ : TContext) (s s' : ETT.Sort) (A B T : ETT.Term)
                  (dA : der (τ_Γ Γ) A (ETT.tsort s) (ETT.snext s))
