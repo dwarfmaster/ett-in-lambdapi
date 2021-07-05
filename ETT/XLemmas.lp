@@ -17,22 +17,22 @@ symbol pushΓ {Γ : Context} {s : Sort} {T : Term} (d : der Γ T (tsort s) (snex
   der_context_push Γ s T d dΓ;
 
 // Shifting derivation
-symbol der_shift0 {Γ : Context} {t T : Term} {s : Sort}
-                  (A : Term) (s' : Sort) (_ : der Γ t T s) :
+symbol der_shift0 {Γ : Context} {t A T : Term} {s s' : Sort}
+                  (_ : der Γ A (tsort s') (snext s')) (_ : der Γ t T s) :
   der (Push A s' Γ) (Shift t) (Shift T) s;
-symbol der_eq_shift0 {Γ : Context} {t1 t2 T : Term} {s : Sort}
-                     (A : Term) (s' : Sort) (_ : der_eq Γ s T t1 t2) :
+symbol der_eq_shift0 {Γ : Context} {t1 t2 A T : Term} {s s' : Sort}
+                     (_ : der Γ A (tsort s') (snext s')) (_ : der_eq Γ s T t1 t2) :
   der_eq (Push A s' Γ) s (Shift T) (Shift t1) (Shift t2);
-symbol der_shift1 {Γ : Context} {t T : Term} {s : Sort}
-                  (A : Term) (sa : Sort)
-                  (B : Term) (sb : Sort)
+symbol der_shift1 {Γ : Context} {t A T B : Term} {s sa sb : Sort}
+                  (_ : der Γ A (tsort sa) (snext sa))
+                  (_ : der Γ B (tsort sb) (snext sb))
                   (_ : der (Push A sa Γ) t T s) : der (Push (Shift A) sa (Push B sb Γ)) (Shift1 t) (Shift1 T) s;
 
 // Iterated shifting
-symbol der_shift (id : DBId) (Γ : Context) {t T : Term} {s : Sort} (_ : der (getΓ Γ id) t T s) : der Γ (ShiftN id t) (ShiftN id T) s;
-rule der_shift db0 (Push $A $s _) $d ↪ der_shift0 $A $s $d
-with der_shift (dbsucc $id) (Push $A $s $Γ) $d ↪ der_shift0 $A $s (der_shift $id $Γ $d);
-symbol der_eq_shift (id : DBId) (Γ : Context) {t1 t2 T : Term} {s : Sort} (_ : der_eq (getΓ Γ id) s T t1 t2)
+symbol der_shift (id : DBId) {Γ : Context} (_ : der_context Γ) {t T : Term} {s : Sort} (_ : der (getΓ Γ id) t T s) : der Γ (ShiftN id t) (ShiftN id T) s;
+rule der_shift db0 (der_context_push _ _ _ $dA _) $d ↪ der_shift0 $dA $d
+with der_shift (dbsucc $id) (der_context_push _ _ _ $dA $dΓ) $d ↪ der_shift0 $dA (der_shift $id $dΓ $d);
+symbol der_eq_shift (id : DBId) {Γ : Context} (_ : der_context Γ) {t1 t2 T : Term} {s : Sort} (_ : der_eq (getΓ Γ id) s T t1 t2)
                   : der_eq Γ s (ShiftN id T) (ShiftN id t1) (ShiftN id t2);
 
 // Congruence for replacement

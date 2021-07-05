@@ -22,7 +22,7 @@ rule inv_sort _ (der_sort $Γ $s) ↪ der_sort $Γ (snext $s)
 with inv_sort _ (der_prod $Γ $s $s' _ _ _ _) ↪ der_sort $Γ (smax $s $s')
 with inv_sort _ (der_sigma $Γ $s $s' _ _ _ _) ↪ der_sort $Γ (smax $s $s')
 with inv_sort _ (der_prop_type_eq $Γ $s _ _ _ _ _ _) ↪ der_sort $Γ $s
-with inv_sort $dΓ (der_var $Γ $id) ↪ der_shift $id $Γ (der_getΓ $id $dΓ)
+with inv_sort $dΓ (der_var _ $id) ↪ der_shift $id $dΓ (der_getΓ $id $dΓ)
 with inv_sort $dΓ (der_type_conv _ _ _ _ _ _ $deq) ↪ inv_eq_t2 $dΓ $deq
 with inv_sort $dΓ (der_abs $Γ $s $s' $A _ $B $dA _ $dt) ↪ der_prod $Γ $s $s' $A $B $dA (inv_sort (pushΓ $dA $dΓ) $dt)
 with inv_sort _ (der_app _ _ _ _ _ _ _ _ $dB _ $du) ↪ substitution $dB $du
@@ -41,9 +41,9 @@ with inv_eq_t2   _   (der_eq_beta _  _  _   _  _  _  _  _ _ $dt $du) ↪ substit
 with inv_eq_sort _   (der_eq_eta  $Γ $s $s' $A _  $B $dA $dB _  ) ↪ der_prod $Γ $s $s' $A $B $dA $dB
 with inv_eq_t1   _   (der_eq_eta  $Γ $s $s' $A $f $B $dA $dB $df) ↪ der_abs $Γ $s $s' $A (tapp (Shift $A) (Shift1 $B) (Shift $f) (var db0)) $B $dA $dB
                                                                       (der_app (Push $A $s $Γ) $s $s' (Shift $A) (Shift $f) (var db0) (Shift1 $B)
-                                                                        (der_shift0 $A $s $dA)
-                                                                        (der_shift1 $A $s $A $s $dB)
-                                                                        (der_shift0 $A $s $df)
+                                                                        (der_shift0 $dA $dA)
+                                                                        (der_shift1 $dA $dA $dB)
+                                                                        (der_shift0 $dA $df)
                                                                         (der_var (Push $A $s $Γ) db0))
 with inv_eq_t2   _   (der_eq_eta  _  _  _   _  _  _  _   _   $df) ↪ $df
 with inv_eq_sort $dΓ (der_eq_π1 _  _  _   _  _  _  _  _ $du _   _  ) ↪ inv_sort $dΓ $du
