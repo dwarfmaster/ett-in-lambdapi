@@ -8,7 +8,6 @@ require open ETT.TranslationDefinition;
 require open ETT.TranslationLemmas;
 require open ETT.HEq;
 
-symbol τ_dΓ (Γ : TContext) : der_context (τ_Γ Γ);
 rule τ_dΓ (TPush $Γ $s $A $dA _) ↪ der_context_push (τ_Γ $Γ) $s $A $dA (τ_dΓ $Γ)
 with τ_dΓ TEmpty ↪ der_context_empty;
 
