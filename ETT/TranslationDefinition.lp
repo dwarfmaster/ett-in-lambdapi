@@ -29,6 +29,8 @@ symbol τ_T (Γ : TContext) {T : ETT.Term} {s : ETT.Sort} :
 symbol τ (Γ : TContext) {s : ETT.Sort} {t T : ETT.Term} (d : der (τ_Γ Γ) t T s) :
   let sort ≔ I.inv_sort (τ_dΓ Γ) d in
   ε (τ_s s) (τ_T Γ sort);
+symbol τ_I (Γ : TContext) {s : ETT.Sort} {t T : ETT.Term}
+           : der (τ_Γ Γ) t T s → U (τ_s s);
 
 // Translation of equality derivation
 symbol τ_eq_type (Γ : TContext) {s : ETT.Sort} {T t1 t2 : ETT.Term} (d : der_eq (τ_Γ Γ) s T t1 t2) : U _ ≔
@@ -60,6 +62,7 @@ symbol convert (Γ : TContext) {s : ETT.Sort} {t T : ETT.Term} (d1 d2 : der (τ_
 // For things to type, we need to make sure that the translation of a sort is a universe
 rule @τ_T _ (ETT.tsort $s) (ETT.snext $s) _ ↪ u (τ_s $s);
 rule @τ _ (ETT.snext (ETT.snext $s)) (ETT.tsort $s) (ETT.tsort (ETT.snext $s)) _ ↪ u (τ_s $s);
+rule τ_I $Γ $d ↪ τ $Γ (I.inv_sort (τ_dΓ $Γ) $d);
 rule τ_T $Γ $d ↪ τ $Γ $d;
 rule τ_eqT $Γ $d ↪ heq_to_eq (τ_eq $Γ $d);
 
