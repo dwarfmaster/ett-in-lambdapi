@@ -19,6 +19,15 @@ symbol inv_teq_t2   {Γ : Context} {s : Sort} {T S t1 t2 : Term} : der_context �
 symbol pushIΓ {Γ : Context} {s : Sort} {t T : Term} (dΓ : der_context Γ) (d: der Γ t T s)
               : der_context (Push T s Γ) ≔
   pushΓ (inv_sort dΓ d) dΓ;
+symbol pushEΓ {Γ : Context} {s : Sort} {t1 t2 T : Term} (dΓ : der_context Γ) (deq: der_eq Γ s T t1 t2)
+              : der_context (Push T s Γ) ≔
+  pushΓ (inv_eq_sort dΓ deq) dΓ;
+symbol push1Γ {Γ : Context} {s : Sort} {T1 T2 : Term} (dΓ : der_context Γ) (deq: der_eq Γ (snext s) (tsort s) T1 T2)
+              : der_context (Push T1 s Γ) ≔
+  pushΓ (inv_eq_t1 dΓ deq) dΓ;
+symbol push2Γ {Γ : Context} {s : Sort} {T1 T2 : Term} (dΓ : der_context Γ) (deq: der_eq Γ (snext s) (tsort s) T1 T2)
+              : der_context (Push T2 s Γ) ≔
+  pushΓ (inv_eq_t2 dΓ deq) dΓ;
 
 // Definition of inv_sort
 rule inv_sort _ (der_sort $Γ $s) ↪ der_sort $Γ (snext $s)
