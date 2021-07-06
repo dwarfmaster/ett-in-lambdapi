@@ -34,9 +34,9 @@ symbol convertTypeConversion (Γ : TContext) (HC : PContext Γ) {t T1 T2 T3 : ET
     (heq_trans
       (heq_of_transport
         (τ (projΓ2 HC) d2)
-        (convert_T (projΓ2 HC) (inv_sort d2) (inv_eq_t1 deq)))
+        (convert_T (projΓ2 HC) (inv_sort (τ_dΓ (projΓ2 HC)) d2) (inv_eq_t1 (τ_dΓ (projΓ2 HC)) deq)))
       (heq_of_transport
-        (transport (convert_T (projΓ2 HC) (inv_sort d2) (inv_eq_t1 deq)) (τ (projΓ2 HC) d2))
+        (transport (convert_T (projΓ2 HC) (inv_sort (τ_dΓ (projΓ2 HC)) d2) (inv_eq_t1 (τ_dΓ (projΓ2 HC)) deq)) (τ (projΓ2 HC) d2))
         (τ_eqT (projΓ2 HC) deq)));
 symbol convertTypeConversion' (Γ : TContext) (HC : PContext Γ) {t T1 T2 T3 : ETT.Term} {s : ETT.Sort}
                               (d1 : der (τ_Γ (projΓ1 HC)) t T1 s)
@@ -48,15 +48,15 @@ symbol convertTypeConversion' (Γ : TContext) (HC : PContext Γ) {t T1 T2 T3 : E
     (heq_symm (heq_trans
       (heq_of_transport
         (τ (projΓ1 HC) d1)
-        (convert_T (projΓ1 HC) (inv_sort d1) (inv_eq_t1 deq)))
+        (convert_T (projΓ1 HC) (inv_sort (τ_dΓ (projΓ1 HC)) d1) (inv_eq_t1 (τ_dΓ (projΓ1 HC)) deq)))
       (heq_of_transport
-        (transport (convert_T (projΓ1 HC) (inv_sort d1) (inv_eq_t1 deq)) (τ (projΓ1 HC) d1))
+        (transport (convert_T (projΓ1 HC) (inv_sort (τ_dΓ (projΓ1 HC)) d1) (inv_eq_t1 (τ_dΓ (projΓ1 HC)) deq)) (τ (projΓ1 HC) d1))
         (τ_eqT (projΓ1 HC) deq))))
     (convertR Γ HC d1 d2);
 
 // convert recursive
 // Types
-rule convertR _ _ (der_sort _ $s _) (der_sort _ _ _)
+rule convertR _ _ (der_sort _ $s) (der_sort _ _)
   ↪ heq_refl (u (snext (τ_s $s))) (u (τ_s $s))
 with convertR $Γ $H (der_prod _ $s $s' $A $B $dA1 $dB1) (der_prod _ $s $s' $A $B $dA2 $dB2)
   ↪ cong_prod
@@ -74,54 +74,54 @@ with convertR $Γ $H (der_prop_type_eq _ $s $A $u $v $dA1 $du1 $dv1) (der_prop_t
   ↪ cong_eq
        (convertR $Γ $H $dA1 $dA2)
        (heq_conj (convertR $Γ $H $du1 $du2)
-         (convert_T (projΓ1 $H) (inv_sort $du1) $dA1)
-         (convert_T (projΓ2 $H) (inv_sort $du2) $dA2))
+         (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $du1) $dA1)
+         (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $du2) $dA2))
        (heq_conj (convertR $Γ $H $dv1 $dv2)
-         (convert_T (projΓ1 $H) (inv_sort $dv1) $dA1)
-         (convert_T (projΓ2 $H) (inv_sort $dv2) $dA2))
+         (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $dv1) $dA1)
+         (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $dv2) $dA2))
 
 // Structural rules
-with convertR _ $H (der_var _ $id $dΓ1) (der_var _ $id $dΓ2)
+with convertR _ $H (der_var _ $id) (der_var _ $id)
   ↪ heq_conj (pgetHShift $id $H)
-       (convert_T (projΓ1 $H) (der_shift $id (τ_dΓ (projΓ1 $H)) (pgetD1 $id $H)) (der_shift $id $dΓ1 (der_getΓ $id $dΓ1)))
-       (convert_T (projΓ2 $H) (der_shift $id (τ_dΓ (projΓ2 $H)) (pgetD2 $id $H)) (der_shift $id $dΓ2 (der_getΓ $id $dΓ2)))
+       (convert_T (projΓ1 $H) (der_shift $id (τ_dΓ (projΓ1 $H)) (pgetD1 $id $H)) (der_shift $id (τ_dΓ (projΓ1 $H)) (der_getΓ $id (τ_dΓ (projΓ1 $H)))))
+       (convert_T (projΓ2 $H) (der_shift $id (τ_dΓ (projΓ2 $H)) (pgetD2 $id $H)) (der_shift $id (τ_dΓ (projΓ2 $H)) (der_getΓ $id (τ_dΓ (projΓ2 $H)))))
 with convertR $Γ $H (der_type_conv _ $u $A $B $s $du1 $deq1) (der_type_conv _ $u $A $B $s $du2 $deq2)
   ↪ convertTypeConversion $Γ $H (der_type_conv _ $u $A $B $s $du1 $deq1) $du2 $deq2
 
 // λ-calculus
 with convertR $Γ $H (der_abs _ $s $s' $A $t $B $dA1 _ $dt1) (der_abs _ $s $s' $A $t $B $dA2 _ $dt2)
   ↪ cong_lambda
-       (λ a, τ_T (TPush (projΓ1 $H) $s $A $dA1 a) (inv_sort $dt1))
-       (λ a, τ_T (TPush (projΓ2 $H) $s $A $dA2 a) (inv_sort $dt2))
+       (λ a, τ_T (TPush (projΓ1 $H) $s $A $dA1 a) (inv_sort (pushΓ $dA1 (τ_dΓ (projΓ1 $H))) $dt1))
+       (λ a, τ_T (TPush (projΓ2 $H) $s $A $dA2 a) (inv_sort (pushΓ $dA2 (τ_dΓ (projΓ2 $H))) $dt2))
        (λ a, τ (TPush (projΓ1 $H) $s $A $dA1 a) $dt1)
        (λ a, τ (TPush (projΓ2 $H) $s $A $dA2 a) $dt2)
        (convertR $Γ $H $dA1 $dA2)
-       (λ p, convertR $Γ (PCPush $H $dA1 $dA2 (projHEq p)) (inv_sort $dt1) (inv_sort $dt2))
+       (λ p, convertR $Γ (PCPush $H $dA1 $dA2 (projHEq p)) (inv_sort (pushΓ $dA1 (τ_dΓ (projΓ1 $H))) $dt1) (inv_sort (pushΓ $dA2 (τ_dΓ (projΓ2 $H))) $dt2))
        (λ p, convertR $Γ (PCPush $H $dA1 $dA2 (projHEq p)) $dt1 $dt2)
 with convertR $Γ $H (der_app _ $s $s' $A $t $u $B _ $dB1 $dt1 $du1) (der_app _ $s $s' $A $t $u $B _ $dB2 $dt2 $du2)
   ↪ heq_conj
        (cong_app
-         (λ a, τ_T (TPush (projΓ1 $H) $s $A (inv_sort $du1) a) $dB1)
-         (λ a, τ_T (TPush (projΓ2 $H) $s $A (inv_sort $du2) a) $dB2)
-         (convertR $Γ $H (inv_sort $du1) (inv_sort $du2))
-         (λ p, convertR $Γ (PCPush $H (inv_sort $du1) (inv_sort $du2) (projHEq p)) $dB1 $dB2)
+         (λ a, τ_T (TPush (projΓ1 $H) $s $A (inv_sort (τ_dΓ (projΓ1 $H)) $du1) a) $dB1)
+         (λ a, τ_T (TPush (projΓ2 $H) $s $A (inv_sort (τ_dΓ (projΓ2 $H)) $du2) a) $dB2)
+         (convertR $Γ $H (inv_sort (τ_dΓ (projΓ1 $H)) $du1) (inv_sort (τ_dΓ (projΓ2 $H)) $du2))
+         (λ p, convertR $Γ (PCPush $H (inv_sort (τ_dΓ (projΓ1 $H)) $du1) (inv_sort (τ_dΓ (projΓ2 $H)) $du2) (projHEq p)) $dB1 $dB2)
          (heq_conj (convertR $Γ $H $dt1 $dt2)
-           (τ_fun_eq (projΓ1 $H) (inv_sort $du1) $dB1 (inv_sort $dt1))
-           (τ_fun_eq (projΓ2 $H) (inv_sort $du2) $dB2 (inv_sort $dt2)))
+           (τ_fun_eq (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $du1) $dB1 (inv_sort (τ_dΓ (projΓ1 $H)) $dt1))
+           (τ_fun_eq (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $du2) $dB2 (inv_sort (τ_dΓ (projΓ2 $H)) $dt2)))
          (convertR $Γ $H $du1 $du2))
        (τ_substT_eq (projΓ1 $H) $dB1 $du1)
        (τ_substT_eq (projΓ2 $H) $dB2 $du2)
 with convertR $Γ $H (der_pair _ $s $s' $u $A $v $B _ $du1 $dB1 $dv1) (der_pair _ $s $s' $u $A $v $B _ $du2 $dB2 $dv2)
   ↪ cong_pair
-       (λ a, τ_T (TPush (projΓ1 $H) $s $A (inv_sort $du1) a) $dB1)
-       (λ a, τ_T (TPush (projΓ2 $H) $s $A (inv_sort $du2) a) $dB2)
-       (convertR $Γ $H (inv_sort $du1) (inv_sort $du2))
-       (λ p, convertR $Γ (PCPush $H (inv_sort $du1) (inv_sort $du2) (projHEq p)) $dB1 $dB2)
+       (λ a, τ_T (TPush (projΓ1 $H) $s $A (inv_sort (τ_dΓ (projΓ1 $H)) $du1) a) $dB1)
+       (λ a, τ_T (TPush (projΓ2 $H) $s $A (inv_sort (τ_dΓ (projΓ2 $H)) $du2) a) $dB2)
+       (convertR $Γ $H (inv_sort (τ_dΓ (projΓ1 $H)) $du1) (inv_sort (τ_dΓ (projΓ2 $H)) $du2))
+       (λ p, convertR $Γ (PCPush $H (inv_sort (τ_dΓ (projΓ1 $H)) $du1) (inv_sort (τ_dΓ (projΓ2 $H)) $du2) (projHEq p)) $dB1 $dB2)
        (convertR $Γ $H $du1 $du2)
        (heq_conj'
          (heq_conj (convertR $Γ $H $dv1 $dv2)
-           (convert_T (projΓ1 $H) (inv_sort $dv1) (substitution $dB1 $du1))
-           (convert_T (projΓ2 $H) (inv_sort $dv2) (substitution $dB2 $du2)))
+           (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $dv1) (substitution $dB1 $du1))
+           (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $dv2) (substitution $dB2 $du2)))
          (τ_substT_eq (projΓ1 $H) $dB1 $du1)
          (τ_substT_eq (projΓ2 $H) $dB2 $du2))
 with convertR $Γ $H (der_π1 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π1 _ $s $s' $p $A $B $dA2 $dB2 $dp2)
@@ -131,8 +131,8 @@ with convertR $Γ $H (der_π1 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π1 _ $s $s
        (convertR $Γ $H $dA1 $dA2)
        (λ p, convertR $Γ (PCPush $H $dA1 $dA2 (projHEq p)) $dB1 $dB2)
        (heq_conj (convertR $Γ $H $dp1 $dp2)
-         (τ_sum_eq (projΓ1 $H) $dA1 $dB1 (inv_sort $dp1))
-         (τ_sum_eq (projΓ2 $H) $dA2 $dB2 (inv_sort $dp2)))
+         (τ_sum_eq (projΓ1 $H) $dA1 $dB1 (inv_sort (τ_dΓ (projΓ1 $H)) $dp1))
+         (τ_sum_eq (projΓ2 $H) $dA2 $dB2 (inv_sort (τ_dΓ (projΓ2 $H)) $dp2)))
 with convertR $Γ $H (der_π2 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π2 _ $s $s' $p $A $B $dA2 $dB2 $dp2)
   ↪ heq_conj
        (cong_proj2
@@ -141,8 +141,8 @@ with convertR $Γ $H (der_π2 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π2 _ $s $s
          (convertR $Γ $H $dA1 $dA2)
          (λ p, convertR $Γ (PCPush $H $dA1 $dA2 (projHEq p)) $dB1 $dB2)
          (heq_conj (convertR $Γ $H $dp1 $dp2)
-           (τ_sum_eq (projΓ1 $H) $dA1 $dB1 (inv_sort $dp1))
-           (τ_sum_eq (projΓ2 $H) $dA2 $dB2 (inv_sort $dp2))))
+           (τ_sum_eq (projΓ1 $H) $dA1 $dB1 (inv_sort (τ_dΓ (projΓ1 $H)) $dp1))
+           (τ_sum_eq (projΓ2 $H) $dA2 $dB2 (inv_sort (τ_dΓ (projΓ2 $H)) $dp2))))
        (τ_substT_eq (projΓ1 $H) $dB1 (der_π1 (τ_Γ (projΓ1 $H)) $s $s' $p $A $B $dA1 $dB1 $dp1))
        (τ_substT_eq (projΓ2 $H) $dB2 (der_π1 (τ_Γ (projΓ2 $H)) $s $s' $p $A $B $dA2 $dB2 $dp2))
 
@@ -151,20 +151,20 @@ with convertR $Γ $H (der_refl _ $s $u $A $dA1 $du1) (der_refl _ $s $u $A $dA2 $
   ↪ cong_refl
        (convertR $Γ $H $dA1 $dA2)
        (heq_conj (convertR $Γ $H $du1 $du2)
-         (convert_T (projΓ1 $H) (inv_sort $du1) $dA1)
-         (convert_T (projΓ2 $H) (inv_sort $du2) $dA2))
+         (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $du1) $dA1)
+         (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $du2) $dA2))
 
 // Type conversion
-with convertR $Γ $H (der_sort _ $s $dΓ) (der_type_conv _ _ _ _ _ $dX $deq)
-  ↪ convertTypeConversion $Γ $H (der_sort _ $s $dΓ) $dX $deq
+with convertR $Γ $H (der_sort _ $s) (der_type_conv _ _ _ _ _ $dX $deq)
+  ↪ convertTypeConversion $Γ $H (der_sort _ $s) $dX $deq
 with convertR $Γ $H (der_prod _ $s $s' $A $B $dA $dB) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_prod _ $s $s' $A $B $dA $dB) $dX $deq
 with convertR $Γ $H (der_sigma _ $s $s' $A $B $dA $dB) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_sigma _ $s $s' $A $B $dA $dB) $dX $deq
 with convertR $Γ $H (der_prop_type_eq _ $s $A $u $v $dA $du $dv) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_prop_type_eq _ $s $A $u $v $dA $du $dv) $dX $deq
-with convertR $Γ $H (der_var _ $id $dΓ) (der_type_conv _ _ _ _ _ $dX $deq)
-  ↪ convertTypeConversion $Γ $H (der_var _ $id $dΓ) $dX $deq
+with convertR $Γ $H (der_var _ $id) (der_type_conv _ _ _ _ _ $dX $deq)
+  ↪ convertTypeConversion $Γ $H (der_var _ $id) $dX $deq
 with convertR $Γ $H (der_abs _ $s $s' $A $t $B $dA $dB $dt) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_abs _ $s $s' $A $t $B $dA $dB $dt) $dX $deq
 with convertR $Γ $H (der_app _ $s $s' $A $t $u $B $dA $dB $dt $du) (der_type_conv _ _ _ _ _ $dX $deq)
@@ -178,16 +178,16 @@ with convertR $Γ $H (der_π2 _ $s $s' $p $A $B $dA $dB $dp) (der_type_conv _ _ 
 with convertR $Γ $H (der_refl _ $s $u $A $dA $du) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_refl _ $s $u $A $dA $du) $dX $deq
 // Symmetric cases
-with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_sort _ $s $dΓ)
-  ↪ convertTypeConversion' $Γ $H $dX (der_sort _ $s $dΓ) $deq
+with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_sort _ $s)
+  ↪ convertTypeConversion' $Γ $H $dX (der_sort _ $s) $deq
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_prod _ $s $s' $A $B $dA $dB)
   ↪ convertTypeConversion' $Γ $H $dX (der_prod _ $s $s' $A $B $dA $dB) $deq
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_sigma _ $s $s' $A $B $dA $dB)
   ↪ convertTypeConversion' $Γ $H $dX (der_sigma _ $s $s' $A $B $dA $dB) $deq
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_prop_type_eq _ $s $A $u $v $dA $du $dv)
   ↪ convertTypeConversion' $Γ $H $dX (der_prop_type_eq _ $s $A $u $v $dA $du $dv) $deq
-with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_var _ $id $dΓ)
-  ↪ convertTypeConversion' $Γ $H $dX (der_var _ $id $dΓ) $deq
+with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_var _ $id)
+  ↪ convertTypeConversion' $Γ $H $dX (der_var _ $id) $deq
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_abs _ $s $s' $A $t $B $dA $dB $dt)
   ↪ convertTypeConversion' $Γ $H $dX (der_abs _ $s $s' $A $t $B $dA $dB $dt) $deq
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_app _ $s $s' $A $t $u $B $dA $dB $dt $du)
