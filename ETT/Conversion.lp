@@ -120,8 +120,8 @@ with convertR $Γ $H (der_pair _ $s $s' $u $A $v $B _ $du1 $dB1 $dv1) (der_pair 
        (convertR $Γ $H $du1 $du2)
        (heq_conj'
          (heq_conj (convertR $Γ $H $dv1 $dv2)
-           (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $dv1) (substitution $dB1 $du1))
-           (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $dv2) (substitution $dB2 $du2)))
+           (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $dv1) (substitution (τ_dΓ (projΓ1 $H)) $dB1 $du1))
+           (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $dv2) (substitution (τ_dΓ (projΓ2 $H)) $dB2 $du2)))
          (τ_substT_eq (projΓ1 $H) $dB1 $du1)
          (τ_substT_eq (projΓ2 $H) $dB2 $du2))
 with convertR $Γ $H (der_π1 _ $s $s' $p $A $B $dA1 $dB1 $dp1) (der_π1 _ $s $s' $p $A $B $dA2 $dB2 $dp2)

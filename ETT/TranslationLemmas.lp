@@ -18,7 +18,7 @@ symbol τ_shift0T_eq (Γ : TContext) {s s' : ETT.Sort} {T A : ETT.Term}
                     (a : ε _ (τ_T Γ dA)) :
   ε _ (eq _ (u (τ_s s))
       (τ_T Γ dT)
-      (τ_T (TPush Γ s' A dA a) (der_shift0 dA dT)));
+      (τ_T (TPush Γ s' A dA a) (der_shift0 dA (τ_dΓ Γ) dT)));
 symbol τ_shift0T (Γ : TContext) {s s' : ETT.Sort} {T A : ETT.Term}
                  (dT : der (τ_Γ Γ) T (ETT.tsort s) (ETT.snext s))
                  (dA : der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
@@ -35,7 +35,7 @@ symbol τ_shift0_eq (Γ : TContext) {s s' : ETT.Sort} {t T A : ETT.Term}
                    (dA : der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
                    (a : ε _ (τ_T Γ dA)) :
   H (τ Γ dt)
-    (τ (TPush Γ s' A dA a) (der_shift0 dA dt));
+    (τ (TPush Γ s' A dA a) (der_shift0 dA (τ_dΓ Γ) dt));
 
 symbol τ_shift1T_eq (Γ : TContext) {s sa sb : ETT.Sort} {T A B : ETT.Term}
                     (dT : der (Push A sa (τ_Γ Γ)) T (ETT.tsort s) (ETT.snext s))
@@ -44,7 +44,7 @@ symbol τ_shift1T_eq (Γ : TContext) {s sa sb : ETT.Sort} {T A B : ETT.Term}
                     (a : ε _ (τ_T Γ dA)) (b : ε _ (τ_T Γ dB)) :
   ε _ (eq _ (u (τ_s s))
       (τ_T (TPush Γ sa A dA a) dT)
-      (τ_T (TPush (TPush Γ sb B dB b) sa (Shift A) (der_shift0 dB dA) (τ_shift0T Γ dA dB b a)) (der_shift1 dA dB dT)));
+      (τ_T (TPush (TPush Γ sb B dB b) sa (Shift A) (der_shift0 dB (τ_dΓ Γ) dA) (τ_shift0T Γ dA dB b a)) (der_shift1 dA dB (τ_dΓ Γ) dT)));
 symbol τ_shift1T (Γ : TContext) {s sa sb : ETT.Sort} {T A B : ETT.Term}
                  (dT : der (Push A sa (τ_Γ Γ)) T (ETT.tsort s) (ETT.snext s))
                  (dA : der (τ_Γ Γ) A (ETT.tsort sa) (ETT.snext sa))
@@ -63,7 +63,7 @@ symbol τ_substT_eq (Γ : TContext) {s s' : ETT.Sort} {A B a : ETT.Term}
                    (dB : der (Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) (da : der (τ_Γ Γ) a A s) :
   ε _ (eq _ (u (τ_s s'))
     (τ_T (TPush Γ s A (inv_sort (τ_dΓ Γ) da) (τ Γ da)) dB)
-    (τ_T Γ (substitution dB da)));
+    (τ_T Γ (substitution (τ_dΓ Γ) dB da)));
 symbol τ_substT (Γ : TContext) {s s' : ETT.Sort} {A B a : ETT.Term}
                 (dB : der (Push A s (τ_Γ Γ)) B (ETT.tsort s') (ETT.snext s')) (da : der (τ_Γ Γ) a A s) ≔
   transport (τ_substT_eq Γ dB da);
@@ -76,9 +76,9 @@ symbol τ_subst_eq (Γ : TContext) {s s' : ETT.Sort} {A B b a : ETT.Term}
                   (da : der (τ_Γ Γ) a A s) :
   HEq (τ_s s')
     (τ_T (TPush Γ s A (inv_sort (τ_dΓ Γ) da) (τ Γ da)) (inv_sort (τ_dΓ (TPush Γ _ _ (inv_sort (τ_dΓ Γ) da) (τ Γ da))) db))
-    (τ_T Γ (inv_sort (τ_dΓ Γ) (substitution db da)))
+    (τ_T Γ (inv_sort (τ_dΓ Γ) (substitution (τ_dΓ Γ) db da)))
     (τ (TPush Γ s A (inv_sort (τ_dΓ Γ) da) (τ Γ da)) db)
-    (τ Γ (substitution db da));
+    (τ Γ (substitution (τ_dΓ Γ) db da));
 
 // Préservation of head type
 

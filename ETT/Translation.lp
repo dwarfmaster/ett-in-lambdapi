@@ -41,7 +41,7 @@ with τ $Γ (der_app _ _ _ _ _ _ _ _ $dB $dt $du)
      τ_substT $Γ $dB $du (f (τ $Γ $du))
 
 with τ $Γ (der_pair _ $s $s' _ $A _ _ _ $du $dB $dv)
-  ↪ let pv ≔ convert_T $Γ (inv_sort (τ_dΓ $Γ) $dv) (substitution $dB $du) in
+  ↪ let pv ≔ convert_T $Γ (inv_sort (τ_dΓ $Γ) $dv) (substitution (τ_dΓ $Γ) $dB $du) in
      mkS (τ_s $s) (τ_s $s') (τ_T $Γ (inv_sort (τ_dΓ $Γ) $du)) (λ a, τ_T (TPush $Γ $s $A (inv_sort (τ_dΓ $Γ) $du) a) $dB)
          (τ $Γ $du) (τ_substT' $Γ $dB $du (transport pv (τ $Γ $dv)))
 with τ $Γ (der_π1 _ $s $s' _ $A _ $dA $dB $dp)

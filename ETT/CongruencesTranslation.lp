@@ -81,7 +81,7 @@ with τ_eq $Γ (der_eq_cong_tapp _ $s $s' $A1 $A2 _ $B2 _ $f2 _ $a2 $deqA $deqB 
          (τ_substT_eq $Γ $dB2 $da2))
        (heq_of_conversion $Γ
          (der_app (τ_Γ $Γ) $s $s' $A2 $f2 $a2 $B2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $dB2 $df2 $da2)
-         (der_eq_symm _ _ _ _ _ (der_eq_cong_apply (τ_Γ $Γ) $deqA $deqB $deqa $dB1 $dB2 $da1 $da2)))
+         (der_eq_symm _ _ _ _ _ (der_eq_cong_apply (τ_dΓ $Γ) $deqA $deqB $deqa $dB1 $dB2 $da1 $da2)))
 
 // Pairs
 with τ_eq $Γ (der_eq_cong_tsum _ $s _ $A1 $A2 _ _ $deqA $deqB $dB1 $dB2)
@@ -121,8 +121,8 @@ with τ_eq $Γ (der_eq_cong_tpair _ $s $s' $A1 $A2 $B1 $B2 _ $a2 _ $b2 $deqA $de
                  (heq_trans
                    (τ_eq $Γ $deqb)
                    (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 (τ_dΓ $Γ) $deqb) $db2)))
-               (convert_T $Γ (inv_sort (τ_dΓ $Γ) $db1) (substitution $dB1 $da1))
-               (convert_T $Γ (inv_sort (τ_dΓ $Γ) $db2) (substitution $dB2 $da2)))
+               (convert_T $Γ (inv_sort (τ_dΓ $Γ) $db1) (substitution (τ_dΓ $Γ) $dB1 $da1))
+               (convert_T $Γ (inv_sort (τ_dΓ $Γ) $db2) (substitution (τ_dΓ $Γ) $dB2 $da2)))
              (inv_eq (τ_substT_eq $Γ $dB1 $da1))
              (inv_eq (τ_substT_eq $Γ $dB2 $da2))))
          (heq_of_conversion $Γ
@@ -175,7 +175,7 @@ with τ_eq $Γ (der_eq_cong_π2 _ $s $s' $A1 $A2 $B1 $B2 $p1 $p2 $deqA $deqB $de
        (heq_of_conversion $Γ
          (der_π2 (τ_Γ $Γ) $s $s' $p2 $A2 $B2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $dB2 $dp2)
          (der_eq_symm _ _ _ _ _
-          (der_eq_cong_apply (τ_Γ $Γ) $deqA $deqB
+          (der_eq_cong_apply (τ_dΓ $Γ) $deqA $deqB
            (der_eq_cong_π1 (τ_Γ $Γ) $s $s' $A1 $A2 $B1 $B2 $p1 $p2 $deqA $deqB $deqp $dB1 $dB2 $dp1 $dp2)
            $dB1 $dB2
            (der_π1 (τ_Γ $Γ) $s $s' $p1 $A1 $B1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) $dB1 $dp1)
