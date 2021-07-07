@@ -31,11 +31,12 @@ symbol τ_shift0T' (Γ : TContext) {s s' : ETT.Sort} {T A : ETT.Term}
   transport (inv_eq (τ_shift0T_eq Γ dT dA a));
 
 symbol τ_shift0_eq (Γ : TContext) {s s' : ETT.Sort} {t T A : ETT.Term}
+                   (dΓ : der_context (τ_Γ Γ))
                    (dt : der (τ_Γ Γ) t T s)
                    (dA : der (τ_Γ Γ) A (ETT.tsort s') (ETT.snext s'))
                    (a : ε _ (τ_T Γ dA)) :
   H (τ Γ dt)
-    (τ (TPush Γ s' A dA a) (der_shift0 dA (τ_dΓ Γ) dt));
+    (τ (TPush Γ s' A dA a) (der_shift0 dA dΓ dt));
 
 symbol τ_shift1T_eq (Γ : TContext) {s sa sb : ETT.Sort} {T A B : ETT.Term}
                     (dT : der (Push A sa (τ_Γ Γ)) T (ETT.tsort s) (ETT.snext s))

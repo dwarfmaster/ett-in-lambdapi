@@ -87,7 +87,7 @@ with τ_eq $Γ (der_eq_eta _ $s $s' $A $f $B $dA $dB $df)
                          (der_shift1 $dA $dA (τ_dΓ $Γ) $dB)
                          (der_shift1 $dA $dA (τ_dΓ $Γ) $dB)))
              (heq_conj
-               (τ_shift0_eq $Γ $df $dA (projT2 p))
+               (τ_shift0_eq $Γ (τ_dΓ $Γ) $df $dA (projT2 p))
                (τ_fun_eq $Γ $dA $dB (inv_sort (τ_dΓ $Γ) $df))
                (τ_fun_eq (TPush $Γ $s $A $dA (projT2 p))
                          (inv_sort (pushΓ $dA (τ_dΓ $Γ)) (der_var (Push $A $s (τ_Γ $Γ)) db0))
