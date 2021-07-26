@@ -41,9 +41,10 @@ rule J _ _ _ _ _ $w _ (refl _ _ _) ↪ $w;
 symbol K {s : Sort} {A : U s} {a : ε s A} (p : ε s (eq s A a a))
          : ε s (eq s (eq s A a a) p (refl s A a));
 rule K (refl $s $A $a) ↪ refl $s (eq $s $A $a $a) (refl $s $A $a);
-constant symbol funext (s s' : Sort) (A : U s) (B : ε s A → U s') (f g : ε (smax s s') (P s s' A B))
-                       (_ : Π(x : ε s A), ε s' (eq s' (B x) (f x) (g x)))
+symbol funext (s s' : Sort) (A : U s) (B : ε s A → U s') (f g : ε (smax s s') (P s s' A B))
+              (_ : Π(x : ε s A), ε s' (eq s' (B x) (f x) (g x)))
               : ε (smax s s') (eq (smax s s') (P s s' A B) f g);
+rule funext $s $s' $A $B $f $f _ ↪ refl (smax $s $s') (P $s $s' $A $B) $f;
 
 // True
 constant symbol ⊤ (s : Sort) : U s;
