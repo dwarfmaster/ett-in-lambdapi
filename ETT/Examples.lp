@@ -100,9 +100,91 @@ symbol trans_der (s : Sort) : der Empty (trans s) (trans_type s) _ ≔
             (der_var (getΓ dΓ) 0)
             (der_eq_lift (getΓ dΓ) _ _ _ _ _ (der_var (getΓ dΓ) 1))))));
 
-// Execution
 compute Tr.τ Tr.TEmpty (I.inv_sort der_context_empty (trans_der s0));
 compute Tr.τ Tr.TEmpty (trans_der s0);
+
+// Application
+symbol app (s s' : Sort) : Term ≔
+  tfun (tsort s) // A
+  (tfun (tfun (var 0) (tsort s')) // B
+  (tfun (tfun (var 1) (tapp (var 2) (tsort s') (var 1) (var 0))) // f
+  (tfun (var 2) // x
+  // B x
+  (tapp (var 3) (tsort s') (var 2) (var 0)))));
+symbol app_term (s s' : Sort) : Term ≔
+  tabs (tsort s)
+    (tfun (tfun (var 0) (tsort s'))
+    (tfun (tfun (var 1) (tapp (var 2) (tsort s') (var 1) (var 0)))
+    (tfun (var 2)
+    (tapp (var 3) (tsort s') (var 2) (var 0)))))
+  (tabs (tfun (var 0) (tsort s'))
+    (tfun (tfun (var 1) (tapp (var 2) (tsort s') (var 1) (var 0)))
+    (tfun (var 2)
+    (tapp (var 3) (tsort s') (var 2) (var 0))))
+  (tabs (tfun (var 1) (tapp (var 2) (tsort s') (var 1) (var 0)))
+    (tfun (var 2)
+    (tapp (var 3) (tsort s') (var 2) (var 0)))
+  (tabs (var 2)
+    (tapp (var 3) (tsort s') (var 2) (var 0))
+  (tapp (var 3) (tapp (var 4) (tsort s') (var 3) (var 0)) (var 1) (var 0)))));
+symbol der_app_term (s s' : Sort) : der Empty (app_term s s') (app s s') _ ≔
+  dabs der_context_empty (der_sort _ s)
+  (λ dΓ, dabs dΓ (dprod dΓ (der_var (getΓ dΓ) 0) (λ dΓ, der_sort (getΓ dΓ) s'))
+  (λ dΓ, dabs dΓ (dprod dΓ (der_var (getΓ dΓ) 1) (λ dΓ, dapp dΓ (der_var (getΓ dΓ) 2) (λ dΓ, der_sort (getΓ dΓ) s') (der_var (getΓ dΓ) 1) (der_var (getΓ dΓ) 0)))
+  (λ dΓ, dabs dΓ (der_var (getΓ dΓ) 2)
+  (λ dΓ, dapp dΓ (der_var (getΓ dΓ) 3)
+                 (λ dΓ, dapp dΓ (der_var (getΓ dΓ) 4) (λ dΓ, der_sort (getΓ dΓ) s') (der_var (getΓ dΓ) 3) (der_var (getΓ dΓ) 0))
+                 (der_var (getΓ dΓ) 1)
+                 (der_var (getΓ dΓ) 0)))));
+
+compute Tr.τ Tr.TEmpty (I.inv_sort der_context_empty (der_app_term s0 s0));
+compute Tr.τ Tr.TEmpty (der_app_term s0 s0);
+
+// Eta equality
+symbol eta_eq (s s' : Sort) : Term ≔
+  tfun (tsort s) // A
+  (tfun (tfun (var 0) (tsort s')) // B
+  (tfun (tfun (var 1) (tapp (var 2) (tsort s') (var 1) (var 0))) // f
+  // f = λx, f x
+  (teq (tfun (var 2) (tapp (var 3) (tsort s') (var 2) (var 0)))
+    (var 0)
+    (tabs (var 2) (tapp (var 3) (tsort s') (var 2) (var 0))
+          (tapp (var 3) (tapp (var 4) (tsort s') (var 3) (var 0)) (var 1) (var 0))))));
+symbol eta_eq_term (s s' : Sort) : Term ≔
+  tabs (tsort s)
+    (tfun (tfun (var 0) (tsort s'))
+    (tfun (tfun (var 1) (tapp (var 2) (tsort s') (var 1) (var 0)))
+    (teq (tfun (var 2) (tapp (var 3) (tsort s') (var 2) (var 0)))
+      (var 0)
+      (tabs (var 2) (tapp (var 3) (tsort s') (var 2) (var 0))
+            (tapp (var 3) (tapp (var 4) (tsort s') (var 3) (var 0)) (var 1) (var 0))))))
+  (tabs (tfun (var 0) (tsort s'))
+    (tfun (tfun (var 1) (tapp (var 2) (tsort s') (var 1) (var 0)))
+    (teq (tfun (var 2) (tapp (var 3) (tsort s') (var 2) (var 0)))
+      (var 0)
+      (tabs (var 2) (tapp (var 3) (tsort s') (var 2) (var 0))
+            (tapp (var 3) (tapp (var 4) (tsort s') (var 3) (var 0)) (var 1) (var 0)))))
+  (tabs (tfun (var 1) (tapp (var 2) (tsort s') (var 1) (var 0)))
+    (teq (tfun (var 2) (tapp (var 3) (tsort s') (var 2) (var 0)))
+      (var 0)
+      (tabs (var 2) (tapp (var 3) (tsort s') (var 2) (var 0))
+            (tapp (var 3) (tapp (var 4) (tsort s') (var 3) (var 0)) (var 1) (var 0))))
+    (trefl (tfun (var 2) (tapp (var 3) (tsort s') (var 2) (var 0)))
+           (var 0))));
+symbol der_eta_eq (s s' : Sort) : der Empty (eta_eq_term s s') (eta_eq s s') _ ≔
+  dabs der_context_empty (der_sort _ s)
+  (λ dΓ, dabs dΓ (dprod dΓ (der_var (getΓ dΓ) 0) (λ dΓ, der_sort (getΓ dΓ) s'))
+  (λ dΓ, dabs dΓ (dprod dΓ (der_var (getΓ dΓ) 1) (λ dΓ, dapp dΓ (der_var (getΓ dΓ) 2) (λ dΓ, der_sort (getΓ dΓ) s') (der_var (getΓ dΓ) 1) (der_var (getΓ dΓ) 0)))
+  (λ dΓ, fromCong dΓ
+  (der_eq_symm (getΓ dΓ) _ _ _ _
+  (deta dΓ
+    (der_var (getΓ dΓ) 2)
+    (λ dΓ, dapp dΓ (der_var (getΓ dΓ) 3) (λ dΓ, der_sort (getΓ dΓ) s') (der_var (getΓ dΓ) 2) (der_var (getΓ dΓ) 0))
+    (der_var (getΓ dΓ) 0))))));
+
+compute Tr.τ Tr.TEmpty (I.inv_sort der_context_empty (der_eta_eq s0 s0));
+// Takes too long and too much RAM
+// compute Tr.τ Tr.TEmpty (der_eta_eq s0 s0);
 
 // Functional extensionality
 symbol funext (s s' : Sort) : Term ≔
@@ -165,5 +247,6 @@ symbol funext_der (s s' : Sort) : der Empty (funext_term s s') (funext s s')
               (der_var (getΓ dΓ) 1) (der_var (getΓ dΓ) 0))))
         (deta dΓ (der_var (getΓ dΓ) 4) (λ dΓ, dapp dΓ (der_var (getΓ dΓ) 5) (λ dΓ, der_sort (getΓ dΓ) s') (der_var (getΓ dΓ) 4) (der_var (getΓ dΓ) 0)) (der_var (getΓ dΓ) 1)))))))));
 
-//compute Tr.τ Tr.TEmpty (I.inv_sort der_context_empty (funext_der s0 s0));
+compute Tr.τ Tr.TEmpty (I.inv_sort der_context_empty (funext_der s0 s0));
+// Takes too long and too much RAM
 //compute Tr.τ Tr.TEmpty (funext_der s0 s0);
