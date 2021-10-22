@@ -202,7 +202,7 @@ with τ_eq $Γ (der_eq_lift _ _ _ _ _ _ $de)
                      (convert_T $Γ (inv_sort (τ_dΓ $Γ) (inv_teq_t1 (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de))) (inv_teq_sort (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de)))
                      (τ_equality $Γ (inv_teq_sort (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de)) (inv_teq_t1 (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de))
                                     (inv_teq_t2 (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de)) (inv_sort (τ_dΓ $Γ) $de) (τ $Γ $de)) in
-     heq_extend_R
+     heq_contract_R
        (τ $Γ (inv_teq_t1 (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de)))
        (τ $Γ (inv_teq_t2 (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de)))
        (convert_T $Γ (inv_sort (τ_dΓ $Γ) (inv_teq_t2 (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de))) (inv_teq_sort (τ_dΓ $Γ) (inv_sort (τ_dΓ $Γ) $de))) heq

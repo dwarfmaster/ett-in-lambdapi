@@ -67,11 +67,21 @@ symbol heq_conj' {s : Sort} {A B C D : U s} {b : ε s B} {c : ε s C} (h : H b c
                  (pAB : ε _ (eq _ (u s) A B)) (pDC : ε _ (eq _ (u s) D C))
                  : H (transport (inv_eq pAB) b) (transport (inv_eq pDC) c) ≔
   heq_conj h (inv_eq pAB) (inv_eq pDC);
-symbol heq_extend_R {s : Sort} {A B C : U s} (a : ε s A) (c : ε s C)
+symbol heq_contract_R {s : Sort} {A B C : U s} (a : ε s A) (c : ε s C)
                     (p : ε _ (eq _ (u s) C B))
                     (h : HEq s A B a (transport p c)) :
                     HEq s A C a c ≔
   heq_trans h (heq_symm (heq_of_transport c p));
+symbol heq_extend_R {s : Sort} {A B C : U s} (a : ε s A) (b : ε s B)
+                    (p : ε _ (eq _ (u s) B C))
+                    (h : HEq s A B a b) :
+                    HEq s A C a (transport p b) ≔
+  heq_trans h (heq_of_transport b p);
+symbol heq_contract_L {s : Sort} {A B C : U s} (a : ε s A) (c : ε s C)
+                    (p : ε _ (eq _ (u s) A B))
+                    (h : HEq s B C (transport p a) c) :
+                    HEq s A C a c ≔
+  heq_trans (heq_of_transport a p) h;
 symbol heq_extend_L {s : Sort} {A B C : U s} (b : ε s B) (c : ε s C)
                     (p : ε _ (eq _ (u s) B A))
                     (h : HEq s B C b c) :
