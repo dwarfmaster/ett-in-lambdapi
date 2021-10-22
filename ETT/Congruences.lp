@@ -130,3 +130,17 @@ symbol cong_refl {s : Sort} {A1 A2 : U s} {a1 : ε s A1} {a2 : ε s A2}
       (λ a, HEq' _ (eq _ A1 a1 a1) (eq _ A1 a a) (refl _ A1 a1) (refl _ A1 a))
       (heq_refl (eq _ A1 a1 a1) (refl _ A1 a1))))
   A2 hA a2 ha;
+
+// Axiom K
+symbol cong_K {s : Sort} {A1 A2 : U s} {a1 : ε s A1} {a2 : ε s A2}
+              {p1 : ε s (eq s A1 a1 a1)} {p2 : ε s (eq s A2 a2 a2)}
+              (hA : H A1 A2) (ha : H a1 a2) (hp : H p1 p2)
+              : H (K p1) (K p2) ≔
+  (λ _ hA, rewr (heq_to_eq hA)
+    (λ A, P _ _ A (λ(a : ε _ (A)), P _ _ (H' a1 a) (λ _, P _ _ (eq _ A a a) (λ(p : ε _ ((eq _ A a a))), P _ _ (H' p1 p) (λ _, HEq' _ (eq _ (eq _ A1 a1 a1) p1 (refl _ A1 a1)) (eq _ (eq _ A a a) p (refl _ A a)) (K p1) (K p))))))
+    (λ a ha, @rewr _ _ A1 a1 a (heq_to_eq ha)
+      (λ a, P _ _ (eq _ A1 a a) (λ(p : ε _ ((eq _ A1 a a))), P _ _ (H' p1 p) (λ _, HEq' _ (eq _ (eq _ A1 a1 a1) p1 (refl _ A1 a1)) (eq _ (eq _ A1 a a) p (refl _ A1 a)) (K p1) (K p))))
+      (λ p hp, @rewr _ _ (eq _ A1 a1 a1) p1 p (heq_to_eq hp)
+        (λ p, HEq' _ (eq _ (eq _ A1 a1 a1) p1 (refl _ A1 a1)) (eq _ (eq _ A1 a1 a1) p (refl _ A1 a1)) (K p1) (K p))
+        (heq_refl (eq _ (eq _ A1 a1 a1) p1 (refl _ A1 a1)) (K p1)))))
+  A2 hA a2 ha p2 hp;

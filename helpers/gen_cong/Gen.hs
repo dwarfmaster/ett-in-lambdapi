@@ -155,6 +155,13 @@ generators = M.fromList
                ]
               , \[a,ta] -> "(refl _ " <> ta <> " " <> a <> ")"
               , \[a,ta] -> "(eq _ " <> ta <> " " <> a <> " " <> a <> ")"))
+           , ("uip",
+              ([ (Simple (SVar "s"), "A")
+               , (Term t0, "a")
+               , (Term (\l -> "(eq _ " <> t0 l <> " " <> t1 l <> " " <> t1 l <> ")"), "p")
+               ]
+              , \[p,_,_] -> "(K " <> p <> ")"
+              , \[p,a,ta] -> "(eq _ (eq _ " <> ta <> " " <> a <> " " <> a <> ") " <> p <> " (refl _ " <> ta <> " " <> a <> "))"))
            ]
 
 main :: IO ()
