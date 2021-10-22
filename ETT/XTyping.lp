@@ -72,6 +72,10 @@ inductive der : Context → Term → Term → Sort → TYPE ≔
 | der_refl :
   Π(Γ : Context), Π(s : Sort), Π(u A : Term),
   der Γ A (tsort s) (snext s) → der Γ u A s → der Γ (trefl A u) (teq A u u) s
+| der_uip :
+  Π(Γ : Context), Π(s : Sort), Π(A a p : Term),
+  der Γ A (tsort s) (snext s) → der Γ a A s
+  → der Γ p (teq A a a) s → der Γ (tuip A a p) (teq (teq A a a) p (trefl A a)) s
 
 with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
 

@@ -42,6 +42,9 @@ with inv_sort $dΓ (der_pair $Γ $s $s' _ $A _ $B _ $du $dB _) ↪ der_sigma $Γ
 with inv_sort _ (der_π1 _ _ _ _ _ _ $dA _ _) ↪ $dA
 with inv_sort $dΓ (der_π2 $Γ $s $s' $p $A $B $dA $dB $dp) ↪ substitution $dΓ $dB (der_π1 $Γ $s $s' $p $A $B $dA $dB $dp)
 with inv_sort _ (der_refl $Γ $s $u $A $dA $du) ↪ der_prop_type_eq $Γ $s $A $u $u $dA $du $du
+with inv_sort _ (der_uip $Γ $s $A $a $p $dA $da $dp) ↪ der_prop_type_eq $Γ $s (teq $A $a $a) $p (trefl $A $a)
+                                                                         (der_prop_type_eq $Γ $s $A $a $a $dA $da $da)
+                                                                         $dp (der_refl $Γ $s $a $A $dA $da)
 ;
 
 // Definition of inv_eq*
