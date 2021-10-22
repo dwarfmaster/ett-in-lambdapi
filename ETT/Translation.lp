@@ -9,6 +9,9 @@ require open ETT.TranslationDefinition;
 require open ETT.TranslationLemmas;
 require open ETT.Congruences;
 require open ETT.TContext;
+require open ETT.HEq;
+
+symbol magic {s : Sort} (A : U s) : ε s A;
 
 // Translation of types
 rule τ _ (der_sort _ $s)
@@ -60,4 +63,13 @@ rule τ $Γ (der_π2 _ $s $s' $p $A $B $dA $dB $dp)
   ↪ let pr ≔ τ_sum $Γ $dA $dB (inv_sort (τ_dΓ $Γ) $dp) (τ $Γ $dp) in
      τ_substT $Γ $dB (der_π1 (τ_Γ $Γ) $s $s' $p $A $B $dA $dB $dp)
        (proj2 (τ_s $s) (τ_s $s') (τ_T $Γ $dA) (λ a, τ_T (TPush $Γ $s $A $dA a) $dB) pr)
+// der_uip needs der_refl to be defined to type
+with τ $Γ (der_uip _ $s $A $a _ $dA $da $dp)
+  ↪ let dT ≔ der_prop_type_eq (τ_Γ $Γ) $s $A $a $a $dA $da $da in
+     let peq ≔ τ_equality_eq $Γ $dA $da $da (inv_sort (τ_dΓ $Γ) $dp) in
+     heq_to_eq
+       (heq_conj
+        (heq_contract_L _ _ peq (eq_to_heq (K (transport peq (τ $Γ $dp)))))
+        (convert_T $Γ (inv_sort (τ_dΓ $Γ) $dp) dT)
+        (convert_T $Γ (inv_sort (τ_dΓ $Γ) (der_refl (τ_Γ $Γ) $s $a $A $dA $da)) dT))
 ;

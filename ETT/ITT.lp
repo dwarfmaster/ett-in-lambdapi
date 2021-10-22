@@ -7,7 +7,9 @@ symbol smax : Sort → Sort → Sort;
 rule smax s0 $s ↪ $s
 with smax $s s0 ↪ $s
 with smax (snext $s1) (snext $s2) ↪ snext (smax $s1 $s2)
-with smax $s $s ↪ $s;
+with smax $s $s ↪ $s
+with smax (snext $s) $s ↪ snext $s
+with smax $s (snext $s) ↪ snext $s;
 
 // Interpretation of sorts
 constant symbol U : Sort → TYPE;
