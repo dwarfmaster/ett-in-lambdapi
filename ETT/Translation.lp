@@ -66,10 +66,13 @@ rule τ $Γ (der_π2 _ $s $s' $p $A $B $dA $dB $dp)
 // der_uip needs der_refl to be defined to type
 with τ $Γ (der_uip _ $s $A $a _ $dA $da $dp)
   ↪ let dT ≔ der_prop_type_eq (τ_Γ $Γ) $s $A $a $a $dA $da $da in
-     let peq ≔ τ_equality_eq $Γ $dA $da $da (inv_sort (τ_dΓ $Γ) $dp) in
-     heq_to_eq
-       (heq_conj
-        (heq_contract_L _ _ peq (eq_to_heq (K (transport peq (τ $Γ $dp)))))
-        (convert_T $Γ (inv_sort (τ_dΓ $Γ) $dp) dT)
-        (convert_T $Γ (inv_sort (τ_dΓ $Γ) (der_refl (τ_Γ $Γ) $s $a $A $dA $da)) dT))
+     // dT ≡ inv_sort (τ_dΓ $Γ) (der_refl (τ_Γ $Γ) $s $a $A $dA $da)
+     let peq ≔ convert_T $Γ (inv_sort (τ_dΓ $Γ) $dp) dT in
+     transport
+       (trans_eq_as_eq
+         (transport peq (τ $Γ $dp))
+         (eq_of_transport
+           (refl (τ_s $s) (τ_T $Γ $dA) (transport (convert_T $Γ (inv_sort (τ_dΓ $Γ) $da) $dA) (τ $Γ $da)))
+           (convert_T $Γ dT dT)))
+       (K (transport peq (τ $Γ $dp)))
 ;

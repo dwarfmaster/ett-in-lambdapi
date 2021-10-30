@@ -15,6 +15,10 @@ symbol apply_eq {s s' : Sort} {A : U s} {B : ε s A → U s'} {f g : ε _ (P s s
                 : ε _ (eq s' (B a) (f a) (g a)) ≔
   J (smax s s') s' (P s s' A B) f (λ g _, eq s' (B a) (f a) (g a)) (refl s' (B a) (f a)) g p;
 
+// Higher equalities lemmas
+symbol trans_eq_as_eq {s : Sort} {A : U s} (a : ε s A) {b c : ε s A} : ε s (eq s A b c) → ε (snext s) (eq (snext s) (u s) (eq s A a b) (eq s A a c)) ≔
+  λ p, J s (snext s) A b (λ c _, eq (snext s) (u s) (eq s A a b) (eq s A a c)) (refl (snext s) (u s) (eq s A a b)) c p;
+
 // Transport
 symbol transport {s : Sort} {T U : U s} (e : ε _ (eq (snext s) (u s) T U)) : ε s T → ε s U ≔
   λ t, J (snext s) s (u s) T (λ X _, X) t U e;
