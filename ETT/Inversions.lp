@@ -148,6 +148,20 @@ with inv_eq_t2   $dΓ (der_eq_cong_trefl $Γ $s $A1 $A2 $a1 $a2 $deqA $deqa $da1
    ↪ der_type_conv $Γ (trefl $A2 $a2) (teq $A2 $a2 $a2) (teq $A1 $a1 $a1) $s
                     (der_refl $Γ $s $a2 $A2 (inv_eq_t2 $dΓ $deqA) $da2)
                     (der_eq_symm _ _ _ _ _ (der_eq_cong_teq $Γ $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2))
+with inv_eq_sort $dΓ (der_eq_cong_tuip $Γ $s $A1 _   $a1 _   $p1 _   $deqA _     _     $da1 _    $dp1 _   )
+   ↪ der_prop_type_eq $Γ $s (teq $A1 $a1 $a1) $p1 (trefl $A1 $a1)
+                       (der_prop_type_eq $Γ $s $A1 $a1 $a1 (inv_eq_t1 $dΓ $deqA) $da1 $da1)
+                       $dp1 (der_refl $Γ $s $a1 $A1 (inv_eq_t1 $dΓ $deqA) $da1)
+with inv_eq_t1   $dΓ (der_eq_cong_tuip $Γ $s $A1 _   $a1 _   $p1 _   $deqA _     _     $da1 _    $dp1 _   )
+   ↪ der_uip $Γ $s $A1 $a1 $p1 (inv_eq_t1 $dΓ $deqA) $da1 $dp1
+with inv_eq_t2   $dΓ (der_eq_cong_tuip $Γ $s $A1 $A2 $a1 $a2 $p1 $p2 $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
+   ↪ der_type_conv $Γ (tuip $A2 $a2 $p2) (teq (teq $A2 $a2 $a2) $p2 (trefl $A2 $a2)) (teq (teq $A1 $a1 $a1) $p1 (trefl $A1 $a1)) $s
+                    (der_uip $Γ $s $A2 $a2 $p2 (inv_eq_t2 $dΓ $deqA) $da2 $dp2)
+                    (der_eq_symm _ _ _ _ _
+                      (der_eq_cong_teq $Γ $s (teq $A1 $a1 $a1) (teq $A2 $a2 $a2) $p1 $p2 (trefl $A1 $a1) (trefl $A2 $a2)
+                        (der_eq_cong_teq $Γ $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2)
+                        $deqp (der_eq_cong_trefl $Γ $s $A1 $A2 $a1 $a2 $deqA $deqa $da1 $da2)
+                        $dp1 $dp2 (der_refl $Γ $s $a1 $A1 (inv_eq_t1 $dΓ $deqA) $da1) (der_refl $Γ $s $a2 $A2 (inv_eq_t2 $dΓ $deqA) $da2)))
 ;
 
 // Propositional equality inversion

@@ -180,6 +180,13 @@ with der_eq : Context → Sort → Term → Term → Term → TYPE ≔
   der_eq Γ (snext s) (tsort s) A1 A2 → der_eq Γ s A1 a1 a2
   → der Γ a1 A1 s → der Γ a2 A2 s
   → der_eq Γ s (teq A1 a1 a1) (trefl A1 a1) (trefl A2 a2)
+| der_eq_cong_tuip :
+  Π(Γ : Context), Π(s : Sort), Π(A1 A2 a1 a2 p1 p2 : Term),
+  der_eq Γ (snext s) (tsort s) A1 A2 → der_eq Γ s A1 a1 a2
+  → der_eq Γ s (teq A1 a1 a1) p1 p2
+  → der Γ a1 A1 s → der Γ a2 A2 s
+  → der Γ p1 (teq A1 a1 a1) s → der Γ p2 (teq A2 a2 a2) s
+  → der_eq Γ s (teq (teq A1 a1 a1) p1 (trefl A1 a1)) (tuip A1 a1 p1) (tuip A2 a2 p2)
 ;
 
 // Independent der_context
