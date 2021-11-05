@@ -202,6 +202,11 @@ with der_subst $id $dΓ $d $sc (der_refl _ $s _ _ $dA $du)
   ↪ der_refl _ $s _ _
               (der_subst $id $dΓ $d $sc $dA)
               (der_subst $id $dΓ $d $sc $du)
+with der_subst $id $dΓ $d $sc (der_uip _ $s _ _ _ $dA $da $dp)
+  ↪ der_uip _ $s _ _ _
+             (der_subst $id $dΓ $d $sc $dA)
+             (der_subst $id $dΓ $d $sc $da)
+             (der_subst $id $dΓ $d $sc $dp)
 ;
 
 // SubstTContext
@@ -540,6 +545,39 @@ with τ_subst_n $Γ $id $d $sc (der_refl _ _ _ _ $dA $du)
          (convert_T (tsc_to_stc $sc)
                     (inv_sort (τ_dΓ (tsc_to_stc $sc)) (der_subst _ (τ_dΓ $Γ) $d (tsc_to_sc $sc) $du))
                     (der_subst _ (τ_dΓ $Γ) $d (tsc_to_sc $sc) $dA)))
+with τ_subst_n $Γ $id $d $sc (der_uip _ $s $A $a $a $dA $da $dp)
+  ↪ let dT ≔ der_prop_type_eq (τ_Γ (tsc_to_tc $sc)) $s $A $a $a $dA $da $da in
+     let da' ≔ der_subst $id (τ_dΓ $Γ) $d (tsc_to_sc $sc) $da in
+     let dA' ≔ der_subst $id (τ_dΓ $Γ) $d (tsc_to_sc $sc) $dA in
+     heq_conj
+       (cong_K
+           (τ_subst_n $Γ $id $d $sc $dA)
+           (heq_conj
+             (τ_subst_n $Γ $id $d $sc $da)
+             (convert_T (tsc_to_tc $sc)  (inv_sort (τ_dΓ (tsc_to_tc $sc))  $da) $dA)
+             (convert_T (tsc_to_stc $sc) (inv_sort (τ_dΓ (tsc_to_stc $sc)) da') dA'))
+           (heq_conj
+             (τ_subst_n $Γ $id $d $sc $dp)
+             (convert_T (tsc_to_tc $sc) (inv_sort (τ_dΓ (tsc_to_tc $sc)) $dp) dT)
+             (convert_T (tsc_to_stc $sc)
+               (inv_sort (τ_dΓ (tsc_to_stc $sc)) (der_subst $id (τ_dΓ $Γ) $d (tsc_to_sc $sc) $dp))
+               (der_prop_type_eq (τ_Γ (tsc_to_stc $sc)) $s _ _ _ dA' da' da'))))
+       (trans_eq_as_eq
+         (transport (convert_T (tsc_to_tc $sc) (inv_sort (τ_dΓ (tsc_to_tc $sc)) $dp) dT) (τ (tsc_to_tc $sc) $dp))
+         (eq_of_transport
+           (refl (τ_s $s) (τ_T (tsc_to_tc $sc) $dA) (transport (convert_T (tsc_to_tc $sc) (inv_sort (τ_dΓ (tsc_to_tc $sc)) $da) $dA) (τ (tsc_to_tc $sc) $da)))
+           (convert_T (tsc_to_tc $sc) dT dT)))
+       (trans_eq_as_eq
+         (transport
+           (convert_T (tsc_to_stc $sc)
+             (inv_sort (τ_dΓ (tsc_to_stc $sc)) (der_subst $id (τ_dΓ $Γ) $d (tsc_to_sc $sc) $dp))
+             (der_prop_type_eq (τ_Γ (tsc_to_stc $sc)) $s _ _ _ dA' da' da'))
+           (τ (tsc_to_stc $sc) (der_subst $id (τ_dΓ $Γ) $d (tsc_to_sc $sc) $dp)))
+         (eq_of_transport
+           (refl (τ_s $s) (τ_T (tsc_to_stc $sc) dA') (transport (convert_T (tsc_to_stc $sc) (inv_sort (τ_dΓ (tsc_to_stc $sc)) da') dA') (τ (tsc_to_stc $sc) da')))
+           (convert_T (tsc_to_stc $sc)
+             (der_prop_type_eq (τ_Γ (tsc_to_stc $sc)) $s _ _ _ dA' da' da')
+             (der_prop_type_eq (τ_Γ (tsc_to_stc $sc)) $s _ _ _ dA' da' da'))))
 ;
 
 rule der_eq_subst $id $r $dΓ $dr $sc (der_eq_beta _ $s $s' $u _ $t $B $dA $dB $dt $du)
@@ -862,5 +900,4 @@ with deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc (der_refl _ $s _ _ 
                        (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $du $deqr)
                        (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $du)
                        (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $du)
-
 ;
