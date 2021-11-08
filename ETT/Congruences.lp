@@ -15,6 +15,20 @@ symbol cong_prod {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s 
       (heq_refl _ (P s s' A1 B1))))
     A2 hA B2 hB;
 
+symbol cong_prod2 {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
+                  (hA : ε _ (eq (snext s) (u s) A1 A2)) (hB : Π(a : ε s A1), ε _ (eq (snext s') (u s') (B1 a) (B2 (transport hA a))))
+                  : ε _ (eq (snext (smax s s')) (u (smax s s')) (P s s' A1 B1) (P s s' A2 B2)) ≔
+  (J _ _ (u s) A1
+     (λ A pA, P _ _ (P _ _ A (λ _, u s'))
+                (λ B, P _ _ (P _ _ A1 (λ a, eq _ _ (B1 a) (B (transport pA a))))
+                        (λ _, eq _ _ (P s s' A1 B1) (P s s' A B))))
+     (λ B hB, J _ _ (P _ _ A1 (λ _, u s')) B1
+        (λ B pB, eq _ _ (P s s' A1 B1) (P s s' A1 B))
+        (refl _ _ (P s s' A1 B1))
+        B
+        (funext _ _ A1 (λ _, u s') B1 B hB)))
+  A2 hA B2 hB;
+
 // Lambda
 symbol cong_lambda {s s' : Sort} {A1 A2 : U s} (B1 : ε s A1 → U s') (B2 : ε s A2 → U s')
                    (t1 : ε _ (P s s' A1 B1)) (t2 : ε _ (P s s' A2 B2))
