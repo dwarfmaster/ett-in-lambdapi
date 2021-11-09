@@ -732,6 +732,15 @@ with der_eq_subst $id $r $dΓ $dr $sc (der_eq_cong_trefl _ $s _ _ _ _ $deqA $deq
                        (der_eq_subst $id $r $dΓ $dr $sc $deqa)
                        (der_subst $id $dΓ $dr $sc $da1)
                        (der_subst $id $dΓ $dr $sc $da2)
+with der_eq_subst $id $r $dΓ $dr $sc (der_eq_cong_tuip _ $s _ _ _ _ _ _ $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
+  ↪ der_eq_cong_tuip _ $s _ _ _ _ _ _
+                       (der_eq_subst $id $r $dΓ $dr $sc $deqA)
+                       (der_eq_subst $id $r $dΓ $dr $sc $deqa)
+                       (der_eq_subst $id $r $dΓ $dr $sc $deqp)
+                       (der_subst $id $dΓ $dr $sc $da1)
+                       (der_subst $id $dΓ $dr $sc $da2)
+                       (der_subst $id $dΓ $dr $sc $dp1)
+                       (der_subst $id $dΓ $dr $sc $dp2)
 ;
 
 symbol esc_to_sec {Γ : Context} {t1 t2 A1 A2 : ETT.Term} {s : ETT.Sort} {id : ETT.DBId}
@@ -900,4 +909,13 @@ with deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc (der_refl _ $s _ _ 
                        (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $du $deqr)
                        (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $du)
                        (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $du)
+with deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc (der_uip _ $s _ _ _ $dA $da $dp) $deqr
+  ↪ der_eq_cong_tuip _ $s _ _ _ _ _ _
+                      (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $dA $deqr)
+                      (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $da $deqr)
+                      (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $dp $deqr)
+                      (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $da)
+                      (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $da)
+                      (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $dp)
+                      (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $dp)
 ;
