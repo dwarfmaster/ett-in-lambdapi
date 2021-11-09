@@ -17,15 +17,16 @@ require open ETT.EqualityTranslationLemmas;
 
 // Lambda calculus
 rule τ_eq $Γ (der_eq_cong_tfun _ $s _ $A1 $A2 _ _ $deqA $deqB $dB1 $dB2)
-  ↪ cong_prod
+  ↪ eq_to_heq (cong_prod2
        (λ a, τ (TPush $Γ $s $A1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) a) $dB1)
        (λ a, τ (TPush $Γ $s $A2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) a) $dB2)
-       (τ_eq $Γ $deqA)
-       (λ p, heq_trans
-         (convert (TPush $Γ $s $A1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) (projT1 p)) $dB1 (inv_eq_t1 (push1Γ (τ_dΓ $Γ) $deqA) $deqB))
-         (heq_trans
-           (τ_eq (TPush $Γ $s $A1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) (projT1 p)) $deqB)
-           (convertR $Γ (PCPush (PCEmpty $Γ) (inv_eq_t1 (τ_dΓ $Γ) $deqA) (inv_eq_t2 (τ_dΓ $Γ) $deqA) (projHEq p)) (inv_eq_t2 (push1Γ (τ_dΓ $Γ) $deqA) $deqB) $dB2)))
+       (heq_to_eq (τ_eq $Γ $deqA))
+       (λ a, heq_to_eq (τ_eq (TPush $Γ $s $A1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) a) $deqB)))
+       // (λ p, heq_trans
+       //   (convert (TPush $Γ $s $A1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) (projT1 p)) $dB1 (inv_eq_t1 (push1Γ (τ_dΓ $Γ) $deqA) $deqB))
+       //   (heq_trans
+       //     (τ_eq (TPush $Γ $s $A1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) (projT1 p)) $deqB)
+       //     (convertR $Γ (PCPush (PCEmpty $Γ) (inv_eq_t1 (τ_dΓ $Γ) $deqA) (inv_eq_t2 (τ_dΓ $Γ) $deqA) (projHEq p)) (inv_eq_t2 (push1Γ (τ_dΓ $Γ) $deqA) $deqB) $dB2)))
 with τ_eq $Γ (der_eq_cong_tabs _ $s $s' $A1 $A2 $B1 $B2 _ $t2 $deqA $deqB $deqt $dB1 $dB2 $dt1 $dt2)
   ↪ heq_trans
        (cong_lambda
