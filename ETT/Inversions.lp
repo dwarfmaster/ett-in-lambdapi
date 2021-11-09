@@ -42,9 +42,9 @@ with inv_sort $dΓ (der_pair $Γ $s $s' _ $A _ $B _ $du $dB _) ↪ der_sigma $Γ
 with inv_sort _ (der_π1 _ _ _ _ _ _ $dA _ _) ↪ $dA
 with inv_sort $dΓ (der_π2 $Γ $s $s' $p $A $B $dA $dB $dp) ↪ substitution $dΓ $dB (der_π1 $Γ $s $s' $p $A $B $dA $dB $dp)
 with inv_sort _ (der_refl $Γ $s $u $A $dA $du) ↪ der_prop_type_eq $Γ $s $A $u $u $dA $du $du
-with inv_sort _ (der_uip $Γ $s $A $a $p $dA $da $dp) ↪ der_prop_type_eq $Γ $s (teq $A $a $a) $p (trefl $A $a)
-                                                                         (der_prop_type_eq $Γ $s $A $a $a $dA $da $da)
-                                                                         $dp (der_refl $Γ $s $a $A $dA $da)
+with inv_sort _ (der_K $Γ $s $A $a $p $dA $da $dp) ↪ der_prop_type_eq $Γ $s (teq $A $a $a) $p (trefl $A $a)
+                                                                       (der_prop_type_eq $Γ $s $A $a $a $dA $da $da)
+                                                                       $dp (der_refl $Γ $s $a $A $dA $da)
 ;
 
 // Definition of inv_eq*
@@ -148,15 +148,15 @@ with inv_eq_t2   $dΓ (der_eq_cong_trefl $Γ $s $A1 $A2 $a1 $a2 $deqA $deqa $da1
    ↪ der_type_conv $Γ (trefl $A2 $a2) (teq $A2 $a2 $a2) (teq $A1 $a1 $a1) $s
                     (der_refl $Γ $s $a2 $A2 (inv_eq_t2 $dΓ $deqA) $da2)
                     (der_eq_symm _ _ _ _ _ (der_eq_cong_teq $Γ $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2))
-with inv_eq_sort $dΓ (der_eq_cong_tuip $Γ $s $A1 _   $a1 _   $p1 _   $deqA _     _     $da1 _    $dp1 _   )
+with inv_eq_sort $dΓ (der_eq_cong_tK $Γ $s $A1 _   $a1 _   $p1 _   $deqA _     _     $da1 _    $dp1 _   )
    ↪ der_prop_type_eq $Γ $s (teq $A1 $a1 $a1) $p1 (trefl $A1 $a1)
                        (der_prop_type_eq $Γ $s $A1 $a1 $a1 (inv_eq_t1 $dΓ $deqA) $da1 $da1)
                        $dp1 (der_refl $Γ $s $a1 $A1 (inv_eq_t1 $dΓ $deqA) $da1)
-with inv_eq_t1   $dΓ (der_eq_cong_tuip $Γ $s $A1 _   $a1 _   $p1 _   $deqA _     _     $da1 _    $dp1 _   )
-   ↪ der_uip $Γ $s $A1 $a1 $p1 (inv_eq_t1 $dΓ $deqA) $da1 $dp1
-with inv_eq_t2   $dΓ (der_eq_cong_tuip $Γ $s $A1 $A2 $a1 $a2 $p1 $p2 $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
-   ↪ der_type_conv $Γ (tuip $A2 $a2 $p2) (teq (teq $A2 $a2 $a2) $p2 (trefl $A2 $a2)) (teq (teq $A1 $a1 $a1) $p1 (trefl $A1 $a1)) $s
-                    (der_uip $Γ $s $A2 $a2 $p2 (inv_eq_t2 $dΓ $deqA) $da2 $dp2)
+with inv_eq_t1   $dΓ (der_eq_cong_tK $Γ $s $A1 _   $a1 _   $p1 _   $deqA _     _     $da1 _    $dp1 _   )
+   ↪ der_K $Γ $s $A1 $a1 $p1 (inv_eq_t1 $dΓ $deqA) $da1 $dp1
+with inv_eq_t2   $dΓ (der_eq_cong_tK $Γ $s $A1 $A2 $a1 $a2 $p1 $p2 $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
+   ↪ der_type_conv $Γ (tK $A2 $a2 $p2) (teq (teq $A2 $a2 $a2) $p2 (trefl $A2 $a2)) (teq (teq $A1 $a1 $a1) $p1 (trefl $A1 $a1)) $s
+                    (der_K $Γ $s $A2 $a2 $p2 (inv_eq_t2 $dΓ $deqA) $da2 $dp2)
                     (der_eq_symm _ _ _ _ _
                       (der_eq_cong_teq $Γ $s (teq $A1 $a1 $a1) (teq $A2 $a2 $a2) $p1 $p2 (trefl $A1 $a1) (trefl $A2 $a2)
                         (der_eq_cong_teq $Γ $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2)

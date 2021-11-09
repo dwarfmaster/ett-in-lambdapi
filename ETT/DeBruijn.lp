@@ -37,7 +37,7 @@ with shift $i (π2 $A $B $p) ↪ π2 (shift $i $A) (shift (dbsucc $i) $B) (shift
 with shift $i (tsum $A $B) ↪ tsum (shift $i $A) (shift (dbsucc $i) $B)
 with shift $i (trefl $A $u) ↪ trefl (shift $i $A) (shift $i $u)
 with shift $i (teq $A $u $v) ↪ teq (shift $i $A) (shift $i $u) (shift $i $v)
-with shift $i (tuip $A $a $p) ↪ tuip (shift $i $A) (shift $i $a) (shift $i $p);
+with shift $i (tK $A $a $p) ↪ tK (shift $i $A) (shift $i $a) (shift $i $p);
 symbol Shift : Term → Term ≔ shift db0;
 symbol Shift1 : Term → Term ≔ shift db1;
 symbol Shift* : DBId → Term → Term;
@@ -67,7 +67,7 @@ with subst $i $V (π2 $A $B $p) ↪ π2 (subst $i $V $A) (subst (dbsucc $i) (Shi
 with subst $i $V (tsum $A $B) ↪ tsum (subst $i $V $A) (subst (dbsucc $i) (Shift $V) $B)
 with subst $i $V (trefl $A $u) ↪ trefl (subst $i $V $A) (subst $i $V $u)
 with subst $i $V (teq $A $u $v) ↪ teq (subst $i $V $A) (subst $i $V $u) (subst $i $V $v)
-with subst $i $V (tuip $A $a $p) ↪ tuip (subst $i $V $A) (subst $i $V $a) (subst $i $V $p);
+with subst $i $V (tK $A $a $p) ↪ tK (subst $i $V $A) (subst $i $V $a) (subst $i $V $p);
 symbol apply1 (t u : Term) : Term ≔ subst db0 u t;
 
 // Some substitution commutation

@@ -73,7 +73,7 @@ inductive Term : TYPE ≔
 | teq
   : Term // Type of the equality
   → Term → Term → Term
-| tuip
+| tK
   : Term // A : U_s
   → Term // a : A
   → Term // p : a =_A a

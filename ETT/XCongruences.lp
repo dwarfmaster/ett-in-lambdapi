@@ -127,11 +127,11 @@ with convert_der $ec (der_refl _ $s $u $A $dA $du)
   ↪ der_refl _ $s $u $A
               (convert_der $ec $dA)
               (convert_der $ec $du)
-with convert_der $ec (der_uip _ $s $A $a $p $dA $da $dp)
-  ↪ der_uip _ $s $A $a $p
-             (convert_der $ec $dA)
-             (convert_der $ec $da)
-             (convert_der $ec $dp)
+with convert_der $ec (der_K _ $s $A $a $p $dA $da $dp)
+  ↪ der_K _ $s $A $a $p
+           (convert_der $ec $dA)
+           (convert_der $ec $da)
+           (convert_der $ec $dp)
 with convert_der_eq $ec (der_eq_beta _ $s $s' $u $A $t $B $dA $dB $dt $du)
   ↪ der_eq_beta _ $s $s' $u $A $t $B
                  (convert_der $ec $dA)
@@ -239,8 +239,8 @@ with convert_der_eq $ec (der_eq_cong_trefl _ _ _ _ _ _ $deqA $deqa $da1 $da2)
        (convert_der_eq $ec $deqA)
        (convert_der_eq $ec $deqa)
        (convert_der $ec $da1) (convert_der $ec $da2)
-with convert_der_eq $ec (der_eq_cong_tuip _ _ _ _ _ _ _ _ $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
-  ↪ der_eq_cong_tuip _ _ _ _ _ _ _ _
+with convert_der_eq $ec (der_eq_cong_tK _ _ _ _ _ _ _ _ $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
+  ↪ der_eq_cong_tK _ _ _ _ _ _ _ _
        (convert_der_eq $ec $deqA)
        (convert_der_eq $ec $deqa)
        (convert_der_eq $ec $deqp)
@@ -302,11 +302,11 @@ with convert_der' $ec (der_refl _ $s $u $A $dA $du)
   ↪ der_refl _ $s $u $A
               (convert_der' $ec $dA)
               (convert_der' $ec $du)
-with convert_der' $ec (der_uip _ $s $A $a $p $dA $da $dp)
-  ↪ der_uip _ $s $A $a $p
-             (convert_der' $ec $dA)
-             (convert_der' $ec $da)
-             (convert_der' $ec $dp)
+with convert_der' $ec (der_K _ $s $A $a $p $dA $da $dp)
+  ↪ der_K _ $s $A $a $p
+           (convert_der' $ec $dA)
+           (convert_der' $ec $da)
+           (convert_der' $ec $dp)
 with convert_der_eq' $ec (der_eq_beta _ $s $s' $u $A $t $B $dA $dB $dt $du)
   ↪ der_eq_beta _ $s $s' $u $A $t $B
                  (convert_der' $ec $dA)
@@ -414,8 +414,8 @@ with convert_der_eq' $ec (der_eq_cong_trefl _ _ _ _ _ _ $deqA $deqa $da1 $da2)
        (convert_der_eq' $ec $deqA)
        (convert_der_eq' $ec $deqa)
        (convert_der' $ec $da1) (convert_der' $ec $da2)
-with convert_der_eq' $ec (der_eq_cong_tuip _ _ _ _ _ _ _ _ $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
-  ↪ der_eq_cong_tuip _ _ _ _ _ _ _ _
+with convert_der_eq' $ec (der_eq_cong_tK _ _ _ _ _ _ _ _ $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
+  ↪ der_eq_cong_tK _ _ _ _ _ _ _ _
        (convert_der_eq' $ec $deqA)
        (convert_der_eq' $ec $deqa)
        (convert_der_eq' $ec $deqp)

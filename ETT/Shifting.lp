@@ -82,11 +82,11 @@ with der_shift_n $id $sc $d (der_π2 _ $s $s' $p $A $B $dA $dB $dp)
 with der_shift_n $id $sc $d (der_refl _ $s $u $A $dA $du)
   ↪ der_refl _ $s (shift $id $u) (shift $id $A)
               (der_shift_n $id $sc $d $dA) (der_shift_n $id $sc $d $du)
-with der_shift_n $id $sc $d (der_uip _ $s $A $a $p $dA $da $dp)
-  ↪ der_uip _ $s (shift $id $A) (shift $id $a) (shift $id $p)
-             (der_shift_n $id $sc $d $dA)
-             (der_shift_n $id $sc $d $da)
-             (der_shift_n $id $sc $d $dp)
+with der_shift_n $id $sc $d (der_K _ $s $A $a $p $dA $da $dp)
+  ↪ der_K _ $s (shift $id $A) (shift $id $a) (shift $id $p)
+           (der_shift_n $id $sc $d $dA)
+           (der_shift_n $id $sc $d $da)
+           (der_shift_n $id $sc $d $dp)
 // der_context_shift_n
 with der_context_shift_n db0 $i (SC0 _) _
   ↪ der_var _ (dbsucc $i)
@@ -172,8 +172,8 @@ with der_eq_shift_n $id $sc $d (der_eq_cong_trefl _ $s $A1 $A2 $a1 $a2 $deqA $de
   ↪ der_eq_cong_trefl _ $s (shift $id $A1) (shift $id $A2) (shift $id $a1) (shift $id $a2)
        (der_eq_shift_n _ $sc $d $deqA) (der_eq_shift_n _ $sc $d $deqa)
        (der_shift_n _ $sc $d $da1) (der_shift_n _ $sc $d $da2)
-with der_eq_shift_n $id $sc $d (der_eq_cong_tuip _ $s $A1 $A2 $a1 $a2 $p1 $p2 $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
-  ↪ der_eq_cong_tuip _ $s (shift $id $A1) (shift $id $A2) (shift $id $a1) (shift $id $a2) (shift $id $p1) (shift $id $p2)
+with der_eq_shift_n $id $sc $d (der_eq_cong_tK _ $s $A1 $A2 $a1 $a2 $p1 $p2 $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
+  ↪ der_eq_cong_tK _ $s (shift $id $A1) (shift $id $A2) (shift $id $a1) (shift $id $a2) (shift $id $p1) (shift $id $p2)
        (der_eq_shift_n _ $sc $d $deqA) (der_eq_shift_n _ $sc $d $deqa) (der_eq_shift_n _ $sc $d $deqp)
        (der_shift_n _ $sc $d $da1) (der_shift_n _ $sc $d $da2)
        (der_shift_n _ $sc $d $dp1) (der_shift_n _ $sc $d $dp2)
@@ -431,7 +431,7 @@ with τ_shift_n $id $sc (der_refl _ _ _ _ $dA $du) $d $x
          (convert_T (tsc_to_stc $d $x $sc)
            (inv_sort (τ_dΓ (tsc_to_stc $d $x $sc)) (der_shift_n $id (tsc_to_sc $sc) $d $du))
            (der_shift_n $id (tsc_to_sc $sc) $d $dA)))
-with τ_shift_n $id $sc (der_uip _ $s $A $a _ $dA $da $dp) $d $x
+with τ_shift_n $id $sc (der_K _ $s $A $a _ $dA $da $dp) $d $x
   ↪ let dT ≔ der_prop_type_eq (τ_Γ (tsc_to_tc $sc)) $s $A $a $a $dA $da $da in
      let da' ≔ der_shift_n $id (tsc_to_sc $sc) $d $da in
      let dA' ≔ der_shift_n $id (tsc_to_sc $sc) $d $dA in

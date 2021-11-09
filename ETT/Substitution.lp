@@ -202,11 +202,11 @@ with der_subst $id $dΓ $d $sc (der_refl _ $s _ _ $dA $du)
   ↪ der_refl _ $s _ _
               (der_subst $id $dΓ $d $sc $dA)
               (der_subst $id $dΓ $d $sc $du)
-with der_subst $id $dΓ $d $sc (der_uip _ $s _ _ _ $dA $da $dp)
-  ↪ der_uip _ $s _ _ _
-             (der_subst $id $dΓ $d $sc $dA)
-             (der_subst $id $dΓ $d $sc $da)
-             (der_subst $id $dΓ $d $sc $dp)
+with der_subst $id $dΓ $d $sc (der_K _ $s _ _ _ $dA $da $dp)
+  ↪ der_K _ $s _ _ _
+           (der_subst $id $dΓ $d $sc $dA)
+           (der_subst $id $dΓ $d $sc $da)
+           (der_subst $id $dΓ $d $sc $dp)
 ;
 
 // SubstTContext
@@ -545,7 +545,7 @@ with τ_subst_n $Γ $id $d $sc (der_refl _ _ _ _ $dA $du)
          (convert_T (tsc_to_stc $sc)
                     (inv_sort (τ_dΓ (tsc_to_stc $sc)) (der_subst _ (τ_dΓ $Γ) $d (tsc_to_sc $sc) $du))
                     (der_subst _ (τ_dΓ $Γ) $d (tsc_to_sc $sc) $dA)))
-with τ_subst_n $Γ $id $d $sc (der_uip _ $s $A $a $a $dA $da $dp)
+with τ_subst_n $Γ $id $d $sc (der_K _ $s $A $a $a $dA $da $dp)
   ↪ let dT ≔ der_prop_type_eq (τ_Γ (tsc_to_tc $sc)) $s $A $a $a $dA $da $da in
      let da' ≔ der_subst $id (τ_dΓ $Γ) $d (tsc_to_sc $sc) $da in
      let dA' ≔ der_subst $id (τ_dΓ $Γ) $d (tsc_to_sc $sc) $dA in
@@ -732,15 +732,15 @@ with der_eq_subst $id $r $dΓ $dr $sc (der_eq_cong_trefl _ $s _ _ _ _ $deqA $deq
                        (der_eq_subst $id $r $dΓ $dr $sc $deqa)
                        (der_subst $id $dΓ $dr $sc $da1)
                        (der_subst $id $dΓ $dr $sc $da2)
-with der_eq_subst $id $r $dΓ $dr $sc (der_eq_cong_tuip _ $s _ _ _ _ _ _ $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
-  ↪ der_eq_cong_tuip _ $s _ _ _ _ _ _
-                       (der_eq_subst $id $r $dΓ $dr $sc $deqA)
-                       (der_eq_subst $id $r $dΓ $dr $sc $deqa)
-                       (der_eq_subst $id $r $dΓ $dr $sc $deqp)
-                       (der_subst $id $dΓ $dr $sc $da1)
-                       (der_subst $id $dΓ $dr $sc $da2)
-                       (der_subst $id $dΓ $dr $sc $dp1)
-                       (der_subst $id $dΓ $dr $sc $dp2)
+with der_eq_subst $id $r $dΓ $dr $sc (der_eq_cong_tK _ $s _ _ _ _ _ _ $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
+  ↪ der_eq_cong_tK _ $s _ _ _ _ _ _
+                    (der_eq_subst $id $r $dΓ $dr $sc $deqA)
+                    (der_eq_subst $id $r $dΓ $dr $sc $deqa)
+                    (der_eq_subst $id $r $dΓ $dr $sc $deqp)
+                    (der_subst $id $dΓ $dr $sc $da1)
+                    (der_subst $id $dΓ $dr $sc $da2)
+                    (der_subst $id $dΓ $dr $sc $dp1)
+                    (der_subst $id $dΓ $dr $sc $dp2)
 ;
 
 symbol esc_to_sec {Γ : Context} {t1 t2 A1 A2 : ETT.Term} {s : ETT.Sort} {id : ETT.DBId}
@@ -909,13 +909,13 @@ with deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc (der_refl _ $s _ _ 
                        (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $du $deqr)
                        (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $du)
                        (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $du)
-with deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc (der_uip _ $s _ _ _ $dA $da $dp) $deqr
-  ↪ der_eq_cong_tuip _ $s _ _ _ _ _ _
-                      (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $dA $deqr)
-                      (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $da $deqr)
-                      (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $dp $deqr)
-                      (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $da)
-                      (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $da)
-                      (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $dp)
-                      (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $dp)
+with deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc (der_K _ $s _ _ _ $dA $da $dp) $deqr
+  ↪ der_eq_cong_tK _ $s _ _ _ _ _ _
+                    (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $dA $deqr)
+                    (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $da $deqr)
+                    (deq_subst_convert $id $r1 $r2 $dΓ $deqR $dr1 $dr2 $esc $dp $deqr)
+                    (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $da)
+                    (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $da)
+                    (der_subst _ $dΓ $dr1 (esc_to_sc1 $esc) $dp)
+                    (der_subst_conj $dΓ $dr1 $dr2 $deqR $deqr $esc $dp)
 ;
