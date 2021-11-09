@@ -216,4 +216,50 @@ with τ_eq $Γ (der_eq_cong_trefl _ $s $A1 $A2 $a1 $a2 $deqA $deqa $da1 $da2)
        (heq_of_conversion $Γ
          (der_refl (τ_Γ $Γ) $s $a2 $A2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $da2)
          (der_eq_symm _ _ _ _ _ (der_eq_cong_teq (τ_Γ $Γ) $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2)))
+with τ_eq $Γ (der_eq_cong_tuip _ $s $A1 $A2 $a1 $a2 $p1 $p2 $deqA $deqa $deqp $da1 $da2 $dp1 $dp2)
+  ↪ heq_trans
+       (heq_conj
+         (cong_K
+           (τ_eq $Γ $deqA)
+           (heq_conj
+             (heq_trans
+               (convert $Γ $da1 (inv_eq_t1 (τ_dΓ $Γ) $deqa))
+               (heq_trans
+                 (τ_eq $Γ $deqa)
+                 (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 (τ_dΓ $Γ) $deqa) $da2)))
+             (convert_T $Γ (inv_sort (τ_dΓ $Γ) $da1) (inv_eq_t1 (τ_dΓ $Γ) $deqA))
+             (convert_T $Γ (inv_sort (τ_dΓ $Γ) $da2) (inv_eq_t2 (τ_dΓ $Γ) $deqA)))
+           (heq_conj
+             (heq_trans
+               (convert $Γ $dp1 (inv_eq_t1 (τ_dΓ $Γ) $deqp))
+               (heq_trans
+                 (τ_eq $Γ $deqp)
+                 (convertR $Γ (PCEmpty $Γ) (inv_eq_t2 (τ_dΓ $Γ) $deqp) $dp2)))
+             (convert_T $Γ (inv_sort (τ_dΓ $Γ) $dp1) (der_prop_type_eq (τ_Γ $Γ) $s $A1 $a1 $a1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) $da1 $da1))
+             (convert_T $Γ (inv_sort (τ_dΓ $Γ) $dp2) (der_prop_type_eq (τ_Γ $Γ) $s $A2 $a2 $a2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $da2 $da2))))
+         (trans_eq_as_eq
+           (transport
+             (convert_T $Γ (inv_sort (τ_dΓ $Γ) $dp1) (der_prop_type_eq (τ_Γ $Γ) $s $A1 $a1 $a1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) $da1 $da1))
+             (τ $Γ $dp1))
+           (eq_of_transport
+             (refl (τ_s $s) (τ_T $Γ (inv_eq_t1 (τ_dΓ $Γ) $deqA)) (transport (convert_T $Γ (inv_sort (τ_dΓ $Γ) $da1) (inv_eq_t1 (τ_dΓ $Γ) $deqA)) (τ $Γ $da1)))
+             (convert_T $Γ
+               (der_prop_type_eq (τ_Γ $Γ) $s $A1 $a1 $a1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) $da1 $da1)
+               (der_prop_type_eq (τ_Γ $Γ) $s $A1 $a1 $a1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) $da1 $da1))))
+         (trans_eq_as_eq
+           (transport
+             (convert_T $Γ (inv_sort (τ_dΓ $Γ) $dp2) (der_prop_type_eq (τ_Γ $Γ) $s $A2 $a2 $a2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $da2 $da2))
+             (τ $Γ $dp2))
+           (eq_of_transport
+             (refl (τ_s $s) (τ_T $Γ (inv_eq_t2 (τ_dΓ $Γ) $deqA)) (transport (convert_T $Γ (inv_sort (τ_dΓ $Γ) $da2) (inv_eq_t2 (τ_dΓ $Γ) $deqA)) (τ $Γ $da2)))
+             (convert_T $Γ
+               (der_prop_type_eq (τ_Γ $Γ) $s $A2 $a2 $a2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $da2 $da2)
+               (der_prop_type_eq (τ_Γ $Γ) $s $A2 $a2 $a2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $da2 $da2)))))
+       (heq_of_conversion $Γ
+         (der_uip (τ_Γ $Γ) $s $A2 $a2 $p2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $da2 $dp2)
+         (der_eq_symm _ _ _ _ _
+           (der_eq_cong_teq (τ_Γ $Γ) $s (ETT.teq $A1 $a1 $a1) (ETT.teq $A2 $a2 $a2) $p1 $p2 (ETT.trefl $A1 $a1) (ETT.trefl $A2 $a2)
+             (der_eq_cong_teq (τ_Γ $Γ) $s $A1 $A2 $a1 $a2 $a1 $a2 $deqA $deqa $deqa $da1 $da2 $da1 $da2)
+             $deqp (der_eq_cong_trefl (τ_Γ $Γ) $s $A1 $A2 $a1 $a2 $deqA $deqa $da1 $da2)
+             $dp1 $dp2 (der_refl (τ_Γ $Γ) $s $a1 $A1 (inv_eq_t1 (τ_dΓ $Γ) $deqA) $da1) (der_refl (τ_Γ $Γ) $s $a2 $A2 (inv_eq_t2 (τ_dΓ $Γ) $deqA) $da2))))
 ;
