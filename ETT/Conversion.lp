@@ -153,6 +153,30 @@ with convertR $Γ $H (der_refl _ $s $u $A $dA1 $du1) (der_refl _ $s $u $A $dA2 $
        (heq_conj (convertR $Γ $H $du1 $du2)
          (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $du1) $dA1)
          (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $du2) $dA2))
+with convertR $Γ $H (der_uip _ $s $A $a $p $dA1 $da1 $dp1) (der_uip _ $s $A $a $p $dA2 $da2 $dp2)
+  ↪ let dT1 ≔ der_prop_type_eq (τ_Γ (projΓ1 $H)) $s $A $a $a $dA1 $da1 $da1 in
+     let dT2 ≔ der_prop_type_eq (τ_Γ (projΓ2 $H)) $s $A $a $a $dA2 $da2 $da2 in
+     heq_conj
+       (cong_K
+           (convertR $Γ $H $dA1 $dA2)
+           (heq_conj
+             (convertR $Γ $H $da1 $da2)
+             (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $da1) $dA1)
+             (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $da2) $dA2))
+           (heq_conj
+             (convertR $Γ $H $dp1 $dp2)
+             (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $dp1) dT1)
+             (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $dp2) dT2)))
+       (trans_eq_as_eq
+         (transport (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $dp1) dT1) (τ (projΓ1 $H) $dp1))
+         (eq_of_transport
+           (refl (τ_s $s) (τ_T (projΓ1 $H) $dA1) (transport (convert_T (projΓ1 $H) (inv_sort (τ_dΓ (projΓ1 $H)) $da1) $dA1) (τ (projΓ1 $H) $da1)))
+           (convert_T (projΓ1 $H) dT1 dT1)))
+       (trans_eq_as_eq
+         (transport (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $dp2) dT2) (τ (projΓ2 $H) $dp2))
+         (eq_of_transport
+           (refl (τ_s $s) (τ_T (projΓ2 $H) $dA2) (transport (convert_T (projΓ2 $H) (inv_sort (τ_dΓ (projΓ2 $H)) $da2) $dA2) (τ (projΓ2 $H) $da2)))
+           (convert_T (projΓ2 $H) dT2 dT2)))
 
 // Type conversion
 with convertR $Γ $H (der_sort _ $s) (der_type_conv _ _ _ _ _ $dX $deq)
@@ -177,6 +201,8 @@ with convertR $Γ $H (der_π2 _ $s $s' $p $A $B $dA $dB $dp) (der_type_conv _ _ 
   ↪ convertTypeConversion $Γ $H (der_π2 _ $s $s' $p $A $B $dA $dB $dp) $dX $deq
 with convertR $Γ $H (der_refl _ $s $u $A $dA $du) (der_type_conv _ _ _ _ _ $dX $deq)
   ↪ convertTypeConversion $Γ $H (der_refl _ $s $u $A $dA $du) $dX $deq
+with convertR $Γ $H (der_uip _ $s $A $a $p $dA $da $dp) (der_type_conv _ _ _ _ _ $dX $deq)
+  ↪ convertTypeConversion $Γ $H (der_uip _ $s $A $a $p $dA $da $dp) $dX $deq
 // Symmetric cases
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_sort _ $s)
   ↪ convertTypeConversion' $Γ $H $dX (der_sort _ $s) $deq
@@ -200,4 +226,6 @@ with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_π2 _ $s $s' $p $A 
   ↪ convertTypeConversion' $Γ $H $dX (der_π2 _ $s $s' $p $A $B $dA $dB $dp) $deq
 with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_refl _ $s $u $A $dA $du)
   ↪ convertTypeConversion' $Γ $H $dX (der_refl _ $s $u $A $dA $du) $deq
+with convertR $Γ $H (der_type_conv _ _ _ _ _ $dX $deq) (der_uip _ $s $A $a $p $dA $da $dp)
+  ↪ convertTypeConversion' $Γ $H $dX (der_uip _ $s $A $a $p $dA $da $dp) $deq
 ;
