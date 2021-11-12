@@ -3,6 +3,7 @@ require open ETT.XAst;
 require open ETT.DeBruijn;
 require open ETT.XTyping;
 require open ETT.XLemmas;
+require open ETT.XCongruences;
 require ETT.main as M;
 require ETT.TranslationDefinition as Tr;
 require ETT.Inversions as I;
@@ -57,6 +58,41 @@ symbol dcong_tabs_body {Γ : Context} {s s' : Sort} {A B t1 t2 : Term}
                      (dt (pushΓ dA dΓ))
                      (dB (pushΓ dA dΓ)) (dB (pushΓ dA dΓ))
                      (I.inv_eq_t1 (pushΓ dA dΓ) (dt (pushΓ dA dΓ))) (I.inv_eq_t2 (pushΓ dA dΓ) (dt (pushΓ dA dΓ)));
+symbol dcong_tapp {Γ : Context} {s s' : Sort} {A1 A2 B1 B2 f1 f2 a1 a2 : Term}
+                  : der_context Γ
+                  → der_eq Γ (snext s) (tsort s) A1 A2
+                  → (der_context (Push A1 s Γ) → der_eq (Push A1 s Γ) (snext s') (tsort s') B1 B2)
+                  → der_eq Γ (smax s s') (tfun A1 B1) f1 f2
+                  → der_eq Γ s A1 a1 a2
+                  → der_eq Γ s' (apply1 B1 a1) (tapp A1 B1 f1 a1) (tapp A2 B2 f2 a2) ≔
+  λ dΓ deqA deqB deqf deqa,
+    der_eq_cong_tapp Γ s s' A1 A2 B1 B2 f1 f2 a1 a2
+                     deqA (deqB (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ)) deqf deqa
+                     (I.inv_eq_t1 (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ) (deqB (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ)))
+                     (convert_der (ECPush (EC0 dΓ) (I.inv_eq_t1 dΓ deqA) (I.inv_eq_t2 dΓ deqA) deqA)
+                                  (I.inv_eq_t2 (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ) (deqB (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ))))
+                     (I.inv_eq_t1 dΓ deqf)
+                     (der_type_conv Γ f2 (tfun A1 B1) (tfun A2 B2) (smax s s') (I.inv_eq_t2 dΓ deqf)
+                                    (der_eq_cong_tfun Γ s s' A1 A2 B1 B2
+                                       deqA (deqB (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ))
+                                       (I.inv_eq_t1 (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ) (deqB (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ)))
+                                       (convert_der (ECPush (EC0 dΓ) (I.inv_eq_t1 dΓ deqA) (I.inv_eq_t2 dΓ deqA) deqA)
+                                                    (I.inv_eq_t2 (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ) (deqB (pushΓ (I.inv_eq_t1 dΓ deqA) dΓ))))))
+                     (I.inv_eq_t1 dΓ deqa)
+                     (der_type_conv Γ a2 A1 A2 s (I.inv_eq_t2 dΓ deqa) deqA);
+symbol dcong_teq {Γ : Context} {s : Sort} {A1 A2 a1 a2 b1 b2 : Term}
+                 : der_context Γ
+                 → der_eq Γ (snext s) (tsort s) A1 A2
+                 → der_eq Γ s A1 a1 a2
+                 → der_eq Γ s A1 b1 b2
+                 → der_eq Γ (snext s) (tsort s) (teq A1 a1 b1) (teq A2 a2 b2) ≔
+  λ dΓ deqA deqa deqb,
+    der_eq_cong_teq Γ s A1 A2 a1 a2 b1 b2
+                    deqA deqa deqb
+                    (I.inv_eq_t1 dΓ deqa)
+                    (der_type_conv Γ a2 A1 A2 s (I.inv_eq_t2 dΓ deqa) deqA)
+                    (I.inv_eq_t1 dΓ deqb)
+                    (der_type_conv Γ b2 A1 A2 s (I.inv_eq_t2 dΓ deqb) deqA);
 symbol fromCong {Γ : Context} {t1 t2 T : Term} {s : Sort}
        : der_context Γ → der_eq Γ s T t1 t2 → der Γ (trefl T t1) (teq T t1 t2) s ≔
   λ dΓ deq,
@@ -139,6 +175,88 @@ symbol der_app_term (s s' : Sort) : der Empty (app_term s s') (app s s') _ ≔
 
 compute Tr.τ Tr.TEmpty (I.inv_sort der_context_empty (der_app_term s0 s0));
 compute Tr.τ Tr.TEmpty (der_app_term s0 s0);
+
+// J
+symbol tJ (s s' : Sort) : Term ≔
+  tfun (tsort s) // A : U s
+  (tfun (var 0) // x : A
+  (tfun (tfun (var 1) (tfun (teq (var 2) (var 1) (var 0)) (tsort s'))) // P : Π(y : A), x = y → U s'
+  (tfun (tapp (teq (var 2) (var 1) (var 1)) (tsort s') (tapp (var 2) (tfun (teq (var 3) (var 2) (var 0)) (tsort s')) (var 0) (var 1)) (trefl (var 2) (var 1))) // w : P x (refl x)
+  (tfun (var 3) // y : A
+  (tfun (teq (var 4) (var 3) (var 0)) // p : x = y
+  (tapp (teq (var 5) (var 4) (var 1)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 1)) (var 0))))))); // P y p
+symbol tJ_term (s s' : Sort) : Term ≔
+  tabs (tsort s)
+    (tfun (var 0) // x : A
+    (tfun (tfun (var 1) (tfun (teq (var 2) (var 1) (var 0)) (tsort s'))) // P : Π(y : A), x = y → U s'
+    (tfun (tapp (teq (var 2) (var 1) (var 1)) (tsort s') (tapp (var 2) (tfun (teq (var 3) (var 2) (var 0)) (tsort s')) (var 0) (var 1)) (trefl (var 2) (var 1))) // w : P x (refl x)
+    (tfun (var 3) // y : A
+    (tfun (teq (var 4) (var 3) (var 0)) // p : x = y
+    (tapp (teq (var 5) (var 4) (var 1)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 1)) (var 0)))))))
+  (tabs (var 0)
+    (tfun (tfun (var 1) (tfun (teq (var 2) (var 1) (var 0)) (tsort s'))) // P : Π(y : A), x = y → U s'
+    (tfun (tapp (teq (var 2) (var 1) (var 1)) (tsort s') (tapp (var 2) (tfun (teq (var 3) (var 2) (var 0)) (tsort s')) (var 0) (var 1)) (trefl (var 2) (var 1))) // w : P x (refl x)
+    (tfun (var 3) // y : A
+    (tfun (teq (var 4) (var 3) (var 0)) // p : x = y
+    (tapp (teq (var 5) (var 4) (var 1)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 1)) (var 0))))))
+  (tabs (tfun (var 1) (tfun (teq (var 2) (var 1) (var 0)) (tsort s')))
+    (tfun (tapp (teq (var 2) (var 1) (var 1)) (tsort s') (tapp (var 2) (tfun (teq (var 3) (var 2) (var 0)) (tsort s')) (var 0) (var 1)) (trefl (var 2) (var 1))) // w : P x (refl x)
+    (tfun (var 3) // y : A
+    (tfun (teq (var 4) (var 3) (var 0)) // p : x = y
+    (tapp (teq (var 5) (var 4) (var 1)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 1)) (var 0)))))
+  (tabs (tapp (teq (var 2) (var 1) (var 1)) (tsort s') (tapp (var 2) (tfun (teq (var 3) (var 2) (var 0)) (tsort s')) (var 0) (var 1)) (trefl (var 2) (var 1)))
+    (tfun (var 3) // y : A
+    (tfun (teq (var 4) (var 3) (var 0)) // p : x = y
+    (tapp (teq (var 5) (var 4) (var 1)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 1)) (var 0))))
+  (tabs (var 3)
+    (tfun (teq (var 4) (var 3) (var 0)) // p : x = y
+    (tapp (teq (var 5) (var 4) (var 1)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 1)) (var 0)))
+  (tabs (teq (var 4) (var 3) (var 0))
+    (tapp (teq (var 5) (var 4) (var 1)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 1)) (var 0))
+  (var 2))))));
+symbol der_tJ_term (s s' : Sort) : der Empty (tJ_term s s') (tJ s s') _ ≔
+  dabs der_context_empty (der_sort _ s)
+  (λ dΓ, dabs dΓ (der_var (getΓ dΓ) 0)
+  (λ dΓ, dabs dΓ (dprod dΓ (der_var (getΓ dΓ) 1) (λ dΓ, dprod dΓ (der_prop_type_eq _ s _ _ _ (der_var (getΓ dΓ) 2) (der_var (getΓ dΓ) 1) (der_var (getΓ dΓ) 0)) (λ dΓ, der_sort (getΓ dΓ) s')))
+  (λ dΓ, dabs dΓ (dapp dΓ
+                       (der_prop_type_eq _ s _ _ _ (der_var (getΓ dΓ) 2) (der_var (getΓ dΓ) 1) (der_var (getΓ dΓ) 1))
+                       (λ dΓ, der_sort (getΓ dΓ) s')
+                       (dapp dΓ
+                             (der_var (getΓ dΓ) 2)
+                             (λ dΓ, dprod dΓ (der_prop_type_eq _ s _ _ _ (der_var (getΓ dΓ) 3) (der_var (getΓ dΓ) 2) (der_var (getΓ dΓ) 0)) (λ dΓ, der_sort (getΓ dΓ) s'))
+                             (der_var (getΓ dΓ) 0)
+                             (der_var (getΓ dΓ) 1))
+                       (der_refl _ s _ _ (der_var (getΓ dΓ) 2) (der_var (getΓ dΓ) 1)))
+  (λ dΓ, dabs dΓ (der_var (getΓ dΓ) 3)
+  (λ dΓ, dabs dΓ (der_prop_type_eq _ s _ _ _ (der_var (getΓ dΓ) 4) (der_var (getΓ dΓ) 3) (der_var (getΓ dΓ) 0))
+  (λ dΓ, der_type_conv _ _ _ _ s' (der_var (getΓ dΓ) 2)
+    (dcong_tapp dΓ
+      (dcong_teq dΓ
+        (der_eq_refl (getΓ dΓ) _ _ _ (der_var (getΓ dΓ) 5))
+        (der_eq_refl (getΓ dΓ) _ _ _ (der_var (getΓ dΓ) 4))
+        (der_eq_lift (getΓ dΓ) s (var 0) (var 4) (var 1) (var 5) (der_var (getΓ dΓ) 0)))
+      (λ dΓ, der_eq_refl (getΓ dΓ) _ _ _ (der_sort (getΓ dΓ) s'))
+      (dcong_tapp dΓ
+        (der_eq_refl (getΓ dΓ) _ _ _ (der_var (getΓ dΓ) 5))
+        (λ dΓ, der_eq_refl (getΓ dΓ) _ _ _
+          (dprod dΓ
+            (der_prop_type_eq _ s _ _ _ (der_var (getΓ dΓ) 6) (der_var (getΓ dΓ) 5) (der_var (getΓ dΓ) 0))
+            (λ dΓ, der_sort (getΓ dΓ) s')))
+        (der_eq_refl (getΓ dΓ) _ _ _ (der_var (getΓ dΓ) 3))
+        (der_eq_lift (getΓ dΓ) s (var 0) (var 4) (var 1) (var 5) (der_var (getΓ dΓ) 0)))
+      (der_eq_symm _ _ _ _ _ (der_eq_lift _ _ _ _ _ _
+        (der_K (getΓ dΓ) s _ _ _
+          (der_var (getΓ dΓ) 5)
+          (der_var (getΓ dΓ) 4)
+          (der_type_conv _ _ _ _ s (der_var (getΓ dΓ) 0)
+            (der_eq_symm _ _ _ _ _
+              (dcong_teq dΓ
+                (der_eq_refl (getΓ dΓ) _ _ _ (der_var (getΓ dΓ) 5))
+                (der_eq_refl (getΓ dΓ) _ _ _ (der_var (getΓ dΓ) 4))
+                (der_eq_lift (getΓ dΓ) s (var 0) (var 4) (var 1) (var 5) (der_var (getΓ dΓ) 0)))))))))))))));
+
+// Takes too long to compute
+// compute Tr.τ Tr.TEmpty (I.inv_sort der_context_empty (der_tJ_term s0 s0));
 
 // Eta equality
 symbol eta_eq (s s' : Sort) : Term ≔
