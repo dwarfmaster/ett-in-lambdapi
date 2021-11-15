@@ -230,6 +230,11 @@ symbol der_tJ_term (s s' : Sort) : der Empty (tJ_term s s') (tJ s s') _ ≔
   (λ dΓ, dabs dΓ (der_var (getΓ dΓ) 3)
   (λ dΓ, dabs dΓ (der_prop_type_eq _ s _ _ _ (der_var (getΓ dΓ) 4) (der_var (getΓ dΓ) 3) (der_var (getΓ dΓ) 0))
   (λ dΓ, der_type_conv _ _ _ _ s' (der_var (getΓ dΓ) 2)
+    // (magic_der_eq' dΓ
+    //   (tapp (teq (var 5) (var 4) (var 4)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 4)) (trefl (var 5) (var 4)))
+    //   (tapp (teq (var 5) (var 4) (var 1)) (tsort s') (tapp (var 5) (tfun (teq (var 6) (var 5) (var 0)) (tsort s')) (var 3) (var 1)) (var 0))
+    //   (tsort s')
+    //   (snext s'))))))));
     (dcong_tapp dΓ
       (dcong_teq dΓ
         (der_eq_refl (getΓ dΓ) _ _ _ (der_var (getΓ dΓ) 5))
